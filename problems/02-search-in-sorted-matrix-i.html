@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02 · Search In Sorted Matrix I</title>
+<meta name="description" content="Round 3 跟读卡：七步流程 + 中英对照口述稿，可逐级遮挡。">
+<meta name="color-scheme" content="light dark">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --warn:#A8412A; --warn-soft:#F7E7E2;
+  --amber:#8A6A1F; --amber-soft:#F5EDD8;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --warn:#E08A70; --warn-soft:#33201B;
+    --amber:#D9B45E; --amber-soft:#2C2617;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --warn:#E08A70; --warn-soft:#33201B;
+  --amber:#D9B45E; --amber-soft:#2C2617;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--f-zh);font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:940px;margin:0 auto;padding:44px 24px 96px}
+
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--rule)}
+.crumb{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{
+  font-family:var(--f-head);font-weight:700;font-size:clamp(27px,4.6vw,37px);
+  line-height:1.1;letter-spacing:-.02em;margin:0;text-wrap:balance;
+}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* ---- 七步导轨 ---- */
+.rail-wrap{margin-top:30px}
+.rail-head{
+  display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap;
+}
+.rail-head .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.rail-head .score{font-family:var(--f-mono);font-size:13px;color:var(--warn);font-weight:600;font-variant-numeric:tabular-nums}
+.rail{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.st{
+  background:var(--card);border:1px solid var(--rule);border-radius:7px;
+  padding:11px 10px 10px;display:flex;flex-direction:column;gap:5px;min-width:0;
+  border-top:3px solid var(--rule);
+}
+.st .n{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--muted)}
+.st .nm{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--ink-2)}
+.st .mk{font-family:var(--f-mono);font-size:14px;line-height:1;margin-top:2px}
+.st.ok{border-top-color:var(--speak);background:var(--speak-soft)}
+.st.ok .nm{color:var(--ink)} .st.ok .mk{color:var(--speak)} .st.ok .n{color:var(--speak)}
+.st.no{border-top-color:var(--warn);background:var(--warn-soft)}
+.st.no .nm{color:var(--ink)} .st.no .mk{color:var(--warn)} .st.no .n{color:var(--warn)}
+.st.half{border-top-color:var(--amber);background:var(--amber-soft)}
+.st.half .nm{color:var(--ink)} .st.half .mk{color:var(--amber)} .st.half .n{color:var(--amber)}
+.rail-note{margin:12px 0 0;font-size:12.5px;color:var(--muted)}
+.rail-note b{color:var(--ink-2);font-weight:600}
+
+/* ---- 四个点说明 ---- */
+.pts{
+  margin-top:20px;background:var(--card);border:1px solid var(--rule);
+  border-radius:9px;padding:16px 19px;box-shadow:var(--shadow);
+}
+.pts h4{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 11px}
+.pts div{display:grid;grid-template-columns:132px 1fr;gap:14px;padding:6px 0;font-size:13px;color:var(--ink-2);align-items:baseline}
+.pts div .p{font-family:var(--f-mono);font-size:11.5px;color:var(--speak);font-weight:600}
+.pts div b{color:var(--ink);font-weight:600}
+
+/* ---- cards ---- */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
+.cd{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;box-shadow:var(--shadow)}
+.cd h2{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
+.cd.die{border-left:3px solid var(--warn)}
+.cd.die h2{color:var(--warn)}
+.cd.gold{border-left:3px solid var(--speak);background:var(--speak-soft)}
+.cd.gold h2{color:var(--speak)}
+.cd p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-2)}
+.cd p + p{margin-top:9px}
+.cd p strong{color:var(--ink);font-weight:600}
+.cd .quote{font-family:var(--f-say);font-size:17px;line-height:1.45;color:var(--ink);margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--rule-soft);padding:1px 5px;border-radius:3px}
+
+/* ---- drill bar ---- */
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0 6px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.03em;background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+/* ---- step groups ---- */
+.grp{margin-top:26px}
+.grp:first-of-type{margin-top:10px}
+.ghead{
+  display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;
+  padding:9px 13px;border-radius:7px 7px 0 0;border-left:3px solid var(--rule);
+  background:var(--rule-soft);
+}
+.ghead .gn{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--muted);font-weight:600}
+.ghead .gt{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--ink)}
+.ghead .gs{font-family:var(--f-mono);font-size:11.5px;margin-left:auto}
+.ghead .gd{font-size:12px;color:var(--muted);width:100%;line-height:1.5}
+.grp.ok .ghead{border-left-color:var(--speak);background:var(--speak-soft)}
+.grp.ok .ghead .gn,.grp.ok .ghead .gs{color:var(--speak)}
+.grp.no .ghead{border-left-color:var(--warn);background:var(--warn-soft)}
+.grp.no .ghead .gn,.grp.no .ghead .gs{color:var(--warn)}
+.grp.half .ghead{border-left-color:var(--amber);background:var(--amber-soft)}
+.grp.half .ghead .gn,.grp.half .ghead .gs{color:var(--amber)}
+
+.ln{
+  display:grid;grid-template-columns:118px 1fr 1.32fr;gap:0 20px;
+  padding:15px 13px;border-bottom:1px solid var(--rule-soft);align-items:start;
+  border-left:3px solid transparent;
+}
+.grp.ok .ln{border-left-color:var(--speak-soft)}
+.grp.no .ln{border-left-color:var(--warn-soft)}
+.grp.half .ln{border-left-color:var(--amber-soft)}
+.when{font-family:var(--f-mono);font-size:11px;color:var(--muted);letter-spacing:-.01em;padding-top:3px;font-variant-numeric:tabular-nums}
+.pt{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--speak);background:var(--speak-soft);border-radius:3px;padding:1px 5px;margin-top:5px}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.zh strong{color:var(--ink);font-weight:600}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.48;color:var(--ink)}
+.en strong{font-weight:600;color:var(--speak)}
+
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){color:transparent;background:var(--rule-soft);min-height:1.5em;user-select:none}
+:root.m-en .en.veil:not(.show) strong,
+:root.m-all .en.veil:not(.show) strong,
+:root.m-all .zh.veil:not(.show) strong{color:transparent}
+:root.m-en .en.veil:not(.show):hover,
+:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+h3{font-family:var(--f-head);font-weight:600;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:52px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.four{display:flex;flex-direction:column;gap:0}
+.four div{display:grid;grid-template-columns:1fr 1.35fr;gap:20px;padding:12px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.four .a{font-size:13.5px;color:var(--ink-2)}
+.four .b{font-family:var(--f-say);font-size:15px;color:var(--ink)}
+.four .b strong{color:var(--speak);font-weight:600}
+
+pre{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;overflow-x:auto;box-shadow:var(--shadow);font-family:var(--f-mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:0}
+pre .c{color:var(--muted)}
+pre .k{color:var(--speak);font-weight:500}
+pre .fix{color:var(--warn);font-weight:600}
+
+ol.take{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:14px}
+ol.take li{counter-increment:t;position:relative;padding-left:34px;font-size:14px;color:var(--ink-2);line-height:1.6}
+ol.take li::before{content:counter(t);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--speak-soft);color:var(--speak);font-family:var(--f-mono);font-size:11px;font-weight:600;display:grid;place-items:center}
+ol.take strong{color:var(--ink);font-weight:600}
+
+.won{display:flex;flex-direction:column;gap:10px}
+.won div{font-size:13.5px;color:var(--ink-2);padding-left:24px;position:relative}
+.won div::before{content:"✓";position:absolute;left:0;color:var(--speak);font-weight:700}
+.won strong{color:var(--ink);font-weight:600}
+
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:820px){
+  .rail{grid-template-columns:repeat(4,1fr)}
+}
+@media (max-width:760px){
+  .wrap{padding:30px 17px 72px}
+  .cards{grid-template-columns:1fr}
+  .ln{grid-template-columns:1fr;gap:7px}
+  .when{padding-top:0}
+  .four div,.pts div{grid-template-columns:1fr;gap:5px}
+  .hint{margin-left:0;width:100%}
+  .ghead .gs{margin-left:0}
+}
+@media (max-width:460px){ .rail{grid-template-columns:repeat(2,1fr)} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:11pt}
+  .wrap{max-width:none;padding:0}
+  .ln,.cd,pre,.grp,.st{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb">
+      <a href="../">alg-round3</a><span>/</span><span>problems</span><span>/</span><span>02</span>
+    </div>
+    <h1>Search In Sorted Matrix I</h1>
+    <div class="meta">LaiCode 267 · 用时 12:19 · Accepted 14/14（但代码有测试没抓到的 bug）</div>
+  </header>
+
+  <section class="rail-wrap">
+    <div class="rail-head">
+      <span class="t">这次做到了几步</span>
+      <span class="score">2.5 / 7</span>
+    </div>
+    <div class="rail">
+      <div class="st ok"><span class="n">STEP 1</span><span class="nm">开场</span><span class="mk">✓</span></div>
+      <div class="st no"><span class="n">STEP 2</span><span class="nm">复述</span><span class="mk">✗</span></div>
+      <div class="st no"><span class="n">STEP 3</span><span class="nm">提问</span><span class="mk">✗</span></div>
+      <div class="st ok"><span class="n">STEP 4</span><span class="nm">归约</span><span class="mk">✓</span></div>
+      <div class="st half"><span class="n">STEP 5</span><span class="nm">边界</span><span class="mk">△</span></div>
+      <div class="st no"><span class="n">STEP 6</span><span class="nm">复杂度·递球</span><span class="mk">✗</span></div>
+      <div class="st no"><span class="n">STEP 7</span><span class="nm">测试</span><span class="mk">✗</span></div>
+    </div>
+    <p class="rail-note">STEP 5 记半分：<b>嘴上说了「or its length is zero」，代码里没写</b>。第 01 题是 4 / 7。</p>
+  </section>
+
+  <section class="pts">
+    <h4>① ② ③ ④ 这四个点不是四步，是四条信息 —— 它们分布在这些步骤里</h4>
+    <div><span class="p">① Return</span><span>要返回什么、什么类型。<b>出现在 STEP 2 复述里。</b></span></div>
+    <div><span class="p">② Constraint</span><span>约束的<b>原文</b>在 STEP 2 里；但它真正算完成，是在 STEP 4 你把它<b>转成一个结论</b>的那一刻。照读题面不算。</span></div>
+    <div><span class="p">③ Reduction</span><span>归约到模型，<b>必须叫出模型全名</b>。在 STEP 4。</span></div>
+    <div><span class="p">④ Edge case</span><span>写码前主动提，<b>要给具体例子</b>。在 STEP 5。</span></div>
+  </section>
+
+  <section class="cards">
+    <div class="cd die">
+      <h2>死因 · 结构崩了</h2>
+      <p>讲完 STEP 4 直接开写：<strong>复述没做、提问 0 个、复杂度没报、递球没有、例子一个没走</strong>。</p>
+      <p>代价是真实的：<code>matrix.length == 0</code> 没判，<code>matrix[0]</code> 会抛异常——而题目写着「N &gt;= 0」。你<strong>嘴上说了这个边界</strong>，<strong>手上没写</strong>；没走例子，所以说的和写的对不上也没发现。</p>
+      <p>01 题是「讲错 → 写错」。这题是「<strong>讲对 → 写漏</strong>」。</p>
+    </div>
+    <div class="cd gold">
+      <h2>这道题的金句</h2>
+      <p class="quote">Row by row, the matrix is already one sorted sequence — so I can index into it as a flat array.</p>
+    </div>
+  </section>
+
+  <div class="bar">
+    <span class="lab">跟读</span>
+    <span class="seg">
+      <button type="button" data-m="none" aria-pressed="true">① 看着念</button>
+      <button type="button" data-m="en" aria-pressed="false">② 藏英文</button>
+      <button type="button" data-m="all" aria-pressed="false">③ 全盖住</button>
+    </span>
+    <span class="hint">遮住后点任意一格单独揭开</span>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="grp ok">
+    <div class="ghead">
+      <span class="gn">STEP 1</span><span class="gt">开场 · 申请沉默</span><span class="gs">✓ 做到了</span>
+      <span class="gd">没有这句，接下来的沉默在他眼里是「卡住了」；有了这句，同样的沉默是「在读题」。</span>
+    </div>
+    <div class="ln">
+      <div class="when">0:00</div>
+      <div class="zh veil">我先通读一遍，会安静一两分钟</div>
+      <div class="en veil">Let me read through this once — I'll be quiet for a minute or two.</div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="grp no">
+    <div class="ghead">
+      <span class="gn">STEP 2</span><span class="gt">复述 · 装着 ① 和 ②</span><span class="gs">✗ 没做</span>
+      <span class="gd">用自己的话，不是念题。它会当场暴露你读反了哪个限定词——他会打断你纠正，这是白捡的一次校验。本周要盯的 <code>we're given</code> 就在这一步，这步没做，那条练习就是空跑的。</span>
+    </div>
+    <div class="ln">
+      <div class="when">1:45<span class="pt">① ②</span></div>
+      <div class="zh veil">给一个二维整数矩阵，每行升序，且下一行第一个元素 ≥ 上一行最后一个元素。返回目标的行列位置，找不到返回 {−1,−1}</div>
+      <div class="en veil">So, to make sure I understand — <strong>we're given</strong> a 2D integer matrix where each row is <strong>sorted in</strong> ascending order, and the first element of each row is greater than or equal to the last element of the previous row. We need to <strong>return the target's position as a row-column pair</strong>, or {−1, −1} if it isn't there.</div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="grp no">
+    <div class="ghead">
+      <span class="gn">STEP 3</span><span class="gt">提问 · 2–3 个</span><span class="gs">✗ 0 个</span>
+      <span class="gd">只问<b>会改变代码</b>的问题。A 类（只影响几行实现）带假设问；B 类（决定整个模型）必须真问，然后停下来等答案。</span>
+    </div>
+    <div class="ln">
+      <div class="when">2:15 ①</div>
+      <div class="zh veil"><strong>B 类 · 真问</strong>　会有重复值吗？行边界写的是「大于<strong>或等于</strong>」，所以如果目标出现多次，返回任意位置可以吗</div>
+      <div class="en veil">Can the matrix contain duplicate values? The row boundary says greater than <strong>or equal to</strong>, so if the target appears more than once, is any position fine?</div>
+    </div>
+    <div class="ln">
+      <div class="when">2:15 ②</div>
+      <div class="zh veil"><strong>A 类 · 带假设</strong>　题目写了 N 和 M 都可以是 0，所以我假设空矩阵返回 {−1,−1}——对吗？我问是因为它决定我开头的守卫</div>
+      <div class="en veil">Since the constraints say N and M can both be zero, <strong>I'll assume</strong> an empty matrix returns {−1, −1} — is that fair? I'm asking because it changes my guard at the top.</div>
+    </div>
+    <div class="ln">
+      <div class="when">2:15 ③</div>
+      <div class="zh veil"><strong>A 类 · 带假设</strong>　m 乘 n 大概能到多大？如果接近 int 上限，扁平下标 m×n−1 本身就会溢出</div>
+      <div class="en veil">Roughly how large can m times n get? I'm asking because if it approaches the max int value, the flat index m × n − 1 would <strong>overflow</strong> on its own.</div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="grp ok">
+    <div class="ghead">
+      <span class="gn">STEP 4</span><span class="gt">归约 · ② 转结论 + ③ 叫出模型名</span><span class="gs">✓ 全场最好的一段</span>
+      <span class="gd">你说完整了「每行升序 + 行间衔接 → 所以整体有序 → 所以能二分」这条链子。这是<b>推导</b>，不是断言——评分上比「排序了所以用二分」高一档。</span>
+    </div>
+    <div class="ln">
+      <div class="when">3:30<span class="pt">② ③</span></div>
+      <div class="zh veil">每行升序，而且每行开头 ≥ 上一行结尾，所以整个矩阵<strong>按行读下来本身就是一个有序序列</strong>，可以直接二分</div>
+      <div class="en veil">Since every row is sorted, and each row starts at a value greater than or equal to where the previous row ended, <strong>reading the matrix row by row gives me one non-decreasing sequence</strong>. So I can <strong>binary search</strong> it directly.</div>
+    </div>
+    <div class="ln">
+      <div class="when">4:00 映射</div>
+      <div class="zh veil">我把它<strong>当成</strong>长度 m×n 的一维数组来索引——不是真的展开，所以不占额外空间。行 = 下标 / 列数，列 = 下标 <strong>取模</strong> 列数</div>
+      <div class="en veil">I'll <strong>treat it as</strong> a flat array of length m × n — I'm not actually flattening it, so no extra space. The row is the index <strong>divided by</strong> the number of columns, and the column is the index <strong>modulo</strong> the number of columns.</div>
+    </div>
+    <div class="ln">
+      <div class="when">4:30 不变量</div>
+      <div class="zh veil">目标如果存在，它的扁平下标一定在 [left, right] 里；区间空了才停</div>
+      <div class="en veil">The <strong>invariant</strong> is: if the target exists, its flat index is always inside [left, right]. The loop runs <strong>while left &lt;= right</strong>, and exits when the range is empty.</div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="grp half">
+    <div class="ghead">
+      <span class="gn">STEP 5</span><span class="gt">边界 · ④ Edge case</span><span class="gs">△ 说了没写</span>
+      <span class="gd">这一步你嘴上做到了，代码没跟上。<b>说完边界，手指要在代码里指一遍。</b></span>
+    </div>
+    <div class="ln">
+      <div class="when">5:30<span class="pt">④</span></div>
+      <div class="zh veil">开写前两个守卫：矩阵可能是 null，也可能是 <strong>0 行</strong>——0 行的话 <code>matrix[0]</code> 本身就会抛异常。所以三个条件都要判</div>
+      <div class="en veil">Two guards before I start: the matrix can be null, and it can have <strong>zero rows</strong> — in which case <code>matrix[0]</code> would throw on its own. So I check null, zero rows, and zero columns.</div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="grp no">
+    <div class="ghead">
+      <span class="gn">STEP 6</span><span class="gt">复杂度 · 递球</span><span class="gs">✗ 没做</span>
+      <span class="gd">递球 = 说完方案主动把决定权交回去，然后<b>停下来等他回答</b>。全套流程里性价比最高的 5 秒：方向纠错的最后机会，而且评分表上单独有一栏。</span>
+    </div>
+    <div class="ln">
+      <div class="when">6:00</div>
+      <div class="zh veil">时间 O(log(m×n))，空间 O(1)——我没有展开矩阵，只是换个方式索引。开始写之前你觉得可以吗</div>
+      <div class="en veil">Time is O(log(m × n)), space is O(1) — I'm not flattening the matrix, just indexing into it differently. <strong>Does that sound reasonable before I start coding?</strong></div>
+    </div>
+  </div>
+
+  <!-- 写码 -->
+  <div class="grp">
+    <div class="ghead">
+      <span class="gn">写码中</span><span class="gt">只说意图，不念语法</span><span class="gs">不计入七步</span>
+      <span class="gd">每 3–5 分钟一句就够。他看得懂代码，他让你讲是想看决策依据。</span>
+    </div>
+    <div class="ln">
+      <div class="when">8:00</div>
+      <div class="zh veil">中点这么算是为了防溢出</div>
+      <div class="en veil">I'm computing mid as left + (right − left) / 2 to avoid overflow.</div>
+    </div>
+    <div class="ln">
+      <div class="when">写码时</div>
+      <div class="zh veil">这两行把扁平下标映射回行和列</div>
+      <div class="en veil">These two lines <strong>map</strong> the flat index back to a row and a column.</div>
+    </div>
+    <div class="ln">
+      <div class="when">写码时</div>
+      <div class="zh veil">这个分支把左半边扔掉</div>
+      <div class="en veil">This branch <strong>discards the left half</strong>, so left = mid + 1.</div>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="grp no">
+    <div class="ghead">
+      <span class="gn">STEP 7</span><span class="gt">测试 · 自己走例子</span><span class="gs">✗ 连续第二题没做</span>
+      <span class="gd">面试里没有 run 按钮。四个例子各对应一条你前面 flag 过的，形成闭环。<b>例 ④ 就是今天那个 bug 的抓捕现场。</b></span>
+    </div>
+    <div class="ln">
+      <div class="when">25:00</div>
+      <div class="zh veil">我走几个例子验证一下</div>
+      <div class="en veil">Let me walk through a few cases.</div>
+    </div>
+    <div class="ln">
+      <div class="when">例 ① 命中</div>
+      <div class="zh veil">3×3 矩阵找 7：mid=4 →(1,1)=5 太小→ left=5；mid=6 →(2,0)=8 太大→ right=5；mid=5 →(1,2)=7，返回 {1,2}</div>
+      <div class="en veil">For the 3 <strong>by</strong> 3 example with target 7 — mid is 4, that's (1,1) which is 5, too small, so left becomes 5. Then mid is 6, that's (2,0) which is 8, too big. Then mid is 5, that's (1,2) which is 7 — we return {1, 2}.</div>
+    </div>
+    <div class="ln">
+      <div class="when">例 ② 找不到</div>
+      <div class="zh veil">找 6：left 越过 right，退出返回 {−1,−1}</div>
+      <div class="en veil">With target 6, left ends up past right, so we exit and return {−1, −1}.</div>
+    </div>
+    <div class="ln">
+      <div class="when">例 ③ 单元素</div>
+      <div class="zh veil">1×1 矩阵：left = right = 0，循环还得跑一次，返回 {0,0}</div>
+      <div class="en veil">For a 1 <strong>by</strong> 1 matrix, left equals right, so the loop still runs once and we return {0, 0}.</div>
+    </div>
+    <div class="ln">
+      <div class="when">例 ④ 空矩阵</div>
+      <div class="zh veil"><strong>这个 case 会抓到今天的 bug</strong>：0 行的矩阵，如果不先判 <code>matrix.length == 0</code>，<code>matrix[0]</code> 直接抛异常</div>
+      <div class="en veil">And a matrix with <strong>zero rows</strong> — <strong>this is the case my guard has to catch</strong>, because <code>matrix[0]</code> would throw before we ever reach the loop.</div>
+    </div>
+  </div>
+
+  <!-- 附加 -->
+  <div class="grp">
+    <div class="ghead">
+      <span class="gn">附加</span><span class="gt">追问 · 保命句</span><span class="gs">不计入七步</span>
+    </div>
+    <div class="ln">
+      <div class="when">33:00 追问</div>
+      <div class="zh veil">如果行之间不衔接（只保证每行升序、每列升序），扁平化就不成立了；那时候从右上角出发，往左或往下走，O(m+n)</div>
+      <div class="en veil">If the rows didn't chain like this — only each row and each column sorted — the flat-array trick breaks. Then I'd start from the <strong>top-right corner</strong> and move left or down, which is O(m + n).</div>
+    </div>
+    <div class="ln">
+      <div class="when">卡住时</div>
+      <div class="zh veil">让我想一下，我想把映射弄对</div>
+      <div class="en veil">Let me think for a second — I want to get the index mapping right.</div>
+    </div>
+  </div>
+
+  <h3>这次要改的说法</h3>
+  <div class="four">
+    <div><span class="a">运算符 <code>%</code>（你读成了 percentage）</span><span class="b">mid <strong>modulo</strong> n ／ mid <strong>mod</strong> n</span></div>
+    <div><span class="a">把二维当成一维来索引</span><span class="b"><strong>treat it as</strong> a flat array（不要说 reduce／flatten，听起来像真开了新数组）</span></div>
+    <div><span class="a">把下标映射回行列</span><span class="b"><strong>map</strong> the index back to a row and column（不要用 reflect）</span></div>
+    <div><span class="a">矩阵尺寸 vs 乘法</span><span class="b">尺寸用 <strong>by</strong>（an m <strong>by</strong> n matrix）；运算用 <strong>times</strong>（m <strong>times</strong> n minus one）</span></div>
+    <div><span class="a">m 是行数，n 是列数</span><span class="b">m is the <strong>number of rows</strong>, n is the <strong>number of columns</strong></span></div>
+    <div><span class="a">题目给了我们一个…（本周只盯这条）</span><span class="b"><strong>we're given</strong> a / an …</span></div>
+  </div>
+
+  <h3>代码 · 一处必须改</h3>
+<pre><span class="k">public int</span>[] search(<span class="k">int</span>[][] matrix, <span class="k">int</span> target) {
+  <span class="k">int</span>[] notFound = <span class="k">new int</span>[]{-1, -1};
+
+  <span class="k">if</span> (matrix == <span class="k">null</span> <span class="fix">|| matrix.length == 0</span>          <span class="c">// ← 你漏了这个，matrix[0] 会抛异常</span>
+      || matrix[0] == <span class="k">null</span> || matrix[0].length == 0) <span class="k">return</span> notFound;
+
+  <span class="k">int</span> m = matrix.length, n = matrix[0].length;
+  <span class="k">int</span> left = 0, right = m * n - 1;
+
+  <span class="k">while</span> (left &lt;= right) {                 <span class="c">// ✓ 这次说对了也写对了</span>
+    <span class="k">int</span> mid = left + (right - left) / 2;  <span class="c">// ✓ 主动说了防溢出</span>
+    <span class="k">int</span> i = mid / n, j = mid % n;         <span class="c">// map back: row = idx / n, col = idx mod n</span>
+
+    <span class="k">if</span> (matrix[i][j] == target) <span class="k">return new int</span>[]{i, j};
+    <span class="k">else if</span> (matrix[i][j] &lt; target) left = mid + 1;   <span class="c">// discard the left half</span>
+    <span class="k">else</span> right = mid - 1;                            <span class="c">// discard the right half</span>
+  }
+  <span class="k">return</span> notFound;
+}</pre>
+
+  <h3>这次确实进步了的</h3>
+  <div class="won">
+    <div><strong>while left &lt;= right 说对了。</strong> 01 题你把终止条件讲反并写反，这题一次就对。</div>
+    <div><strong>主动说了防溢出。</strong> 01 题是问了不用，这题用上了。</div>
+    <div><strong>用了 discard the left half</strong>，不是 shrink。</div>
+    <div><strong>STEP 4 是推导不是断言。</strong>那条链子说完整了，是全场最好的一段。</div>
+  </div>
+
+  <h3>下一题只带走三件事</h3>
+  <ol class="take">
+    <li><strong>七步一步都不能跳。</strong>这题跳了 2、3、6、7——内容讲得再好，评分表上那几栏是空的</li>
+    <li><strong>说完边界，手指要在代码里指一遍。</strong>你嘴上说了「length is zero」，代码里没有——这个差值只有 STEP 7 会暴露</li>
+    <li><code>%</code> 读 <strong>modulo</strong>，不读 percentage；犹豫时用<strong>停顿</strong>，不要发「呃」</li>
+  </ol>
+
+  <footer>
+    <span>ALG ROUND 3 · #02</span>
+    <span>本周只盯 we're given</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,
+      btns=document.querySelectorAll('.seg button'),
+      body=document.body;
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    body.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m ? 'true':'false');});
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){setMode(b.dataset.m);}); });
+  body.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))) v.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
