@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01 · Classical Binary Search</title>
+<meta name="description" content="Round 3 跟读卡：中英对照口述稿，可逐级遮挡。">
+<meta name="color-scheme" content="light dark">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --warn:#A8412A; --warn-soft:#F7E7E2;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --warn:#E08A70; --warn-soft:#33201B;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --warn:#E08A70; --warn-soft:#33201B;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--f-zh);font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:920px;margin:0 auto;padding:44px 24px 96px}
+
+/* header */
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--rule)}
+.crumb{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{
+  font-family:var(--f-head);font-weight:700;font-size:clamp(27px,4.6vw,37px);
+  line-height:1.1;letter-spacing:-.02em;margin:0;text-wrap:balance;
+}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* cards */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
+.cd{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;box-shadow:var(--shadow)}
+.cd h2{
+  font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;margin:0 0 10px;
+}
+.cd.die{border-left:3px solid var(--warn)}
+.cd.die h2{color:var(--warn)}
+.cd.gold{border-left:3px solid var(--speak);background:var(--speak-soft)}
+.cd.gold h2{color:var(--speak)}
+.cd p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-2)}
+.cd p strong{color:var(--ink);font-weight:600}
+.cd .quote{font-family:var(--f-say);font-size:17px;line-height:1.45;color:var(--ink);margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--rule-soft);padding:1px 5px;border-radius:3px}
+
+/* drill controls */
+.bar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin:34px 0 6px;padding-bottom:12px;border-bottom:1px solid var(--rule);
+}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{
+  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.03em;
+  background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;
+  transition:background .15s,color .15s;
+}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"],
+@media (prefers-color-scheme:dark){}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+/* script rows */
+.script{display:flex;flex-direction:column;margin-top:8px}
+.ln{
+  display:grid;grid-template-columns:118px 1fr 1.35fr;gap:0 20px;
+  padding:16px 0;border-bottom:1px solid var(--rule-soft);align-items:start;
+}
+.ln.key{background:linear-gradient(90deg,var(--speak-soft),transparent 62%);margin:0 -14px;padding:16px 14px;border-radius:6px}
+.when{
+  font-family:var(--f-mono);font-size:11px;color:var(--muted);
+  letter-spacing:-.01em;padding-top:3px;font-variant-numeric:tabular-nums;
+}
+.ln.key .when{color:var(--speak);font-weight:600}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.zh strong{color:var(--ink);font-weight:600}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.48;color:var(--ink)}
+.en strong{font-weight:600;color:var(--speak)}
+
+/* hide modes */
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){
+  color:transparent;background:var(--rule-soft);min-height:1.5em;
+  user-select:none;
+}
+:root.m-en .en.veil:not(.show) strong,
+:root.m-all .en.veil:not(.show) strong,
+:root.m-all .zh.veil:not(.show) strong{color:transparent}
+:root.m-en .en.veil:not(.show):hover,
+:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+/* memorize */
+h3{
+  font-family:var(--f-head);font-weight:600;font-size:12.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted);
+  margin:52px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule);
+}
+.four{display:flex;flex-direction:column;gap:0}
+.four div{
+  display:grid;grid-template-columns:1fr 1.35fr;gap:20px;
+  padding:12px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline;
+}
+.four .a{font-size:13.5px;color:var(--ink-2)}
+.four .b{font-family:var(--f-say);font-size:15px;color:var(--ink)}
+.four .b strong{color:var(--speak);font-weight:600}
+
+/* code */
+pre{
+  background:var(--card);border:1px solid var(--rule);border-radius:9px;
+  padding:18px 20px;overflow-x:auto;box-shadow:var(--shadow);
+  font-family:var(--f-mono);font-size:12.5px;line-height:1.7;color:var(--ink);
+  margin:0;
+}
+pre .c{color:var(--muted)}
+pre .k{color:var(--speak);font-weight:500}
+
+/* takeaways */
+ol.take{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:14px}
+ol.take li{
+  counter-increment:t;position:relative;padding-left:34px;
+  font-size:14px;color:var(--ink-2);line-height:1.6;
+}
+ol.take li::before{
+  content:counter(t);position:absolute;left:0;top:1px;
+  width:22px;height:22px;border-radius:50%;background:var(--speak-soft);color:var(--speak);
+  font-family:var(--f-mono);font-size:11px;font-weight:600;
+  display:grid;place-items:center;
+}
+ol.take strong{color:var(--ink);font-weight:600}
+
+footer{
+  margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted);
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+footer a{color:var(--muted)}
+
+@media (max-width:760px){
+  .wrap{padding:30px 17px 72px}
+  .cards{grid-template-columns:1fr}
+  .ln{grid-template-columns:1fr;gap:7px}
+  .when{padding-top:0}
+  .ln.key{background:var(--speak-soft)}
+  .four div{grid-template-columns:1fr;gap:5px}
+  .hint{margin-left:0;width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:11pt}
+  .wrap{max-width:none;padding:0}
+  .ln,.cd,pre{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb">
+      <a href="../README.md">alg-round3</a><span>/</span><span>problems</span><span>/</span><span>01</span>
+    </div>
+    <h1>Classical Binary Search</h1>
+    <div class="meta">LaiCode 14 · 用时 10:27 · Accepted 18/18（run 了两遍才过）</div>
+  </header>
+
+  <section class="cards">
+    <div class="cd die">
+      <h2>死因</h2>
+      <p>口述时把终止条件说成「left == right 时停」，代码就照着写成了 <code>while(left &lt; right)</code>。真正的终止是 <code>left &gt; right</code> —— <code>left == right</code> 时区间还剩一个元素，必须再查一次。<strong>讲错的模型直接变成了写错的代码。</strong></p>
+    </div>
+    <div class="cd gold">
+      <h2>这道题的金句</h2>
+      <p class="quote">The invariant is: if the target exists, its index is always inside [left, right].</p>
+    </div>
+  </section>
+
+  <div class="bar">
+    <span class="lab">跟读</span>
+    <span class="seg">
+      <button type="button" data-m="none" aria-pressed="true">① 看着念</button>
+      <button type="button" data-m="en" aria-pressed="false">② 藏英文</button>
+      <button type="button" data-m="all" aria-pressed="false">③ 全盖住</button>
+    </span>
+    <span class="hint">遮住之后点任意一格可以单独揭开</span>
+  </div>
+
+  <div class="script" id="script">
+
+    <div class="ln">
+      <div class="when">0:00 开场</div>
+      <div class="zh veil">我先通读一遍，会安静一两分钟</div>
+      <div class="en veil">Let me read through this once — I'll be quiet for a minute or two.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">1:45 复述</div>
+      <div class="zh veil">给一个升序整数数组和目标 T，返回<strong>任意一个</strong> A[i] == T 的下标，找不到返回 −1</div>
+      <div class="en veil">So, to make sure I understand — <strong>we're given</strong> an integer array <strong>sorted in</strong> ascending order and a target T, and we need to return <strong>any</strong> index i where A[i] == T, or −1 if the target isn't in the array.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">2:15 提问 ①</div>
+      <div class="zh veil">数组里会有重复值吗，还是严格递增</div>
+      <div class="en veil">Can the array contain duplicate <strong>values</strong>, or is it strictly increasing?</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">2:15 提问 ②</div>
+      <div class="zh veil">数组大概多大？如果接近 int 上限，我中点会写成 left+(right−left)/2 防溢出</div>
+      <div class="en veil">Roughly how large can the array be? I'm asking because if the length gets close to the max int value, I'll compute the midpoint as left + (right − left) / 2 to avoid <strong>overflow</strong>.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">2:15 提问 ③</div>
+      <div class="zh veil">null 或空数组应该返回什么，也是 −1 吗</div>
+      <div class="en veil">And what should I return for a null or empty array — is −1 right there as well?</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">3:30 归约</div>
+      <div class="zh veil">因为有序，比一下中点就知道目标只可能在哪一半，所以每步能扔掉一半</div>
+      <div class="en veil">Since the array is sorted, <strong>comparing the middle element with the target tells me which half the target can be in</strong>, so I can discard half the array on every step. That's binary search — O(log n).</div>
+    </div>
+
+    <div class="ln key">
+      <div class="when">4:30 不变量</div>
+      <div class="zh veil">目标如果存在，下标一定在 [left, right] 里；<strong>区间空了才停</strong></div>
+      <div class="en veil">The <strong>invariant</strong> is: if the target exists, its index is always inside [left, right]. The loop runs <strong>while left &lt;= right</strong>, and exits when left &gt; right — the range is empty and the target isn't there.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">5:30 边界</div>
+      <div class="zh veil">我要小心长度为 1 的数组，[0,0] 这个区间还得查一次，所以是 &lt;= 不是 &lt;</div>
+      <div class="en veil">The case I want to be careful about is an array of <strong>length 1</strong> — the range [0, 0] still has to be checked, which is exactly why the condition is left &lt;= right, not left &lt; right.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">6:00 复杂度 · 递球</div>
+      <div class="zh veil">时间 O(log n)，空间 O(1)，只要两个边界变量。开始写之前你觉得可以吗</div>
+      <div class="en veil">Time is O(log n), space is O(1) — just two boundary variables, <strong>no extra</strong> data structure. <strong>Does that sound reasonable before I start coding?</strong></div>
+    </div>
+
+    <div class="ln">
+      <div class="when">写码时</div>
+      <div class="zh veil">中点这么算是为了防溢出</div>
+      <div class="en veil">I'm computing the midpoint as left + (right − left) / 2 to avoid overflow.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">写码时</div>
+      <div class="zh veil">这个分支把左半边扔掉</div>
+      <div class="en veil">This branch <strong>discards the left half</strong>, so left = mid + 1.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">写码时</div>
+      <div class="zh veil">这是给 null 输入的防御</div>
+      <div class="en veil">And this is the guard for a null input.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">25:00 测试</div>
+      <div class="zh veil">我走几个例子验证一下</div>
+      <div class="en veil">Let me walk through a few cases.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">例 ① 命中</div>
+      <div class="zh veil">中点是 2，A[2] 是 3，返回 2</div>
+      <div class="en veil">[1,2,3,4,5] with T = 3 — mid is 2, A[2] is 3, so we return 2.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">例 ② 找不到</div>
+      <div class="zh veil">left 越过 right，退出，返回 −1</div>
+      <div class="en veil">T = 6 — left ends up past right, so we exit and return −1.</div>
+    </div>
+
+    <div class="ln key">
+      <div class="when">例 ③ 单元素</div>
+      <div class="zh veil">left 等于 right，循环还得跑一次，返回 0。<strong>这就是条件写成 &lt; 会挂的那个 case</strong></div>
+      <div class="en veil">[1] with T = 1 — left equals right, so the loop still runs once and we return 0. <strong>This is the case that breaks if the condition is left &lt; right.</strong></div>
+    </div>
+
+    <div class="ln">
+      <div class="when">例 ④ 空数组</div>
+      <div class="zh veil">根本进不去循环，自己就返回 −1，所以开头那个防御其实只为 null 存在</div>
+      <div class="en veil">An empty array never enters the loop, so it returns −1 on its own — the guard at the top is really only needed for null.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">33:00 追问</div>
+      <div class="zh veil">如果要找第一次出现的位置</div>
+      <div class="en veil">If you wanted the <strong>first</strong> occurrence instead, I'd keep searching to the left after a match rather than returning immediately — that's the <strong>lower-bound</strong> variant.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">卡住时</div>
+      <div class="zh veil">让我想一下，我想把边界弄对</div>
+      <div class="en veil">Let me think for a second — I want to get the boundary right.</div>
+    </div>
+
+    <div class="ln">
+      <div class="when">发现写错时</div>
+      <div class="zh veil">等一下，这个没处理长度为 1 的情况</div>
+      <div class="en veil">Actually, wait — that doesn't handle the length-one case. Let me fix that.</div>
+    </div>
+
+  </div>
+
+  <h3>这五个说法每题都会用到</h3>
+  <div class="four">
+    <div><span class="a">题目给了我们一个…</span><span class="b"><strong>we're given</strong> a / an …</span></div>
+    <div><span class="a">按升序排好的</span><span class="b">sorted <strong>in</strong> ascending order</span></div>
+    <div><span class="a">没有这样的下标</span><span class="b">there's <strong>no such index</strong></span></div>
+    <div><span class="a">不需要额外的数据结构</span><span class="b">we don't need <strong>any extra</strong> data structure</span></div>
+    <div><span class="a">二分查找（不是 two pointers）</span><span class="b"><strong>binary search</strong>, with two boundary pointers</span></div>
+  </div>
+
+  <h3>代码</h3>
+<pre><span class="k">public int</span> binarySearch(<span class="k">int</span>[] array, <span class="k">int</span> target) {
+  <span class="k">if</span> (array == <span class="k">null</span> || array.length == 0) <span class="k">return</span> -1;   <span class="c">// 严格说只有 null 需要它</span>
+  <span class="k">int</span> left = 0, right = array.length - 1;
+  <span class="k">while</span> (left &lt;= right) {                 <span class="c">// 不是 &lt;，left==right 时还剩一个元素要查</span>
+    <span class="k">int</span> mid = left + (right - left) / 2;  <span class="c">// 防溢出，正是你问的那个问题</span>
+    <span class="k">if</span> (array[mid] == target) <span class="k">return</span> mid;
+    <span class="k">else if</span> (array[mid] &lt; target) left = mid + 1;   <span class="c">// discard the left half</span>
+    <span class="k">else</span> right = mid - 1;                            <span class="c">// discard the right half</span>
+  }
+  <span class="k">return</span> -1;
+}</pre>
+
+  <h3>下一题只带走三件事</h3>
+  <ol class="take">
+    <li>讲终止条件永远讲<strong>不变量</strong>（区间里一定有答案，区间空了才停），不讲「什么时候停」</li>
+    <li>开口前先<strong>换名词</strong>，上一题的实义词一个都不许带进来</li>
+    <li>walkthrough 必跑 <strong>n = 1</strong>，这一个 case 今天本来就能替你抓到两个 bug</li>
+  </ol>
+
+  <footer>
+    <span>ALG ROUND 3 · #01</span>
+    <span>本周只盯 we're given</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,
+      btns=document.querySelectorAll('.seg button'),
+      script=document.getElementById('script');
+
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    script.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m ? 'true':'false');});
+  }
+
+  btns.forEach(function(b){
+    b.addEventListener('click',function(){setMode(b.dataset.m);});
+  });
+
+  script.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))){
+      v.classList.toggle('show');
+    }
+  });
+})();
+</script>
+</body>
+</html>
