@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>句式库</title>
+<meta name="description" content="按七步排的中英句式骨架，空槽每题现填。可逐级遮挡跟读。">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --slot:#A8412A; --slot-soft:#F7E7E2;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --slot:#E08A70; --slot-soft:#33201B;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --slot:#E08A70; --slot-soft:#33201B;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-zh);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:860px;margin:0 auto;padding:38px 22px 90px}
+
+.top{display:flex;flex-direction:column;gap:11px;padding-bottom:20px;border-bottom:1px solid var(--rule)}
+.crumb{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{font-family:var(--f-head);font-weight:700;font-size:clamp(26px,4.6vw,36px);line-height:1.08;letter-spacing:-.02em;margin:0}
+.dek{margin:0;max-width:58ch;color:var(--ink-2);font-size:14px;line-height:1.6}
+.dek b{color:var(--ink);font-weight:600}
+.dek .s{color:var(--slot);font-family:var(--f-mono);font-weight:600}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:22px 0 0;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{font-family:var(--f-mono);font-size:11.5px;background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+.grp{margin-top:24px}
+.ghead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:8px 12px;border-radius:7px 7px 0 0;border-left:3px solid var(--speak);background:var(--speak-soft)}
+.ghead .gn{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--speak);font-weight:600}
+.ghead .gt{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--ink)}
+.ghead .gd{font-size:11.5px;color:var(--muted);width:100%;line-height:1.5}
+.grp.aux .ghead{border-left-color:var(--rule);background:var(--rule-soft)}
+.grp.aux .ghead .gn{color:var(--muted)}
+
+.ln{display:grid;grid-template-columns:1fr 1.28fr;gap:0 20px;padding:13px 12px;border-bottom:1px solid var(--rule-soft);align-items:start;border-left:3px solid var(--speak-soft)}
+.grp.aux .ln{border-left-color:var(--rule-soft)}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.55}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.45;color:var(--ink)}
+.en b{font-weight:600;color:var(--speak)}
+i.s{
+  font-style:normal;font-family:var(--f-mono);font-size:.82em;font-weight:600;
+  color:var(--slot);background:var(--slot-soft);border-radius:3px;padding:0 5px;
+  letter-spacing:.04em;
+}
+.tg{
+  display:inline-block;font-family:var(--f-mono);font-size:9.5px;font-weight:600;
+  letter-spacing:.08em;color:var(--muted)!important;border:1px solid var(--rule);
+  border-radius:3px;padding:1px 5px;margin:0 0 5px;background:var(--paper)!important;
+}
+
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){color:transparent;background:var(--rule-soft);min-height:1.4em;user-select:none}
+:root.m-en .en.veil:not(.show) b,:root.m-en .en.veil:not(.show) i.s,
+:root.m-all .en.veil:not(.show) b,:root.m-all .en.veil:not(.show) i.s,
+:root.m-all .zh.veil:not(.show) i.s{color:transparent;background:transparent}
+:root.m-en .en.veil:not(.show):hover,:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+footer{margin-top:46px;padding-top:16px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:10.5px;letter-spacing:.07em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:700px){
+  .wrap{padding:26px 16px 70px}
+  .ln{grid-template-columns:1fr;gap:6px}
+  .hint{margin-left:0;width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:10.5pt}.wrap{padding:0;max-width:none}.grp{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb"><a href="./">alg-round3</a> · 句式库</div>
+    <h1>句式库</h1>
+    <p class="dek">按七步排。<b>红色的 <i class="s">___</i> 是每题要换的内容，其余是骨架</b>——骨架背熟，内容现编。<b>不要背整句</b>，背稿的人一被追问就崩。<br>没标记的是<b>通用骨架</b>，每题都用；标了 <span class="tg">二分 · 模版 B</span> 的是<b>题型专用的现成句</b>，碰到那类题原样搬，碰不到就跳过。</p>
+  </header>
+
+  <div class="bar">
+    <span class="lab">跟读</span>
+    <span class="seg">
+      <button type="button" data-m="none" aria-pressed="true">① 看着念</button>
+      <button type="button" data-m="en" aria-pressed="false">② 只看中文</button>
+      <button type="button" data-m="all" aria-pressed="false">③ 全盖住</button>
+    </span>
+    <span class="hint">遮住后点任意一格单独揭开</span>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 1</span><span class="gt">开场</span>
+      <span class="gd">先申请沉默，再读题。标注过的沉默是专业，没标注的沉默是无进展。</span></div>
+    <div class="ln"><div class="zh veil">我先通读一遍，会安静一两分钟。</div><div class="en veil">Let me read through this once — <b>I'll be quiet for a minute or two.</b></div></div>
+    <div class="ln"><div class="zh veil">还在读，这题铺垫挺长。</div><div class="en veil">Still reading — there's a lot of setup here.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 2</span><span class="gt">复述</span>
+      <span class="gd">用自己的话，不是念题。限定词（any / strictly / distinct）必须复述出来。</span></div>
+    <div class="ln"><div class="zh veil">为了确认我理解对了：题目给了我们 <i class="s">___</i>，我们需要返回 <i class="s">___</i>。</div><div class="en veil">So, to make sure I understand — <b>we're given</b> <i class="s">___</i>, and we need to <b>return</b> <i class="s">___</i>.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 3</span><span class="gt">提问 ×2–3</span>
+      <span class="gd">前三条是<b>真问句</b>，问完停下来等答案（B 类：决定模型）。后三条是<b>带假设</b>，说完可以直接往下走（A 类：只影响几行实现）。</span></div>
+    <div class="ln"><div class="zh veil">如果 <i class="s">___</i> 该怎么办？</div><div class="en veil">What should I do if <i class="s">___</i>?</div></div>
+    <div class="ln"><div class="zh veil">应该 <i class="s">___</i>，还是 <i class="s">___</i>？</div><div class="en veil">Should I <i class="s">___</i>, or <i class="s">___</i>?</div></div>
+    <div class="ln"><div class="zh veil">输入里会有 <i class="s">___</i> 吗？</div><div class="en veil">Can the input contain <i class="s">___</i>?</div></div>
+    <div class="ln"><div class="zh veil">我假设 <i class="s">___</i>，这样可以吗？</div><div class="en veil"><b>I'll assume</b> <i class="s">___</i> — <b>is that fair?</b></div></div>
+    <div class="ln"><div class="zh veil">既然题目写了 <i class="s">___</i>，那我就当作 <i class="s">___</i>。</div><div class="en veil">Since the constraints say <i class="s">___</i>, I'll take it that <i class="s">___</i>.</div></div>
+    <div class="ln"><div class="zh veil">我先处理 <i class="s">___</i>，有时间再回来做 <i class="s">___</i>。</div><div class="en veil">I'll <b>handle</b> <i class="s">___</i> <b>first and come back to</b> <i class="s">___</i> if we have time.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 4</span><span class="gt">归约 · 不变量</span>
+      <span class="gd">先推导再下结论，模型名要叫全。后三条是二分家族的通用骨架，讲终止条件永远讲<b>不变量</b>，不讲「什么时候停」。</span></div>
+    <div class="ln"><div class="zh veil">因为 <i class="s">___</i>，所以这归约成 <i class="s">___</i>。</div><div class="en veil">Since <i class="s">___</i>, <b>this reduces to</b> <i class="s">___</i>.</div></div>
+    <div class="ln"><div class="zh veil">不变量是：<i class="s">___</i> 一定在 <i class="s">___</i> 里。</div><div class="en veil">The <b>invariant</b> is: <i class="s">___</i> is always inside <i class="s">___</i>.</div></div>
+    <div class="ln"><div class="zh veil">循环在 <i class="s">___</i> 时继续，在 <i class="s">___</i> 时退出。</div><div class="en veil">The loop runs while <i class="s">___</i>, and exits when <i class="s">___</i>.</div></div>
+    <div class="ln"><div class="zh veil"><span class="tg">二分 · 模版 B</span><br>我移到 mid 本身，不越过它——mid 自己可能就是答案。</div><div class="en veil">I move left or right <b>to mid</b>, not past it — mid itself might be the answer.</div></div>
+    <div class="ln"><div class="zh veil"><span class="tg">二分 · 模版 B</span><br>既然我不丢弃 mid，循环就必须在 left 和 right 还相邻时停下。<br><span style="color:var(--muted);font-size:12px">这两句永远连着说——它们是同一个决定的两面。</span></div><div class="en veil">Since I never discard mid, the loop has to stop while left and right are still <b>adjacent</b>.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 5</span><span class="gt">边界</span>
+      <span class="gd">主动提，而且<b>要给具体例子</b>——只说「边界是返回 0」很虚。说完手指在代码里指一遍。</span></div>
+    <div class="ln"><div class="zh veil">写代码之前，说一个边界：<i class="s">___</i> 的时候返回 <i class="s">___</i>，不是 <i class="s">___</i>。</div><div class="en veil"><b>Before I code — one edge case:</b> <i class="s">___</i>, we return <i class="s">___</i>, not <i class="s">___</i>.</div></div>
+    <div class="ln"><div class="zh veil">具体来说，<i class="s">___</i> 这个例子的答案是 <i class="s">___</i>。</div><div class="en veil">Concretely, for <i class="s">___</i> the answer is <i class="s">___</i>.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 6</span><span class="gt">复杂度 · 递球</span>
+      <span class="gd">报完复杂度把球递回去，<b>然后停下来等他回答</b>。全套里性价比最高的 5 秒。</span></div>
+    <div class="ln"><div class="zh veil">时间 O(<i class="s">___</i>)，空间 O(<i class="s">___</i>)。</div><div class="en veil">Time is <b>big O of</b> <i class="s">___</i>, space is O(<i class="s">___</i>).</div></div>
+    <div class="ln"><div class="zh veil">开始写之前，你觉得这个方向可以吗？</div><div class="en veil"><b>Does that sound reasonable before I start coding?</b></div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 7</span><span class="gt">测试</span>
+      <span class="gd">面试里没有 run 按钮。四个例子：正常 / 找不到 / <b>n = 1</b> / 空输入。最后一条是加分句——说明你知道这个 case 为什么在这儿。</span></div>
+    <div class="ln"><div class="zh veil">我走几个例子验证一下。</div><div class="en veil"><b>Let me walk through a few cases.</b></div></div>
+    <div class="ln"><div class="zh veil"><i class="s">___</i> 这个例子，结果是 <i class="s">___</i>。</div><div class="en veil">For <i class="s">___</i>, we get <i class="s">___</i>.</div></div>
+    <div class="ln"><div class="zh veil">而这个 case，如果 <i class="s">___</i> 就会挂。</div><div class="en veil">And <b>this is the case that breaks if</b> <i class="s">___</i>.</div></div>
+  </div>
+
+  <div class="grp aux">
+    <div class="ghead"><span class="gn">写码中</span><span class="gt">只说意图，不念语法</span>
+      <span class="gd">每 3–5 分钟一句就够。他看得懂代码，他让你讲是想看决策依据。</span></div>
+    <div class="ln"><div class="zh veil"><span class="tg">二分</span><br>中点这么算是为了防溢出。</div><div class="en veil">I'm computing mid as left + (right − left) / 2 to avoid <b>overflow</b>.</div></div>
+    <div class="ln"><div class="zh veil"><span class="tg">二分</span><br>这个分支把左半边扔掉。</div><div class="en veil">This branch <b>discards the left half</b>.</div></div>
+    <div class="ln"><div class="zh veil">这是给 <i class="s">___</i> 的防御。</div><div class="en veil">And this is the guard for <i class="s">___</i>.</div></div>
+  </div>
+
+  <div class="grp aux">
+    <div class="ghead"><span class="gn">追问</span><span class="gt">Follow-up</span>
+      <span class="gd">答不出细节没关系——能说出方向就拿到这一问的分了。</span></div>
+    <div class="ln"><div class="zh veil">如果你想要的是 <i class="s">___</i>，我会 <i class="s">___</i>。</div><div class="en veil">If you wanted <i class="s">___</i> instead, I'd <i class="s">___</i>.</div></div>
+  </div>
+
+  <div class="grp aux">
+    <div class="ghead"><span class="gn">保命</span><span class="gt">卡住 · 自我纠正</span>
+      <span class="gd">沉默是面试里最贵的东西。自我纠正是<b>加分项</b>——所以不要道歉，直接改。</span></div>
+    <div class="ln"><div class="zh veil">让我想一下，我想把 <i class="s">___</i> 弄对。</div><div class="en veil">Let me think for a second — I want to get <i class="s">___</i> right.</div></div>
+    <div class="ln"><div class="zh veil">让我倒回去一下——我想先走一个例子。</div><div class="en veil"><b>Actually, let me back up</b> — I want to walk through an example first.</div></div>
+    <div class="ln"><div class="zh veil">等等，这个没处理 <i class="s">___</i> 的情况，我改一下。</div><div class="en veil"><b>Actually, wait</b> — that doesn't handle <i class="s">___</i>. Let me fix that.</div></div>
+    <div class="ln"><div class="zh veil">我还没看到最优解，先从暴力开始找冗余。</div><div class="en veil">I'm not seeing the optimal approach yet — let me start with brute force and look for the redundant work.</div></div>
+    <div class="ln"><div class="zh veil">时间快到了，你希望我优化，还是多走几个例子？</div><div class="en veil">Given the time, should I optimize, or walk through more test cases?</div></div>
+  </div>
+
+  <footer>
+    <span>ALG ROUND 3 · 句式库</span>
+    <span>骨架背熟 · 内容现编</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,
+      btns=document.querySelectorAll('.seg button'),
+      body=document.body;
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    body.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m?'true':'false');});
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){setMode(b.dataset.m);}); });
+  body.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))) v.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
