@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>05 · Last Occurrence</title>
+<meta name="description" content="Round 3 第一次脱稿：七步 7/7，翻小抄 0 次。">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --warn:#A8412A; --warn-soft:#F7E7E2;
+  --amber:#8A6A1F; --amber-soft:#F5EDD8;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --warn:#E08A70; --warn-soft:#33201B;
+    --amber:#D9B45E; --amber-soft:#2C2617;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --warn:#E08A70; --warn-soft:#33201B;
+  --amber:#D9B45E; --amber-soft:#2C2617;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-zh);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:44px 24px 96px}
+
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--rule)}
+.crumb{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{font-family:var(--f-head);font-weight:700;font-size:clamp(27px,4.6vw,37px);line-height:1.1;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.mile{margin-top:22px;background:var(--speak);border-radius:10px;padding:20px 24px;color:#fff}
+.mile .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.75}
+.mile h2{font-family:var(--f-head);font-size:clamp(19px,3.4vw,25px);font-weight:700;margin:7px 0 9px;letter-spacing:-.01em;color:#fff}
+.mile p{margin:0;font-size:13.5px;line-height:1.6;opacity:.93}
+.mile .nums{display:flex;gap:26px;margin-top:15px;flex-wrap:wrap}
+.mile .nums div{display:flex;flex-direction:column;gap:1px}
+.mile .nums .v{font-family:var(--f-mono);font-size:23px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.mile .nums .k{font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;opacity:.75}
+
+.rail-wrap{margin-top:26px}
+.rail-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.rail-head .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.rail-head .score{font-family:var(--f-mono);font-size:15px;color:var(--speak);font-weight:600;font-variant-numeric:tabular-nums}
+.rail{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.st{border:1px solid var(--rule);border-radius:7px;padding:11px 10px 10px;display:flex;flex-direction:column;gap:5px;min-width:0;border-top:3px solid var(--speak);background:var(--speak-soft)}
+.st .n{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--speak)}
+.st .nm{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.st .mk{font-family:var(--f-mono);font-size:14px;line-height:1;margin-top:2px;color:var(--speak)}
+.st.save{border-top-color:var(--amber);background:var(--amber-soft)}
+.st.save .n,.st.save .mk{color:var(--amber)}
+.rail-note{margin:12px 0 0;font-size:12.5px;color:var(--muted)}
+.rail-note b{color:var(--ink-2);font-weight:600}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
+.cd{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;box-shadow:var(--shadow)}
+.cd h3{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
+.cd.die{border-left:3px solid var(--warn)}
+.cd.die h3{color:var(--warn)}
+.cd.gold{border-left:3px solid var(--speak);background:var(--speak-soft)}
+.cd.gold h3{color:var(--speak)}
+.cd p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-2)}
+.cd p + p{margin-top:9px}
+.cd p strong{color:var(--ink);font-weight:600}
+.cd .quote{font-family:var(--f-say);font-size:16.5px;line-height:1.45;color:var(--ink);margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--rule-soft);padding:1px 5px;border-radius:3px}
+
+.hero{margin-top:20px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--speak);border-radius:0 9px 9px 0;padding:20px 22px;box-shadow:var(--shadow)}
+.hero .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--speak);font-weight:600}
+.hero h3{font-family:var(--f-head);font-size:17px;font-weight:600;margin:8px 0 12px;letter-spacing:-.01em}
+.hero .said{font-family:var(--f-say);font-size:17px;line-height:1.5;color:var(--ink);padding:12px 16px;background:var(--speak-soft);border-radius:7px;margin:0 0 13px}
+.hero .said b{color:var(--speak);font-weight:600}
+.hero ol{margin:0;padding-left:20px;font-size:13.5px;color:var(--ink-2);line-height:1.7}
+.hero ol b{color:var(--ink);font-weight:600}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0 6px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{font-family:var(--f-mono);font-size:11.5px;background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+.grp{margin-top:26px}
+.grp:first-of-type{margin-top:10px}
+.ghead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding:9px 13px;border-radius:7px 7px 0 0;border-left:3px solid var(--speak);background:var(--speak-soft)}
+.ghead .gn{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--speak);font-weight:600}
+.ghead .gt{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--ink)}
+.ghead .gs{font-family:var(--f-mono);font-size:11.5px;margin-left:auto;color:var(--speak)}
+.ghead .gd{font-size:12px;color:var(--muted);width:100%;line-height:1.5}
+.ghead .gd b{color:var(--ink-2);font-weight:600}
+.grp.aux .ghead{border-left-color:var(--rule);background:var(--rule-soft)}
+.grp.aux .ghead .gn,.grp.aux .ghead .gs{color:var(--muted)}
+.grp.half .ghead{border-left-color:var(--amber);background:var(--amber-soft)}
+.grp.half .ghead .gn,.grp.half .ghead .gs{color:var(--amber)}
+
+.ln{display:grid;grid-template-columns:118px 1fr 1.32fr;gap:0 20px;padding:15px 13px;border-bottom:1px solid var(--rule-soft);align-items:start;border-left:3px solid var(--speak-soft)}
+.grp.aux .ln{border-left-color:var(--rule-soft)}
+.grp.half .ln{border-left-color:var(--amber-soft)}
+.when{font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:3px;font-variant-numeric:tabular-nums}
+.pt{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--speak);background:var(--speak-soft);border-radius:3px;padding:1px 5px;margin-top:5px}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.zh strong{color:var(--ink);font-weight:600}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.48;color:var(--ink)}
+.en strong{font-weight:600;color:var(--speak)}
+
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){color:transparent;background:var(--rule-soft);min-height:1.5em;user-select:none}
+:root.m-en .en.veil:not(.show) strong,
+:root.m-all .en.veil:not(.show) strong,
+:root.m-all .zh.veil:not(.show) strong{color:transparent}
+:root.m-en .en.veil:not(.show):hover,:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+h3.sec{font-family:var(--f-head);font-weight:600;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:52px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.four{display:flex;flex-direction:column;gap:0}
+.four div{display:grid;grid-template-columns:1fr 1.35fr;gap:20px;padding:12px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.four .a{font-size:13.5px;color:var(--ink-2)}
+.four .b{font-family:var(--f-say);font-size:15px;color:var(--ink)}
+.four .b strong{color:var(--speak);font-weight:600}
+.four .b em{font-style:normal;color:var(--muted);font-size:13px}
+
+pre{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;overflow-x:auto;box-shadow:var(--shadow);font-family:var(--f-mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:0}
+pre .c{color:var(--muted)}
+pre .k{color:var(--speak);font-weight:500}
+pre .hl{color:var(--warn);font-weight:600}
+
+.mirror{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+.mi{border:1px solid var(--rule);border-radius:9px;padding:16px 18px;background:var(--card);box-shadow:var(--shadow)}
+.mi .h{font-family:var(--f-mono);font-size:11px;font-weight:600;color:var(--speak);margin-bottom:9px;letter-spacing:.05em}
+.mi table{width:100%;border-collapse:collapse;font-family:var(--f-mono);font-size:12px}
+.mi td{padding:5px 0;border-bottom:1px solid var(--rule-soft)}
+.mi td:last-child{text-align:right;color:var(--speak);font-weight:600}
+.mi tr:last-child td{border-bottom:0}
+
+ol.take{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:14px}
+ol.take li{counter-increment:t;position:relative;padding-left:34px;font-size:14px;color:var(--ink-2);line-height:1.6}
+ol.take li::before{content:counter(t);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--speak-soft);color:var(--speak);font-family:var(--f-mono);font-size:11px;font-weight:600;display:grid;place-items:center}
+ol.take strong{color:var(--ink);font-weight:600}
+
+.won{display:flex;flex-direction:column;gap:10px}
+.won div{font-size:13.5px;color:var(--ink-2);padding-left:24px;position:relative}
+.won div::before{content:"✓";position:absolute;left:0;color:var(--speak);font-weight:700}
+.won strong{color:var(--ink);font-weight:600}
+
+.trend{overflow-x:auto;margin-top:4px}
+.trend table{width:100%;border-collapse:collapse;font-size:13.5px}
+.trend th{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 11px 8px;border-bottom:1px solid var(--rule)}
+.trend td{padding:10px 11px;border-bottom:1px solid var(--rule-soft)}
+.trend td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:center;width:1%;white-space:nowrap}
+.trend td.hi{color:var(--speak);font-weight:600}
+.trend td.bad{color:var(--warn);font-weight:600}
+
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:820px){ .rail{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:760px){
+  .wrap{padding:30px 17px 72px}
+  .cards,.mirror{grid-template-columns:1fr}
+  .ln{grid-template-columns:1fr;gap:7px}
+  .when{padding-top:0}
+  .four div{grid-template-columns:1fr;gap:5px}
+  .hint{margin-left:0;width:100%}
+  .ghead .gs{margin-left:0}
+}
+@media (max-width:460px){ .rail{grid-template-columns:repeat(2,1fr)} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:11pt}.wrap{max-width:none;padding:0}
+  .ln,.cd,pre,.grp,.st,.hero,.mile{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb"><a href="../">alg-round3</a><span>/</span><span>problems</span><span>/</span><span>05</span></div>
+    <h1>Last Occurrence</h1>
+    <div class="meta">LaiCode 16 · Accepted · <b>第一次完全脱稿</b></div>
+  </header>
+
+  <section class="mile">
+    <span class="lb">Milestone</span>
+    <h2>零小抄，七步全做到</h2>
+    <p>04 题的 7/7 是照读；这次是<b>从记忆里跑完整套流程</b>。而且在没有任何提示的情况下，你自己抓回了漏掉的那一步。</p>
+    <div class="nums">
+      <div><span class="v">7 / 7</span><span class="k">七步</span></div>
+      <div><span class="v">0</span><span class="k">翻小抄</span></div>
+      <div><span class="v">1</span><span class="k">自我纠正</span></div>
+      <div><span class="v">3</span><span class="k">走的例子</span></div>
+    </div>
+  </section>
+
+  <section class="rail-wrap">
+    <div class="rail-head">
+      <span class="t">脱稿完成度</span>
+      <span class="score">7 / 7 · 翻小抄 0 次</span>
+    </div>
+    <div class="rail">
+      <div class="st"><span class="n">STEP 1</span><span class="nm">开场</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 2</span><span class="nm">复述</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 3</span><span class="nm">提问</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 4</span><span class="nm">归约</span><span class="mk">✓</span></div>
+      <div class="st save"><span class="n">STEP 5</span><span class="nm">边界</span><span class="mk">↺</span></div>
+      <div class="st"><span class="n">STEP 6</span><span class="nm">复杂度·递球</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 7</span><span class="nm">测试</span><span class="mk">✓</span></div>
+    </div>
+    <p class="rail-note">STEP 5 标 <b>↺</b>：当时漏了，<b>你自己在讲复杂度之后发现并补回来了</b>——这不算失分，算加分。</p>
+  </section>
+
+  <section class="hero">
+    <span class="lb">这次录音里最值钱的 10 秒</span>
+    <h3>你在压力下自动用出了订正过的句子</h3>
+    <p class="said">"<b>Wait, let me back up</b> — <b>I forgot the edge case</b>: if A is null or has zero length, I need to return −1."</p>
+    <ol>
+      <li>你<b>发现自己漏了一整步</b>——注意力全在算法上时还能监控流程，这是新能力</li>
+      <li>你用的是 <b>"let me back up"</b>——03 题订正表里的那一条</li>
+      <li>你<b>没有说 sorry</b>——也是 03 题订正表里的那一条</li>
+    </ol>
+    <p style="margin-top:12px;font-size:13.5px;color:var(--ink-2)">三条都是我们改过的东西，在<b>没有小抄、注意力被算法占满</b>的时候自动出现了。这才叫内化——不是记住了，是不用记就会。</p>
+  </section>
+
+  <section class="cards">
+    <div class="cd die">
+      <h3>唯一稳定的弱点</h3>
+      <p><strong>走例子时 trace 说错——连续第二题。</strong></p>
+      <p>例 ① <code>{1,2,2,2,3}</code> T=2：你说「mid 是 3，我们 <strong>shrink the right</strong>」。<br>实际 <code>array[3] == 2</code>，是<strong>命中</strong>，应该 <code>left = 3</code>——方向说反了。</p>
+      <p>然后你说「check right first，就是答案」。实际 <code>right = 4</code> 那个是 3，不等于 2，<strong>答案来自 left = 3</strong>。</p>
+      <p><strong>例 ② ③ 都说对了，只有例 ① 错。</strong>但走例子的全部价值在于数值准确——04 题也错了一次，这是现在唯一还没解决的问题。</p>
+    </div>
+    <div class="cd gold">
+      <h3>这道题的金句</h3>
+      <p class="quote">Last occurrence mirrors first — I keep mid on the left, and check right first at the end.</p>
+    </div>
+  </section>
+
+  <h3 class="sec">两题镜像 · 一起记</h3>
+  <div class="mirror">
+    <div class="mi">
+      <div class="h">04 · First Occurrence</div>
+      <table>
+        <tr><td>== target</td><td>right = mid</td></tr>
+        <tr><td>&lt; target</td><td>left = mid + 1</td></tr>
+        <tr><td>&gt; target</td><td>right = mid − 1</td></tr>
+        <tr><td>post</td><td>check left first</td></tr>
+      </table>
+    </div>
+    <div class="mi">
+      <div class="h">05 · Last Occurrence</div>
+      <table>
+        <tr><td>== target</td><td>left = mid</td></tr>
+        <tr><td>&lt; target</td><td>left = mid + 1</td></tr>
+        <tr><td>&gt; target</td><td>right = mid − 1</td></tr>
+        <tr><td>post</td><td>check right first</td></tr>
+      </table>
+    </div>
+  </div>
+  <p style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.6">只有<b>两处</b>不同：命中时把哪一边钉住、后处理先查哪一个。<b>不等的两个分支完全一样</b>——因为「mid 不等于 target 就一定不是答案」这条和找第几次出现无关。<br>面试里被问到另一个方向，一句话就能答：<span style="font-family:var(--f-say);color:var(--ink)">"It mirrors — I'd move left to mid instead, and check right first."</span></p>
+
+  <div class="bar">
+    <span class="lab">跟读</span>
+    <span class="seg">
+      <button type="button" data-m="none" aria-pressed="true">① 看着念</button>
+      <button type="button" data-m="en" aria-pressed="false">② 只看中文</button>
+      <button type="button" data-m="all" aria-pressed="false">③ 全盖住</button>
+    </span>
+    <span class="hint">你已经能脱稿了，这题直接用 ③</span>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 1</span><span class="gt">开场</span><span class="gs">✓</span>
+      <span class="gd">两句都从记忆里出来了。这一步已经完全不用想。</span></div>
+    <div class="ln"><div class="when">0:00</div><div class="zh veil">我先通读一遍，会安静一两分钟</div><div class="en veil">Let me read through this once — I'll be quiet for a minute or two.</div></div>
+    <div class="ln"><div class="when">读题中</div><div class="zh veil">还在读，这题铺垫挺长</div><div class="en veil">Still reading — there's a lot of setup here.</div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 2</span><span class="gt">复述</span><span class="gs">✓ 语序要改</span>
+      <span class="gd">你说的是 "an ascending order sorted array"——意思对，但英文习惯是<b>后置</b>：an array <b>sorted in</b> ascending order。这已经是这条的第三种变体了，还没稳定。</span></div>
+    <div class="ln"><div class="when">1:45<span class="pt">① ②</span></div>
+      <div class="zh veil">给一个目标 T 和一个<strong>升序排列的</strong>整数数组，返回 T <strong>最后一次出现</strong>的下标，找不到返回 −1</div>
+      <div class="en veil">So, to make sure I understand — we're given a target T and an array <strong>sorted in ascending order</strong>, and we need to return <strong>the index of the last occurrence</strong> of T, or −1 if it isn't there.</div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 3</span><span class="gt">提问</span><span class="gs">✓ 迄今最好，但仍没停</span>
+      <span class="gd">三条假设、三次征询、每条都有依据（"this question mentioned"）——这是五题里最好的一次 STEP 3。<b>唯一还缺的仍然是那 2 秒的停顿</b>，你三次都是问完立刻接着说。<br>另外 "Is that sounds good?" 语法错了：is 和 sounds 是两个动词。</span></div>
+    <div class="ln"><div class="when">2:15 ①</div>
+      <div class="zh veil">题目说了可能有重复值。因为要的是<strong>最后一次</strong>出现，所以我会返回最右边那个——对吗</div>
+      <div class="en veil">The problem mentions there can be duplicates. Since we want the <strong>last</strong> occurrence, I'll return the rightmost index — <strong>is that fair?</strong> <span style="color:var(--muted)">〔停 2 秒〕</span></div></div>
+    <div class="ln"><div class="when">2:15 ②</div>
+      <div class="zh veil">null 或空数组我会返回 −1，找不到也返回 −1</div>
+      <div class="en veil">For a null or empty array I'll return −1, and also −1 if the target isn't found.</div></div>
+    <div class="ln"><div class="when">2:15 ③</div>
+      <div class="zh veil">这样可以吗</div>
+      <div class="en veil"><strong>Does that sound good?</strong> <span style="color:var(--muted)">〔不是 "Is that sounds good"——is 和 sounds 不能连用〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 4</span><span class="gt">归约</span><span class="gs">✓ 但变薄了</span>
+      <span class="gd">模型名给了，三个分支的理由都说了，<b>adjacent 也主动说了</b>——这些都好。<br>但 04 题你说过「答案一定是最后那两个相邻候选<b>之一</b>」，这次<b>没说不变量</b>。脱稿的代价正好落在最需要精确的那一步——下次专门补回来。</span></div>
+    <div class="ln"><div class="when">3:30<span class="pt">② ③</span></div>
+      <div class="zh veil">因为数组有序、要找最后一次出现，<strong>这归约成</strong>二分</div>
+      <div class="en veil">Since the array is sorted and we want the last occurrence, <strong>this reduces to</strong> binary search.</div></div>
+    <div class="ln"><div class="when">4:00 不变量 <strong>这次漏了</strong></div>
+      <div class="zh veil">我把区间收缩到<strong>最后两个相邻的候选</strong>，答案一定是<strong>这两个之一</strong></div>
+      <div class="en veil">I narrow the range down to <strong>two adjacent candidates</strong> — the answer must be <strong>one of those two</strong>.</div></div>
+    <div class="ln"><div class="when">4:30 关键</div>
+      <div class="zh veil">命中时 <code>left = mid</code>，<strong>把 mid 钉在左边、保住右半边</strong>——因为右边可能还有更靠后的一个</div>
+      <div class="en veil">On a match I move <strong>left to mid</strong> and <strong>keep the right half</strong> — there could still be a later occurrence to the right.</div></div>
+    <div class="ln"><div class="when">4:45</div>
+      <div class="zh veil">不相等的两个分支可以直接跳过 mid，因为 mid 确定不是答案</div>
+      <div class="en veil">The other two branches skip past mid, because if mid isn't the target it can't be the answer.</div></div>
+    <div class="ln"><div class="when">5:00 终止</div>
+      <div class="zh veil">所以循环条件是 <code>left &lt; right − 1</code>——停在两者还<strong>相邻</strong>的时候</div>
+      <div class="en veil">So the loop runs while left &lt; right − 1, stopping while the two are still <strong>adjacent</strong>.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 5</span><span class="gt">边界</span><span class="gs">↺ 自己抓回来了</span>
+      <span class="gd">当时漏了，讲完复杂度之后你自己发现并补上。<b>这句纠正本身就是这次录音的最高分。</b></span></div>
+    <div class="ln"><div class="when">自我纠正</div>
+      <div class="zh veil">等一下，我倒回去一下——边界忘了说</div>
+      <div class="en veil"><strong>Wait, let me back up</strong> — I forgot the edge case. <span style="color:var(--muted)">〔不说 sorry〕</span></div></div>
+    <div class="ln"><div class="when">5:30<span class="pt">④</span></div>
+      <div class="zh veil">null 或空数组返回 −1。另外长度 1 或 2 时循环一次都不跑，后处理必须自己能处理</div>
+      <div class="en veil">A null or empty array returns −1. And with one or two elements the loop never runs, so the post-processing has to handle those on its own.</div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 6</span><span class="gt">复杂度 · 递球</span><span class="gs">✓ 一个词换掉</span>
+      <span class="gd">你说的是 "does this sound feasible"——feasible 偏正式，像在评估工程可行性。日常面试用 <b>reasonable</b>。</span></div>
+    <div class="ln"><div class="when">6:00</div>
+      <div class="zh veil">时间 O(log n)，空间 O(1)。开始写之前，你觉得这个方向可以吗</div>
+      <div class="en veil">Time is <strong>big O of log n</strong>, space is O(1). <strong>Does that sound reasonable before I start coding?</strong></div></div>
+  </div>
+
+  <div class="grp aux">
+    <div class="ghead"><span class="gn">写码中</span><span class="gt">只说意图</span><span class="gs">卡了一处</span>
+      <span class="gd">"we initialize our two <b>environment envarient</b>"——你想说 variables，卡住了。脱稿时这是正常的，绕过去讲完就好。下面是那一句的正确说法。</span></div>
+    <div class="ln"><div class="when">写码时</div><div class="zh veil">先处理边界，然后<strong>初始化两个指针</strong>在数组两端</div><div class="en veil">First the guard, then I'll <strong>initialize two pointers</strong> at both ends of the array.</div></div>
+    <div class="ln"><div class="when">写码时</div><div class="zh veil">中点这么算是为了防溢出</div><div class="en veil">I'm computing mid as left + (right − left) / 2 to avoid overflow.</div></div>
+    <div class="ln"><div class="when">写码时</div><div class="zh veil">后处理<strong>先查 right</strong>，因为要的是最后一次出现</div><div class="en veil">In the post-processing I <strong>check right first</strong>, because we want the last occurrence.</div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 7</span><span class="gt">测试</span><span class="gs">✓ 三个例子，一个说错</span>
+      <span class="gd"><b>慢一点，一步一个数。</b>每一步都完整报出三个量：left 是多少、right 是多少、mid 落在哪、array[mid] 是什么。下面是例 ① 的正确 trace。</span></div>
+    <div class="ln"><div class="when">25:00</div><div class="zh veil">我走几个例子验证一下</div><div class="en veil">Let me walk through a few cases.</div></div>
+    <div class="ln"><div class="when">例 ① <strong>正确版</strong></div>
+      <div class="zh veil"><code>{1,2,2,2,3}</code> T=2：<br>left=0, right=4, mid=2 → array[2]=2 <strong>命中 → left=2</strong><br>left=2, right=4, mid=3 → array[3]=2 <strong>命中 → left=3</strong><br>left=3, right=4 <strong>相邻 → 退出</strong><br>后处理：array[4]=3 ≠ 2；array[3]=2 → <strong>返回 left = 3</strong></div>
+      <div class="en veil">left is 0, right is 4, mid is 2 — array of 2 is a match, so <strong>left becomes 2</strong>. Next round mid is 3, also a match, so <strong>left becomes 3</strong>. Now left and right are adjacent, so we exit. Checking right first: array of 4 is 3, not the target. Then left: array of 3 is 2 — so we return <strong>3</strong>.</div></div>
+    <div class="ln"><div class="when">例 ② 找不到</div>
+      <div class="zh veil"><code>{1,2,3}</code> T=4：mid=1，2&lt;4 → left=2；退出；两个候选都不等于 4 → 返回 −1</div>
+      <div class="en veil">With target 4 — mid is 1, two is smaller, so left becomes 2. Neither candidate equals 4, so we return −1.</div></div>
+    <div class="ln"><div class="when">例 ③ 命中</div>
+      <div class="zh veil"><code>{1,2,3}</code> T=2：mid=1 命中 → left=1；退出；array[2]=3≠2，array[1]=2 → 返回 1</div>
+      <div class="en veil">With target 2 — mid is 1, a match, so left becomes 1. We exit; right is 3 which isn't the target, left is 2 — so we return 1.</div></div>
+  </div>
+
+  <div class="grp aux">
+    <div class="ghead"><span class="gn">追问</span><span class="gt">你主动问了</span><span class="gs">措辞理顺</span>
+      <span class="gd">"do I need to go some past or you think it's all good" —— 意思到了，理顺一下更利落。</span></div>
+    <div class="ln"><div class="when">33:00</div>
+      <div class="zh veil">已经是 O(log n) 了，我觉得没法再优化。你想让我再走几个 case，还是这样就可以</div>
+      <div class="en veil">It's already O(log n), so I don't think it can be optimized further. <strong>Would you like me to walk through more cases, or does this look good?</strong></div></div>
+    <div class="ln"><div class="when">追问准备</div>
+      <div class="zh veil">如果要的是<strong>第一次</strong>出现：命中时改成 <code>right = mid</code>，后处理<strong>先查 left</strong>——完全镜像</div>
+      <div class="en veil">If you wanted the <strong>first</strong> occurrence, <strong>it mirrors</strong> — I'd move right to mid instead, and check left first at the end.</div></div>
+  </div>
+
+  <h3 class="sec">这次要改的说法</h3>
+  <div class="four">
+    <div><span class="a">mid 处的<strong>值</strong>（这次退化了）</span><span class="b"><strong>array of mid</strong> ／ the <strong>value at</strong> mid　<em>你说的是 "the mid is less than target"——mid 是下标，array[mid] 才是值。03、04 你都说对了</em></span></div>
+    <div><span class="a">升序排列的数组</span><span class="b">an array <strong>sorted in</strong> ascending order　<em>后置，不是 "an ascending order sorted array"</em></span></div>
+    <div><span class="a">这样可以吗</span><span class="b"><strong>Does that sound good?</strong>　<em>不是 "Is that sounds good"——is 和 sounds 两个动词不能连用</em></span></div>
+    <div><span class="a">你觉得这个方向可以吗</span><span class="b">Does that sound <strong>reasonable</strong>?　<em>不用 feasible，那个偏工程评估的语气</em></span></div>
+    <div><span class="a">初始化两个指针</span><span class="b">I'll <strong>initialize two pointers</strong> at both ends　<em>不是 "two environment envarient"</em></span></div>
+    <div><span class="a">通过了（第 2 次）</span><span class="b">it <strong>passed</strong> ／ it was <strong>accepted</strong>　<em>不是 "it's accept"</em></span></div>
+    <div><span class="a">再走几个 case</span><span class="b">walk through <strong>more cases</strong>　<em>不是 "go some past"</em></span></div>
+  </div>
+
+  <h3 class="sec">代码 · 全对</h3>
+<pre><span class="k">public int</span> lastOccur(<span class="k">int</span>[] array, <span class="k">int</span> target) {
+  <span class="k">if</span> (array == <span class="k">null</span> || array.length == 0) <span class="k">return</span> -1;
+
+  <span class="k">int</span> left = 0, right = array.length - 1;
+
+  <span class="k">while</span> (left &lt; right - 1) {
+    <span class="k">int</span> mid = left + (right - left) / 2;
+
+    <span class="k">if</span> (array[mid] == target) <span class="hl">left = mid;</span>        <span class="c">// ← 钉住左边，保住右半边（和 04 唯一的不同）</span>
+    <span class="k">else if</span> (array[mid] &lt; target) left = mid + 1;
+    <span class="k">else</span> right = mid - 1;
+  }
+
+  <span class="c">// 后处理：先查 right，因为要的是最后一次出现（和 04 的另一处不同）</span>
+  <span class="k">if</span> (array[right] == target) <span class="k">return</span> right;
+  <span class="k">if</span> (array[left]  == target) <span class="k">return</span> left;
+  <span class="k">return</span> -1;
+}</pre>
+
+  <h3 class="sec">这次确实进步了的</h3>
+  <div class="won">
+    <div><strong>零小抄跑完七步。</strong>顺序完全内化了。</div>
+    <div><strong>自我纠正三条全对</strong>：发现漏步 + "let me back up" + 不道歉。压力下自动出现。</div>
+    <div><strong>STEP 3 五题里最好的一次</strong>：三条假设、三次征询、每条都带依据。</div>
+    <div><strong>adjacent 的因果链再次主动说出</strong>，连续第二题。</div>
+    <div><strong>三个分支的理由全说了</strong>，包括「不等就能丢弃 mid」——04 的洞察带过来了。</div>
+    <div><strong>主动递球两次</strong>：写码前一次、写完一次。</div>
+  </div>
+
+  <h3 class="sec">五题趋势</h3>
+  <div class="trend">
+    <table>
+      <thead><tr><th></th><th>01</th><th>02</th><th>03</th><th>04</th><th>05</th></tr></thead>
+      <tbody>
+        <tr><td>七步</td><td class="n">4</td><td class="n">2.5</td><td class="n">6.5</td><td class="n">7</td><td class="n hi">7</td></tr>
+        <tr><td>看小抄</td><td class="n">—</td><td class="n">—</td><td class="n">否</td><td class="n bad">是</td><td class="n hi">否</td></tr>
+        <tr><td>留在代码里的 bug</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n hi">0</td></tr>
+        <tr><td>自己走例子</td><td class="n">✗</td><td class="n">✗</td><td class="n">✓</td><td class="n">✓</td><td class="n hi">✓</td></tr>
+        <tr><td>走例子 trace 说错</td><td class="n">—</td><td class="n">—</td><td class="n">0</td><td class="n bad">1</td><td class="n bad">1</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sec">下一题只带走三件事</h3>
+  <ol class="take">
+    <li><strong>走例子时把三个量都报出来</strong>：left 多少、right 多少、mid 落在哪、array[mid] 是什么。这是现在唯一还没解决的问题，连续两题都栽在这里。<strong>慢比快重要。</strong></li>
+    <li><strong>归约那一步补回不变量。</strong>「答案一定是最后两个相邻候选之一」——04 说了，05 掉了。脱稿的代价不该落在最需要精确的那一步。</li>
+    <li><strong>问完停 2 秒。</strong>你已经会问了（这题问了三次），但三次都没停。<strong>问号的意义就在那 2 秒。</strong></li>
+  </ol>
+
+  <footer>
+    <span>ALG ROUND 3 · #05 · 第一次脱稿</span>
+    <span>本周只盯 中文语气词</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.seg button'),body=document.body;
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    body.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m?'true':'false');});
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){setMode(b.dataset.m);}); });
+  body.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))) v.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
