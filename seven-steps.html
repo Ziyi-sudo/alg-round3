@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>面试七步</title>
+<meta name="description" content="开录音前扫一眼的七步清单，每步一句现成的话。">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --f-head:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--f-head);font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:480px;margin:0 auto;padding:26px 18px 56px}
+
+.hd{display:flex;align-items:baseline;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--rule);flex-wrap:wrap}
+h1{font-family:var(--f-head);font-weight:700;font-size:24px;letter-spacing:-.02em;margin:0;line-height:1.1}
+.sub{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-left:auto}
+.lead{margin:12px 0 0;font-size:13px;color:var(--muted);line-height:1.55}
+.lead b{color:var(--ink-2);font-weight:600}
+
+.list{display:flex;flex-direction:column;gap:9px;margin-top:18px}
+.s{
+  background:var(--card);border:1px solid var(--rule);border-radius:9px;
+  border-left:3px solid var(--speak);padding:12px 14px;
+}
+.s .r1{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.s .n{
+  font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.06em;
+  color:var(--speak);background:var(--speak-soft);border-radius:4px;padding:2px 6px;
+}
+.s .t{font-weight:700;font-size:16px;letter-spacing:-.01em}
+.s .w{font-size:11.5px;color:var(--muted);margin-left:auto;font-family:var(--f-mono)}
+.s .d{margin:5px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5}
+.s .d b{color:var(--ink-2);font-weight:600}
+.s .q{
+  font-family:var(--f-say);font-size:14.5px;line-height:1.45;color:var(--ink);
+  margin:8px 0 0;padding-left:10px;border-left:2px solid var(--speak-soft);
+}
+.s .q + .q{margin-top:5px}
+.s .q b{color:var(--speak);font-weight:600}
+.s .q em{font-style:normal;color:var(--muted)}
+
+.tail{margin-top:22px;display:flex;flex-direction:column;gap:9px}
+.tl{
+  background:var(--speak-soft);border-radius:9px;padding:12px 14px;
+  font-size:12.5px;color:var(--ink);line-height:1.55;
+}
+.tl b{font-weight:700}
+.tl .lb{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--speak);display:block;margin-bottom:4px}
+.tl .q{font-family:var(--f-say);font-size:14px;color:var(--ink);display:block;margin-top:4px}
+
+footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);text-align:center}
+@media print{body{background:#fff}.wrap{padding:0}.s{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hd">
+    <h1>面试七步</h1>
+    <span class="sub">开录音前扫一眼</span>
+  </div>
+  <p class="lead">只看步骤名，别读内容。<b>目标不是讲得漂亮，是七步一步都不跳</b>——讲得烂但完整，好过讲得顺但残缺。</p>
+
+  <div class="list">
+
+    <div class="s">
+      <div class="r1"><span class="n">STEP 1</span><span class="t">开场</span><span class="w">0:00</span></div>
+      <p class="d">先申请沉默，再读题。没这句，沉默 = 卡住了。</p>
+      <p class="q">Let me read through this once — <b>I'll be quiet for a minute or two.</b></p>
+    </div>
+
+    <div class="s">
+      <div class="r1"><span class="n">STEP 2</span><span class="t">复述</span><span class="w">1:45</span></div>
+      <p class="d">用自己的话，不是念题。<b>限定词要复述出来</b>（any / strictly / distinct）。</p>
+      <p class="q">So, to make sure I understand — <b>we're given</b> ___, and we need to <b>return</b> ___.</p>
+    </div>
+
+    <div class="s">
+      <div class="r1"><span class="n">STEP 3</span><span class="t">提问 ×2–3</span><span class="w">2:15</span></div>
+      <p class="d">只问<b>会改代码</b>的。B 类（决定模型）真问、真等答案；A 类（几行实现）带假设问。</p>
+      <p class="q"><em>B 类</em>　Can it contain duplicates? / What should I do if ___?</p>
+      <p class="q"><em>A 类</em>　<b>I'll assume</b> ___ — is that fair?</p>
+      <p class="q"><em>排期</em>　I'll handle ___ first and come back to ___ if we have time.</p>
+    </div>
+
+    <div class="s">
+      <div class="r1"><span class="n">STEP 4</span><span class="t">归约</span><span class="w">3:30</span></div>
+      <p class="d">先<b>推导</b>再下结论，然后<b>叫出模型全名</b>。「排序了所以二分」是断言，不是推导。</p>
+      <p class="q">Since ___, <b>this reduces to</b> ___.</p>
+      <p class="q">The <b>invariant</b> is: ___ is always inside ___.</p>
+    </div>
+
+    <div class="s">
+      <div class="r1"><span class="n">STEP 5</span><span class="t">边界</span><span class="w">5:30</span></div>
+      <p class="d">主动提，<b>而且给具体例子</b>。说完手指在代码里指一遍——嘴上说了手上要写。</p>
+      <p class="q"><b>Before I code — one edge case:</b> for ___, we return ___, not ___.</p>
+    </div>
+
+    <div class="s">
+      <div class="r1"><span class="n">STEP 6</span><span class="t">复杂度 · 递球</span><span class="w">6:00</span></div>
+      <p class="d">报完复杂度，把球递回去，<b>然后停下来等他回答</b>。全套里性价比最高的 5 秒。</p>
+      <p class="q">Time is O(___), space is O(___). <b>Does that sound reasonable before I start coding?</b></p>
+    </div>
+
+    <div class="s">
+      <div class="r1"><span class="n">STEP 7</span><span class="t">测试</span><span class="w">25:00</span></div>
+      <p class="d">面试里没有 run 按钮。四个例子：正常 / 找不到 / <b>n = 1</b> / 空输入。<b>n = 1 必跑。</b></p>
+      <p class="q"><b>Let me walk through a few cases.</b></p>
+    </div>
+
+  </div>
+
+  <div class="tail">
+    <div class="tl">
+      <span class="lb">写码那 15 分钟</span>
+      只说<b>意图</b>，不念语法。每 3–5 分钟一句就够。
+      <span class="q">I'm handling the duplicate case here.</span>
+    </div>
+    <div class="tl">
+      <span class="lb">卡住时 · 必须出声</span>
+      沉默是面试里最贵的东西。
+      <span class="q">Let me think for a second — I want to get the boundary right.</span>
+    </div>
+    <div class="tl">
+      <span class="lb">本周只盯</span>
+      <b>we're given</b>（被动语态）。其余错误全部允许，一次只盯一条。
+    </div>
+  </div>
+
+  <footer>ALG ROUND 3 · 七步一步都不跳</footer>
+</div>
+</body>
+</html>
