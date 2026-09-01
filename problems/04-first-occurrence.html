@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>04 · First Occurrence</title>
+<meta name="description" content="Round 3 跟读卡：七步 7/7，混合模版的口头讲法。">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --warn:#A8412A; --warn-soft:#F7E7E2;
+  --amber:#8A6A1F; --amber-soft:#F5EDD8;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --warn:#E08A70; --warn-soft:#33201B;
+    --amber:#D9B45E; --amber-soft:#2C2617;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --warn:#E08A70; --warn-soft:#33201B;
+  --amber:#D9B45E; --amber-soft:#2C2617;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-zh);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:44px 24px 96px}
+
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--rule)}
+.crumb{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{font-family:var(--f-head);font-weight:700;font-size:clamp(27px,4.6vw,37px);line-height:1.1;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.rail-wrap{margin-top:30px}
+.rail-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.rail-head .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.rail-head .score{font-family:var(--f-mono);font-size:15px;color:var(--speak);font-weight:600;font-variant-numeric:tabular-nums}
+.rail-head .prev{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.rail{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.st{background:var(--card);border:1px solid var(--rule);border-radius:7px;padding:11px 10px 10px;display:flex;flex-direction:column;gap:5px;min-width:0;border-top:3px solid var(--speak);background:var(--speak-soft)}
+.st .n{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--speak)}
+.st .nm{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.st .mk{font-family:var(--f-mono);font-size:14px;line-height:1;margin-top:2px;color:var(--speak)}
+.rail-note{margin:12px 0 0;font-size:12.5px;color:var(--muted)}
+.rail-note b{color:var(--ink-2);font-weight:600}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
+.cd{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;box-shadow:var(--shadow)}
+.cd h2{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
+.cd.die{border-left:3px solid var(--amber)}
+.cd.die h2{color:var(--amber)}
+.cd.gold{border-left:3px solid var(--speak);background:var(--speak-soft)}
+.cd.gold h2{color:var(--speak)}
+.cd p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-2)}
+.cd p + p{margin-top:9px}
+.cd p strong{color:var(--ink);font-weight:600}
+.cd .quote{font-family:var(--f-say);font-size:16.5px;line-height:1.45;color:var(--ink);margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--rule-soft);padding:1px 5px;border-radius:3px}
+
+.hero{margin-top:20px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--speak);border-radius:0 9px 9px 0;padding:20px 22px;box-shadow:var(--shadow)}
+.hero .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--speak);font-weight:600}
+.hero h3{font-family:var(--f-head);font-size:17px;font-weight:600;margin:8px 0 10px;letter-spacing:-.01em}
+.hero p{margin:0 0 9px;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero p strong{color:var(--ink);font-weight:600}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.sp{border:1px solid var(--rule);border-radius:7px;padding:13px 15px}
+.sp .h{font-family:var(--f-mono);font-size:11px;font-weight:600;margin-bottom:6px}
+.sp.keep{background:var(--speak-soft)} .sp.keep .h{color:var(--speak)}
+.sp.drop{background:var(--warn-soft)} .sp.drop .h{color:var(--warn)}
+.sp p{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0 6px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{font-family:var(--f-mono);font-size:11.5px;background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+.grp{margin-top:26px}
+.grp:first-of-type{margin-top:10px}
+.ghead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding:9px 13px;border-radius:7px 7px 0 0;border-left:3px solid var(--speak);background:var(--speak-soft)}
+.ghead .gn{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--speak);font-weight:600}
+.ghead .gt{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--ink)}
+.ghead .gs{font-family:var(--f-mono);font-size:11.5px;margin-left:auto;color:var(--speak)}
+.ghead .gd{font-size:12px;color:var(--muted);width:100%;line-height:1.5}
+.ghead .gd b{color:var(--ink-2);font-weight:600}
+.grp.aux .ghead{border-left-color:var(--rule);background:var(--rule-soft)}
+.grp.aux .ghead .gn,.grp.aux .ghead .gs{color:var(--muted)}
+.grp.half .ghead{border-left-color:var(--amber);background:var(--amber-soft)}
+.grp.half .ghead .gn,.grp.half .ghead .gs{color:var(--amber)}
+
+.ln{display:grid;grid-template-columns:118px 1fr 1.32fr;gap:0 20px;padding:15px 13px;border-bottom:1px solid var(--rule-soft);align-items:start;border-left:3px solid var(--speak-soft)}
+.grp.aux .ln{border-left-color:var(--rule-soft)}
+.grp.half .ln{border-left-color:var(--amber-soft)}
+.when{font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:3px;font-variant-numeric:tabular-nums}
+.pt{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--speak);background:var(--speak-soft);border-radius:3px;padding:1px 5px;margin-top:5px}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.zh strong{color:var(--ink);font-weight:600}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.48;color:var(--ink)}
+.en strong{font-weight:600;color:var(--speak)}
+
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){color:transparent;background:var(--rule-soft);min-height:1.5em;user-select:none}
+:root.m-en .en.veil:not(.show) strong,
+:root.m-all .en.veil:not(.show) strong,
+:root.m-all .zh.veil:not(.show) strong{color:transparent}
+:root.m-en .en.veil:not(.show):hover,:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+h3.sec{font-family:var(--f-head);font-weight:600;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:52px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.four{display:flex;flex-direction:column;gap:0}
+.four div{display:grid;grid-template-columns:1fr 1.35fr;gap:20px;padding:12px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.four .a{font-size:13.5px;color:var(--ink-2)}
+.four .b{font-family:var(--f-say);font-size:15px;color:var(--ink)}
+.four .b strong{color:var(--speak);font-weight:600}
+.four .b em{font-style:normal;color:var(--muted);font-size:13px}
+
+pre{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;overflow-x:auto;box-shadow:var(--shadow);font-family:var(--f-mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:0}
+pre .c{color:var(--muted)}
+pre .k{color:var(--speak);font-weight:500}
+pre .hl{color:var(--warn);font-weight:600}
+
+ol.take{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:14px}
+ol.take li{counter-increment:t;position:relative;padding-left:34px;font-size:14px;color:var(--ink-2);line-height:1.6}
+ol.take li::before{content:counter(t);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--speak-soft);color:var(--speak);font-family:var(--f-mono);font-size:11px;font-weight:600;display:grid;place-items:center}
+ol.take strong{color:var(--ink);font-weight:600}
+
+.won{display:flex;flex-direction:column;gap:10px}
+.won div{font-size:13.5px;color:var(--ink-2);padding-left:24px;position:relative}
+.won div::before{content:"✓";position:absolute;left:0;color:var(--speak);font-weight:700}
+.won strong{color:var(--ink);font-weight:600}
+
+.trend{overflow-x:auto;margin-top:4px}
+.trend table{width:100%;border-collapse:collapse;font-size:13.5px}
+.trend th{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 11px 8px;border-bottom:1px solid var(--rule)}
+.trend td{padding:10px 11px;border-bottom:1px solid var(--rule-soft)}
+.trend td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:center;width:1%;white-space:nowrap}
+.trend td.hi{color:var(--speak);font-weight:600}
+
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:820px){ .rail{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:760px){
+  .wrap{padding:30px 17px 72px}
+  .cards,.split{grid-template-columns:1fr}
+  .ln{grid-template-columns:1fr;gap:7px}
+  .when{padding-top:0}
+  .four div{grid-template-columns:1fr;gap:5px}
+  .hint{margin-left:0;width:100%}
+  .ghead .gs{margin-left:0}
+}
+@media (max-width:460px){ .rail{grid-template-columns:repeat(2,1fr)} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:11pt}.wrap{max-width:none;padding:0}
+  .ln,.cd,pre,.grp,.st,.hero{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb"><a href="../">alg-round3</a><span>/</span><span>problems</span><span>/</span><span>04</span></div>
+    <h1>First Occurrence</h1>
+    <div class="meta">LaiCode 15 · Accepted · 七步全做到 · <b>照着小抄念的</b></div>
+  </header>
+
+  <section class="rail-wrap">
+    <div class="rail-head">
+      <span class="t">这次做到了几步</span>
+      <span class="score">7 / 7</span>
+      <span class="prev">01 → 4　02 → 2.5　03 → 6.5　04 → 7</span>
+    </div>
+    <div class="rail">
+      <div class="st"><span class="n">STEP 1</span><span class="nm">开场</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 2</span><span class="nm">复述</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 3</span><span class="nm">提问</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 4</span><span class="nm">归约</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 5</span><span class="nm">边界</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 6</span><span class="nm">复杂度·递球</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 7</span><span class="nm">测试</span><span class="mk">✓</span></div>
+    </div>
+    <p class="rail-note"><b>但这是「照读满分」，不是「脱稿满分」。</b>跟读三步法的第一步就是看着念，你正走在流程上——只是下一格是<b>只看中文说</b>，再下一格是全盖住。<br>七步这个指标到顶了，从下一题起换新的：<b>脱稿完成度</b>。</p>
+  </section>
+
+  <section class="cards">
+    <div class="cd die">
+      <h2>要修的两处</h2>
+      <p><strong>① 走例子时数值说错了。</strong>第三个例子 <code>{1,2,2,2,3}</code> T=2，你说「left 变成 1，最后 return left」。实际 right 从 4→2→1，<strong>left 一直是 0</strong>，答案从 <strong>right</strong> 出来。数值恰好也是 1，所以你没察觉。<br><strong>走例子的全部价值在于数值准确</strong>——说错了数值，代码有问题你也发现不了。</p>
+      <p><strong>② 同一次口述里同一个错误既对又错。</strong>复述时 ✅ "sorted in ascending order"；归约时 ❌ "since the array is ascending order"。说明只是复述那一句练熟了，这条还没稳定。</p>
+    </div>
+    <div class="cd gold">
+      <h2>这道题的金句</h2>
+      <p class="quote">Only the equal case keeps mid — if mid isn't the target, it can't be the answer, so I discard it.</p>
+    </div>
+  </section>
+
+  <section class="hero">
+    <span class="lb">全场最有价值的一段</span>
+    <h3>你把「混合模版」讲明白了</h3>
+    <p>这题不是纯模版 B。你原话：<strong>"we can discard mid also, because we need the exactly element equal to target, so if mid is not equal to target we don't want mid."</strong></p>
+    <p>03 题你是<strong>套模版</strong>，这次是<strong>理解了模版为什么长这样</strong>——深了一层。</p>
+    <div class="split">
+      <div class="sp keep">
+        <div class="h">== target　→　right = mid</div>
+        <p><strong>不丢弃。</strong>mid 本身就是一个 occurrence，可能就是第一次出现——不能扔。</p>
+      </div>
+      <div class="sp drop">
+        <div class="h">&lt; 或 &gt; target　→　mid ± 1</div>
+        <p><strong>丢弃。</strong>mid 不等于 target，它<strong>确定</strong>不是答案——扔掉安全。</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="bar">
+    <span class="lab">跟读</span>
+    <span class="seg">
+      <button type="button" data-m="none" aria-pressed="true">① 看着念</button>
+      <button type="button" data-m="en" aria-pressed="false">② 只看中文</button>
+      <button type="button" data-m="all" aria-pressed="false">③ 全盖住</button>
+    </span>
+    <span class="hint">这题请从 ② 开始</span>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 1</span><span class="gt">开场</span><span class="gs">✓</span>
+      <span class="gd">这次把第二句也用上了——题面长的时候中途冒一句，让他知道你没死机。</span></div>
+    <div class="ln"><div class="when">0:00</div><div class="zh veil">我先通读一遍，会安静一两分钟</div><div class="en veil">Let me read through this once — I'll be quiet for a minute or two.</div></div>
+    <div class="ln"><div class="when">读题中</div><div class="zh veil">还在读，这题铺垫挺长</div><div class="en veil">Still reading — there's a lot of setup here.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 2</span><span class="gt">复述</span><span class="gs">✓ 本周目标说对了</span>
+      <span class="gd">"sorted in ascending order" 是 grammar 表里次数最高的那条，这次第一次说对。只差一个冠词：the index。</span></div>
+    <div class="ln"><div class="when">1:45<span class="pt">① ②</span></div>
+      <div class="zh veil">给一个<strong>升序</strong>数组和目标 T，返回 T <strong>第一次出现</strong>的下标，找不到返回 −1</div>
+      <div class="en veil">So, to make sure I understand — we're given an array <strong>sorted in</strong> ascending order and a target T, and we need to return <strong>the index of the first occurrence</strong> of T, or −1 if it isn't there.</div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 3</span><span class="gt">提问</span><span class="gs">✓ 但还是没停</span>
+      <span class="gd">你说了 "is it fair?" —— 有问句了，而且假设都带了依据（"as the question said"）。<b>唯一还缺的是停顿</b>：问完直接接着往下讲了。问号的意义在于那 2 秒的等待。</span></div>
+    <div class="ln"><div class="when">2:15 ①</div>
+      <div class="zh veil"><strong>真问，问完停 2 秒</strong>　有重复值的时候，我应该返回最左边那个下标——对吗</div>
+      <div class="en veil"><strong>What should I do</strong> when there are duplicates — should I return the <strong>leftmost</strong> index? <span style="color:var(--muted)">〔停下来等他答〕</span></div></div>
+    <div class="ln"><div class="when">2:15 ②</div>
+      <div class="zh veil"><strong>带假设 · 有依据</strong>　题目写了 null 或空数组返回 −1，所以我就照这个来</div>
+      <div class="en veil">The problem says a null or empty array returns −1, so I'll go with that.</div></div>
+    <div class="ln"><div class="when">2:15 ③</div>
+      <div class="zh veil"><strong>带假设</strong>　所以后处理我会<strong>先检查 left</strong>，因为找的是第一次出现——这样可以吗</div>
+      <div class="en veil">So in the post-processing I'll <strong>check left first</strong>, since we want the first occurrence — <strong>is that fair?</strong></div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 4</span><span class="gt">归约 · 不变量</span><span class="gs">✓ 因果链两半都说了</span>
+      <span class="gd">03 题你只说了「不丢弃 mid」，这次<b>主动</b>接上了「所以要相邻停」。要改的只有主语：不是 "I can reduce to"，是 "<b>this reduces to</b>"。</span></div>
+    <div class="ln"><div class="when">3:30<span class="pt">② ③</span></div>
+      <div class="zh veil">因为数组有序、而且要找第一次出现，所以<strong>这归约成</strong>二分</div>
+      <div class="en veil">Since the array is sorted and we want the first occurrence, <strong>this reduces to</strong> binary search.</div></div>
+    <div class="ln"><div class="when">4:00 不变量</div>
+      <div class="zh veil">我把区间收缩到<strong>最后两个相邻的候选</strong>，答案一定是这两个之一</div>
+      <div class="en veil">I narrow the range down to <strong>two adjacent candidates</strong> — the answer must be <strong>one of those two</strong>.</div></div>
+    <div class="ln"><div class="when">4:30 关键</div>
+      <div class="zh veil"><strong>只有相等的分支保留 mid</strong>——mid 本身就是一个 occurrence，可能就是第一次出现，不能扔。<br><strong>不相等的分支可以丢弃 mid</strong>——它确定不是答案</div>
+      <div class="en veil"><strong>Only the equal case keeps mid</strong> — mid is an occurrence itself, so it might be the first one. If mid <strong>isn't</strong> the target, it can't be the answer, so I discard it.</div></div>
+    <div class="ln"><div class="when">5:00 终止</div>
+      <div class="zh veil">所以循环条件是 <code>left &lt; right − 1</code>——我要的是最后<strong>相邻</strong>的两个</div>
+      <div class="en veil">So the loop condition is left &lt; right − 1, because I want to stop while the two are still <strong>adjacent</strong>.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 5</span><span class="gt">边界</span><span class="gs">✓</span>
+      <span class="gd">可以再加半句：长度 1 或 2 时循环一次都不跑，全靠后处理——这一句会让边界从「防御」变成「我知道它为什么在」。</span></div>
+    <div class="ln"><div class="when">5:30<span class="pt">④</span></div>
+      <div class="zh veil">写码前：null 或空数组返回 −1，不是 0 也不是别的。另外长度 1 或 2 时循环不跑，后处理必须自己能处理</div>
+      <div class="en veil">Before I code — a null or empty array returns −1, not 0. And with one or two elements the loop never runs, so the post-processing has to handle those on its own.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 6</span><span class="gt">复杂度 · 递球</span><span class="gs">✓ 措辞一字不差</span>
+      <span class="gd">03 题你说的是 "is there any question"，标了要改——这次改对了。</span></div>
+    <div class="ln"><div class="when">6:00</div>
+      <div class="zh veil">时间 O(log n)，空间 O(1)。开始写之前，你觉得这个方向可以吗</div>
+      <div class="en veil">Time is <strong>big O of log n</strong>, space is O(1). <strong>Does that sound reasonable before I start coding?</strong></div></div>
+  </div>
+
+  <div class="grp aux">
+    <div class="ghead"><span class="gn">写码中</span><span class="gt">只说意图</span><span class="gs">不计入七步</span>
+      <span class="gd">这题最值得说出口的是那个三分支——尤其「相等时不动 left」那一句。</span></div>
+    <div class="ln"><div class="when">写码时</div><div class="zh veil">相等时我只收右边界，<strong>左边界不动</strong>——因为左边可能还有一个更早的</div><div class="en veil">On a match I only move the right boundary and <strong>leave left where it is</strong> — there could still be an earlier occurrence on the left.</div></div>
+    <div class="ln"><div class="when">写码时</div><div class="zh veil">这两个分支可以直接跳过 mid，因为 mid 不是答案</div><div class="en veil">These two branches skip past mid, because mid isn't the answer.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 7</span><span class="gt">测试 · 自己走例子</span><span class="gs">✓ 连续第二题</span>
+      <span class="gd"><b>这次是写完主动走的，不是被 bug 逼的</b>——这是质的区别。但数值要说准：例 ③ 你把 left 说成了 1，实际 left 一直是 0，答案从 right 出来。<b>慢一点，一步一个数。</b></span></div>
+    <div class="ln"><div class="when">25:00</div><div class="zh veil">我走几个例子验证一下</div><div class="en veil">Let me walk through a few cases.</div></div>
+    <div class="ln"><div class="when">例 ① 命中</div>
+      <div class="zh veil">{1,2,3} T=2：mid=1 命中 → right=1；left=0、right=1 相邻，退出；后处理 array[0]=1≠2，array[1]=2 → <strong>返回 right = 1</strong></div>
+      <div class="en veil">One, two, three with target 2 — mid is 1, that's a match, so right becomes 1. Now left and right are adjacent, we exit, and the post-processing returns <strong>right, which is 1</strong>.</div></div>
+    <div class="ln"><div class="when">例 ② 找不到</div>
+      <div class="zh veil">{1,2,3} T=4：mid=1，2&lt;4 → left=2；退出；两个候选都不等于 4 → 返回 −1</div>
+      <div class="en veil">With target 4 — mid is 1, two is smaller, so left becomes 2. We exit, neither candidate equals 4, so we return −1.</div></div>
+    <div class="ln"><div class="when">例 ③ 重复值　<strong>数值别说错</strong></div>
+      <div class="zh veil">{1,2,2,2,3} T=2：mid=2 命中 → right=2；再一轮 mid=1 命中 → right=1；<strong>left 全程是 0</strong>；退出后 array[0]=1≠2，array[1]=2 → <strong>返回 right = 1</strong></div>
+      <div class="en veil">One, two, two, two, three with target 2 — mid is 2, a match, so right becomes 2. Next round mid is 1, also a match, right becomes 1. <strong>Left never moved from 0.</strong> We exit, array of 0 is 1 which isn't the target, array of 1 is — so we return <strong>right, which is 1</strong>.</div></div>
+    <div class="ln"><div class="when">例 ④ n = 1</div>
+      <div class="zh veil">单元素：循环一次都不跑，后处理直接查 array[0]</div>
+      <div class="en veil">For a single element the loop never runs, and the post-processing just checks that one element.</div></div>
+  </div>
+
+  <div class="grp aux">
+    <div class="ghead"><span class="gn">追问</span><span class="gt">你主动问了，很好</span><span class="gs">不计入七步</span>
+      <span class="gd">"do I need to optimize, or you can give me some other cases" —— 这是 33:00 那一步，主动递球。措辞理顺一下就完美。</span></div>
+    <div class="ln"><div class="when">33:00</div>
+      <div class="zh veil">这已经是 O(log n) 了，我觉得是最优的。你想让我优化别的地方，还是再给我几个 case</div>
+      <div class="en veil">Since this is already O(log n) I think it's optimal. <strong>Would you like me to optimize anything else, or would you rather give me more test cases?</strong></div></div>
+    <div class="ln"><div class="when">追问准备</div>
+      <div class="zh veil">如果要的是<strong>最后一次</strong>出现：相等时改成 <code>left = mid</code>，后处理<strong>先检查 right</strong>——整个结构镜像</div>
+      <div class="en veil">If you wanted the <strong>last</strong> occurrence instead, I'd set left to mid on a match and check <strong>right first</strong> in the post-processing — the whole thing mirrors.</div></div>
+  </div>
+
+  <h3 class="sec">这次要改的说法</h3>
+  <div class="four">
+    <div><span class="a">这归约成二分（主语）</span><span class="b"><strong>this reduces to</strong> binary search　<em>不是 "I can reduce to"——归约的是问题，不是你</em></span></div>
+    <div><span class="a">左右边界 / 指针</span><span class="b">the left <strong>boundary</strong> ／ the left <strong>pointer</strong>　<em>不是 "the left bar"（03、04 各说了一次）</em></span></div>
+    <div><span class="a">答案是这两个之一</span><span class="b">the answer must be <strong>one of those two</strong>　<em>不是 "between left and right"，答案就是这两个本身</em></span></div>
+    <div><span class="a">收缩到两个相邻候选</span><span class="b">narrow it down to two <strong>adjacent</strong> candidates</span></div>
+    <div><span class="a">正好等于 target 的那个元素</span><span class="b">the element <strong>exactly equal to</strong> the target</span></div>
+    <div><span class="a">初始化在两端</span><span class="b">I'll <strong>initialize</strong> them <strong>at both ends</strong> of the array</span></div>
+    <div><span class="a">提交之前</span><span class="b">before I <strong>submit</strong> ／ before I finish up</span></div>
+    <div><span class="a">通过了</span><span class="b">it <strong>passed</strong> ／ it's <strong>accepted</strong>　<em>不是 "it's accept"</em></span></div>
+    <div><span class="a">数组是升序的（本周继续盯）</span><span class="b">the array is <strong>sorted in</strong> ascending order　<em>复述时对了，归约时又说回 "is ascending order"</em></span></div>
+  </div>
+
+  <h3 class="sec">代码 · 这次全对</h3>
+<pre><span class="k">public int</span> firstOccur(<span class="k">int</span>[] array, <span class="k">int</span> target) {
+  <span class="k">if</span> (array == <span class="k">null</span> || array.length == 0) <span class="k">return</span> -1;
+
+  <span class="k">int</span> left = 0, right = array.length - 1;
+
+  <span class="k">while</span> (left &lt; right - 1) {              <span class="c">// 停在相邻</span>
+    <span class="k">int</span> mid = left + (right - left) / 2;
+
+    <span class="k">if</span> (array[mid] == target) <span class="hl">right = mid;</span>       <span class="c">// ← 保留 mid：它可能就是第一次出现</span>
+    <span class="k">else if</span> (array[mid] &lt; target) left = mid + 1;  <span class="c">// ← 丢弃 mid：确定不是答案</span>
+    <span class="k">else</span> right = mid - 1;                          <span class="c">// ← 同上</span>
+  }
+
+  <span class="c">// 后处理：先查 left，因为要的是第一次出现</span>
+  <span class="k">if</span> (array[left] == target) <span class="k">return</span> left;
+  <span class="k">if</span> (array[right] == target) <span class="k">return</span> right;
+  <span class="k">return</span> -1;
+}</pre>
+
+  <h3 class="sec">这次确实进步了的</h3>
+  <div class="won">
+    <div><strong>七步 7 / 7</strong>，第一次全做到。</div>
+    <div><strong>sorted in ascending order 说对了</strong>——grammar 表里次数最高的那条，本周目标命中。</div>
+    <div><strong>递球措辞一字不差</strong>："Does that sound reasonable before I start coding?" 03 题标了要改，改掉了。</div>
+    <div><strong>adjacent 的因果链两半都说了</strong>——03 题只说了前半句，这次主动接上了后半句。</div>
+    <div><strong>STEP 7 是主动走的，不是被 bug 逼的。</strong>03 题是 run 出死循环才想起来，这次写完就走。</div>
+    <div><strong>把混合模版讲明白了</strong>——理解了模版，不是套模版。</div>
+    <div><strong>中文语气词从 4 次降到 2 次。</strong></div>
+  </div>
+
+  <h3 class="sec">四题趋势</h3>
+  <div class="trend">
+    <table>
+      <thead><tr><th></th><th>01</th><th>02</th><th>03</th><th>04</th></tr></thead>
+      <tbody>
+        <tr><td>七步</td><td class="n">4</td><td class="n">2.5</td><td class="n">6.5</td><td class="n hi">7</td></tr>
+        <tr><td>内容错误</td><td class="n">2</td><td class="n">0</td><td class="n">1</td><td class="n hi">0</td></tr>
+        <tr><td>留在代码里的 bug</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n hi">0</td></tr>
+        <tr><td>自己走例子</td><td class="n">✗</td><td class="n">✗</td><td class="n">✓</td><td class="n hi">✓</td></tr>
+        <tr><td>中文语气词</td><td class="n">0</td><td class="n">2</td><td class="n">4</td><td class="n hi">2</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="sec">下一题只带走三件事</h3>
+  <ol class="take">
+    <li><strong>把小抄扣过去放。</strong>七步这个指标到顶了——下一题的目标是<strong>脱稿</strong>：只在真卡住时才翻，翻了就在卡片上记一笔「翻了第几步」。新指标是<b>脱稿完成度</b>。</li>
+    <li><strong>问完停 2 秒。</strong>你已经会说 "is that fair?" 了，但说完就接着往下讲。<strong>问号的意义在于那 2 秒的等待</strong>——不停，等于没问。</li>
+    <li><strong>走例子时数值说准。</strong>慢一点，一步一个数：left 现在多少、right 现在多少、mid 落在哪。说错数值 = 白走。</li>
+  </ol>
+
+  <footer>
+    <span>ALG ROUND 3 · #04</span>
+    <span>本周只盯 中文语气词</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.seg button'),body=document.body;
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    body.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m?'true':'false');});
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){setMode(b.dataset.m);}); });
+  body.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))) v.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
