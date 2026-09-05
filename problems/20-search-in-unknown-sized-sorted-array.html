@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>20 · Search In Unknown Sized Sorted Array</title>
+<meta name="description" content="STEP 4 里含糊带过的那一环，就是你写码会卡的那一环。三题验证。">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --warn:#A8412A; --warn-soft:#F7E7E2;
+  --amber:#8A6A1F; --amber-soft:#F5EDD8;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --warn:#E08A70; --warn-soft:#33201B;
+    --amber:#D9B45E; --amber-soft:#2C2617;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --warn:#E08A70; --warn-soft:#33201B;
+  --amber:#D9B45E; --amber-soft:#2C2617;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-zh);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:44px 24px 96px}
+
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--rule)}
+.crumb{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{font-family:var(--f-head);font-weight:700;font-size:clamp(25px,4.3vw,35px);line-height:1.12;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chapdone{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--speak);background:var(--speak-soft);border:1px solid var(--speak);border-radius:4px;padding:3px 9px}
+
+.head-find{margin-top:24px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:0 9px 9px 0;padding:22px 24px;box-shadow:var(--shadow)}
+.head-find .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--warn);font-weight:600}
+.head-find h2{font-family:var(--f-head);font-size:clamp(18px,2.9vw,22px);font-weight:700;margin:9px 0 6px;letter-spacing:-.015em;line-height:1.28}
+.head-find .sub{font-size:13.5px;color:var(--ink-2);margin:0 0 17px;line-height:1.62}
+.head-find .sub b{color:var(--ink);font-weight:600}
+.head-find .close{margin:17px 0 0;font-size:13.5px;color:var(--ink-2);line-height:1.62;padding-top:15px;border-top:1px dashed var(--rule)}
+.head-find .close b{color:var(--ink);font-weight:600}
+
+.evid{width:100%;border-collapse:collapse;font-size:13px}
+.evid th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 11px 8px;border-bottom:1px solid var(--rule)}
+.evid td{padding:11px;border-bottom:1px solid var(--rule-soft);vertical-align:top;line-height:1.55}
+.evid td.q{font-family:var(--f-mono);font-weight:600;color:var(--speak);width:1%;white-space:nowrap}
+.evid td.said{font-family:var(--f-say);color:var(--ink)}
+.evid td.out{color:var(--warn);font-weight:600;width:31%}
+
+.rail-wrap{margin-top:26px}
+.rail-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.rail-head .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.rail-head .score{font-family:var(--f-mono);font-size:15px;color:var(--speak);font-weight:600;font-variant-numeric:tabular-nums}
+.rail{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.st{border:1px solid var(--rule);border-radius:7px;padding:11px 10px 10px;display:flex;flex-direction:column;gap:5px;min-width:0;border-top:3px solid var(--speak);background:var(--speak-soft)}
+.st .n{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--speak)}
+.st .nm{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.st .mk{font-family:var(--f-mono);font-size:14px;line-height:1;margin-top:2px;color:var(--speak)}
+.st.half{border-top-color:var(--amber);background:var(--amber-soft)}
+.st.half .n,.st.half .mk{color:var(--amber)}
+.st.up{border-top-color:var(--speak);background:var(--speak);color:#fff}
+.st.up .n,.st.up .nm,.st.up .mk{color:#fff}
+.rail-note{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.rail-note b{color:var(--ink-2);font-weight:600}
+
+.chain{margin-top:26px;border:1px solid var(--rule);border-radius:9px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+.chain .ch{padding:14px 19px;border-bottom:1px solid var(--rule);background:var(--rule-soft)}
+.chain .ch .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.chain .ch .q{font-size:13.5px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.chain .ch .q b{color:var(--ink);font-weight:600}
+.stp{display:grid;grid-template-columns:112px 1fr;gap:0 18px;padding:15px 19px;border-bottom:1px solid var(--rule-soft);align-items:start}
+.stp:last-child{border-bottom:0}
+.stp .k{font-family:var(--f-mono);font-size:11px;color:var(--speak);font-weight:600;padding-top:2px;letter-spacing:.04em}
+.stp .arrow{font-family:var(--f-head);font-size:14.5px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.stp .why{font-size:13px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.stp .why b{color:var(--ink);font-weight:600}
+.stp .tc{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-top:5px}
+.stp.hot{background:var(--warn-soft)}
+.stp.hot .k{color:var(--warn)}
+.stp .tag{display:inline-block;font-family:var(--f-mono);font-size:9.5px;font-weight:600;color:var(--warn);background:var(--card);border:1px solid var(--warn);border-radius:3px;padding:1px 5px;margin-left:8px;vertical-align:2px;letter-spacing:.06em}
+
+.hero{margin-top:22px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--speak);border-radius:0 9px 9px 0;padding:20px 22px;box-shadow:var(--shadow)}
+.hero.w{border-left-color:var(--warn)}
+.hero .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--speak);font-weight:600}
+.hero.w .lb{color:var(--warn)}
+.hero h3{font-family:var(--f-head);font-size:17px;font-weight:600;margin:8px 0 12px;letter-spacing:-.01em}
+.hero .said{font-family:var(--f-say);font-size:16px;line-height:1.5;color:var(--ink);padding:12px 16px;background:var(--speak-soft);border-radius:7px;margin:0 0 11px}
+.hero.w .said{background:var(--warn-soft)}
+.hero .said b{color:var(--speak);font-weight:600}
+.hero.w .said b{color:var(--warn)}
+.hero p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero p + p{margin-top:9px}
+.hero p b{color:var(--ink);font-weight:600}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.cd{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;box-shadow:var(--shadow)}
+.cd h3{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
+.cd.die{border-left:3px solid var(--amber)}
+.cd.die h3{color:var(--amber)}
+.cd.gold{border-left:3px solid var(--speak);background:var(--speak-soft)}
+.cd.gold h3{color:var(--speak)}
+.cd p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-2)}
+.cd p + p{margin-top:9px}
+.cd p strong{color:var(--ink);font-weight:600}
+.cd .quote{font-family:var(--f-say);font-size:16px;line-height:1.45;color:var(--ink);margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--rule-soft);padding:1px 5px;border-radius:3px}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0 6px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{font-family:var(--f-mono);font-size:11.5px;background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+.grp{margin-top:26px}
+.grp:first-of-type{margin-top:10px}
+.ghead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding:9px 13px;border-radius:7px 7px 0 0;border-left:3px solid var(--speak);background:var(--speak-soft)}
+.ghead .gn{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--speak);font-weight:600}
+.ghead .gt{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--ink)}
+.ghead .gs{font-family:var(--f-mono);font-size:11.5px;margin-left:auto;color:var(--speak)}
+.ghead .gd{font-size:12px;color:var(--muted);width:100%;line-height:1.5}
+.ghead .gd b{color:var(--ink-2);font-weight:600}
+.grp.aux .ghead{border-left-color:var(--rule);background:var(--rule-soft)}
+.grp.aux .ghead .gn,.grp.aux .ghead .gs{color:var(--muted)}
+.grp.half .ghead{border-left-color:var(--amber);background:var(--amber-soft)}
+.grp.half .ghead .gn,.grp.half .ghead .gs{color:var(--amber)}
+
+.ln{display:grid;grid-template-columns:120px 1fr 1.32fr;gap:0 20px;padding:15px 13px;border-bottom:1px solid var(--rule-soft);align-items:start;border-left:3px solid var(--speak-soft)}
+.grp.aux .ln{border-left-color:var(--rule-soft)}
+.grp.half .ln{border-left-color:var(--amber-soft)}
+.when{font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:3px;font-variant-numeric:tabular-nums}
+.pt{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--speak);background:var(--speak-soft);border-radius:3px;padding:1px 5px;margin-top:5px}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.zh strong{color:var(--ink);font-weight:600}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.48;color:var(--ink)}
+.en strong{font-weight:600;color:var(--speak)}
+.en s{color:var(--warn);text-decoration-thickness:1px}
+
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){color:transparent;background:var(--rule-soft);min-height:1.5em;user-select:none}
+:root.m-en .en.veil:not(.show) strong,
+:root.m-all .en.veil:not(.show) strong,
+:root.m-all .zh.veil:not(.show) strong{color:transparent}
+:root.m-en .en.veil:not(.show):hover,:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+h3.sec{font-family:var(--f-head);font-weight:600;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:52px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.four{display:flex;flex-direction:column;gap:0}
+.four div{display:grid;grid-template-columns:1fr 1.35fr;gap:20px;padding:12px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.four .a{font-size:13.5px;color:var(--ink-2)}
+.four .b{font-family:var(--f-say);font-size:15px;color:var(--ink)}
+.four .b strong{color:var(--speak);font-weight:600}
+.four .b em{font-style:normal;color:var(--muted);font-size:13px}
+
+pre{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;overflow-x:auto;box-shadow:var(--shadow);font-family:var(--f-mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:0}
+pre .c{color:var(--muted)}
+pre .k{color:var(--speak);font-weight:500}
+pre .hl{color:var(--warn);font-weight:600}
+
+ol.take{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:14px}
+ol.take li{counter-increment:t;position:relative;padding-left:34px;font-size:14px;color:var(--ink-2);line-height:1.6}
+ol.take li::before{content:counter(t);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--speak-soft);color:var(--speak);font-family:var(--f-mono);font-size:11px;font-weight:600;display:grid;place-items:center}
+ol.take strong{color:var(--ink);font-weight:600}
+
+.won{display:flex;flex-direction:column;gap:10px}
+.won div{font-size:13.5px;color:var(--ink-2);padding-left:24px;position:relative}
+.won div::before{content:"✓";position:absolute;left:0;color:var(--speak);font-weight:700}
+.won strong{color:var(--ink);font-weight:600}
+
+.trend{overflow-x:auto;margin-top:4px}
+.trend table{width:100%;border-collapse:collapse;font-size:13.5px}
+.trend th{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 10px 8px;border-bottom:1px solid var(--rule)}
+.trend td{padding:10px;border-bottom:1px solid var(--rule-soft);line-height:1.55}
+.trend td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:center;width:1%;white-space:nowrap}
+.trend td.hi{color:var(--speak);font-weight:600}
+.trend td.bad{color:var(--warn);font-weight:600}
+.trend td.id{font-family:var(--f-mono);font-weight:600;color:var(--muted);width:1%;text-align:center}
+.trend td.tpl{font-family:var(--f-mono);font-size:11.5px;color:var(--speak);white-space:nowrap;width:1%}
+
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:820px){ .rail{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:760px){
+  .wrap{padding:30px 17px 72px}
+  .cards{grid-template-columns:1fr}
+  .ln{grid-template-columns:1fr;gap:7px}
+  .stp{grid-template-columns:1fr;gap:5px}
+  .when{padding-top:0}
+  .four div{grid-template-columns:1fr;gap:5px}
+  .hint{margin-left:0;width:100%}
+  .ghead .gs{margin-left:0}
+  .evid td.out{width:auto}
+}
+@media (max-width:460px){ .rail{grid-template-columns:repeat(2,1fr)} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:11pt}.wrap{max-width:none;padding:0}
+  .ln,.cd,pre,.grp,.st,.hero,.stp,.head-find{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb"><a href="../">alg-round3</a><span>/</span><span>problems</span><span>/</span><span>20</span></div>
+    <h1>Search In Unknown Sized Sorted Array</h1>
+    <div class="meta">Binary Search 20 · A 类新 pattern · 脱稿 · 中文语气词 <b style="color:var(--speak)">0 次</b></div>
+    <div><span class="chapdone">Binary Search 一章收官 · 10 / 10</span></div>
+  </header>
+
+  <section class="head-find">
+    <span class="lb">这次的头条发现 · 三题验证，可以预测</span>
+    <h2>你在 STEP 4 里含糊带过的那一环，就是你写码时会卡住的那一环</h2>
+    <p class="sub">这次的 bug 不是从代码里长出来的，是从<b>归约里那半句话</b>长出来的。你说「then I will do <b>classical</b> binary search」——但这题恰恰<b>不是</b>经典二分，因为 <code>mid</code> 可能越界。<b>你把第 ③ 环说成了「就是经典的」，于是你写的就是经典的，于是 NPE。</b></p>
+    <div style="overflow-x:auto">
+    <table class="evid">
+      <thead><tr><th>题</th><th>STEP 4 里那一环你是怎么说的</th><th>写码时卡在哪</th></tr></thead>
+      <tbody>
+        <tr><td class="q">06</td><td class="said">"expand the result to K" —— 一句带过</td><td class="out">收缩 ③ · 死循环 · 44 分钟未 AC</td></tr>
+        <tr><td class="q">09</td><td class="said">拆两半说清楚了，但「为什么峰能二分」漏到了 STEP 6</td><td class="out">收缩 ② · 两个 if 写成并列</td></tr>
+        <tr><td class="q">20</td><td class="said">"then <b>classical</b> binary search" —— 第 ③ 环直接跳过</td><td class="out">收缩 ③ · mid 越界 NPE</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="close"><b>三题，三次命中。</b>这不是巧合——你说不满的那一环，就是你还没想清楚的那一环，只是嘴替你把它盖过去了。<br><br><b>反过来用，这是个免费的预警器：</b>归约的时候，如果某一环你说得<b>明显比别的环短</b>，或者用了「就是经典 XX」「然后扩展一下」「按常规做」这类词——<b>停下来，把那一环说满再动手</b>。说不满，就是提前 15 分钟知道自己会卡在哪。<br><br>这一条比这道题本身值钱。它是 06、09、20 三次事故共同的上游。</p>
+  </section>
+
+  <section class="rail-wrap">
+    <div class="rail-head">
+      <span class="t">脱稿完成度</span>
+      <span class="score">6 / 7</span>
+    </div>
+    <div class="rail">
+      <div class="st"><span class="n">STEP 1</span><span class="nm">开场</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 2</span><span class="nm">复述</span><span class="mk">✓</span></div>
+      <div class="st up"><span class="n">STEP 3</span><span class="nm">提问</span><span class="mk">★</span></div>
+      <div class="st half"><span class="n">STEP 4</span><span class="nm">归约</span><span class="mk">半</span></div>
+      <div class="st half"><span class="n">STEP 5</span><span class="nm">边界</span><span class="mk">半</span></div>
+      <div class="st"><span class="n">STEP 6</span><span class="nm">复杂度·递球</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 7</span><span class="nm">测试</span><span class="mk">✓</span></div>
+    </div>
+    <p class="rail-note"><b>★ STEP 3 出现了一个新品种的问题</b>："The problem gives us the interface of the Dictionary — <b>can I just use it?</b>" 这是九题以来<b>第一个关于 API 契约的问题</b>，不是边界问题。这一类问题在真实面试里含金量最高，因为它说明你在想「这个东西是怎么被调用的」。<br><b>半步的两步</b>：STEP 4 缺第 ③ 环（见上）；STEP 5 你说的边界是「空数组」，<b>挂你的边界是「只有一个元素」</b>——09 也是这样（说 null/空，被全降数组挂）。<b>连续两题，说的边界和挂你的边界不是同一个。</b></p>
+  </section>
+
+  <section class="chain">
+    <div class="ch">
+      <span class="t">收缩链</span>
+      <div class="q"><b>原题</b>　升序 dictionary，长度未知。返回 target 的下标，不存在返回 −1。<code>get(i)</code> 越界返回 <code>null</code>。</div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ①</span>
+      <div>
+        <div class="arrow">长度未知 → 先造一个右边界</div>
+        <div class="why">从 1 开始<b>倍增</b>，直到 <code>get(right) == null</code>。此时 <code>right</code> 一定越界，且 <code>right &lt; 2n</code>。<br><span style="color:var(--speak)">这一环你说得很清楚，一次到位。</span></div>
+        <div class="tc">O(log n)</div>
+      </div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ②</span>
+      <div>
+        <div class="arrow">有了 [0, right] → 经典二分（模版 A）</div>
+        <div class="why">但 <code>right</code> 是越界的，所以 <code>mid</code> 也可能越界。<b>这句你没说。</b></div>
+        <div class="tc">O(log n)</div>
+      </div>
+    </div>
+    <div class="stp hot">
+      <span class="k">收缩 ③</span>
+      <div>
+        <div class="arrow">越界不是特例 → 把 <code>null</code> 当 +∞<span class="tag">卡在这</span></div>
+        <div class="why"><code>null</code> 和「太大」都往左收，<b>合并成同一条分支</b>。越界这件事从代码里消失了。<br><b>不变量：</b><code>null</code> 只可能出现在<b>右段</b>（升序 + 前缀连续），所以「null → 往左」永远安全。<b>这句是 STEP 4 必须说的，说了就不会写成经典二分。</b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero w">
+    <span class="lb">STEP 7 · 好习惯没延续</span>
+    <h3>你走的例子，又一次绕开了那条坏分支</h3>
+    <p class="said">A = {1, 2, 5, 9}, T = 5 → 倍增到 right=4 → mid=2 → <b>命中，返回 2</b></p>
+    <p>第一轮就撞上答案，<b><code>cur == null</code> 那条分支一次都没执行</b>。跟 09 完全一样：<b>你走对了例子，但那个例子碰不到你最不确定的那一行。</b></p>
+    <p><b>而 09 那次你其实做对了一件事</b>——走完主例子之后你主动说 "change the element to three"，换了个输入去覆盖另一条分支。<b>这次没有。</b>那个动作是九题里最成熟的一次测试意识，只出现了一次就消失了。</p>
+    <p style="margin-top:12px"><b>规则：走例子之前先问自己一句——「我最不确定哪一行？」然后设计一个必须经过那一行的输入。</b>题目自带的例子是用来<b>说明题意</b>的，不是用来<b>测代码</b>的。<br>这题能打到 null 分支的输入很好造：<code>A={1,2,5,9}, T=100</code>（target 比所有元素都大），或者你自己踩到的 <code>dict=[1], T=2</code>。</p>
+  </section>
+
+  <section class="cards">
+    <div class="cd die">
+      <h3>可以带走的自检信号</h3>
+      <p><strong>代码里出现「越界 / 不存在 / 特殊值」这种分支时，先问一句——能不能把它翻译成一个普通的值？</strong></p>
+      <p style="margin-top:11px">越界 = <strong>+∞</strong>（20）<br>缺失 = <strong>跳变</strong>（08，<code>a[i]−i</code> 从 1 变 2）<br>峰 = <strong>上升停止</strong>（09）</p>
+      <p style="margin-top:11px">翻译成功之后，predicate 就恢复单调，特殊分支消失，代码短一半。<strong>这一章十道题，全在做这一件事。</strong></p>
+      <p style="margin-top:11px"><strong>还有一条老账：</strong>这题你写了<strong>两个特判，两个都是死代码</strong>（<code>dict.get(0)==null</code> 和 <code>get(1)==null</code>）。同一个反射的第三次出现（06 是「先挑第一个」）。<strong>检验法：写完特判，注释掉跑一遍，能过就删。</strong></p>
+    </div>
+    <div class="cd gold">
+      <h3>这道题的金句</h3>
+      <p class="quote">Out of bounds isn't a special case — it's <strong>just a very large value</strong>. Treat <code>null</code> as <strong>positive infinity</strong> and the boundary check disappears.</p>
+      <p style="margin-top:11px;font-size:13px;color:var(--ink-2)"><strong>识别信号</strong>：数组长度未知 / 只能通过 API 访问 / 越界有哨兵返回值 → <strong>倍增造右边界，然后把哨兵当极值并进普通比较</strong>。<br><br>这一套还管：Search in Infinite Stream、找第一个坏版本、以及任何「只给你一个 <code>isBad(i)</code> 的黑盒」的题。</p>
+    </div>
+  </section>
+
+  <div class="bar">
+    <span class="lab">跟读</span>
+    <span class="seg">
+      <button type="button" data-m="none" aria-pressed="true">① 看着念</button>
+      <button type="button" data-m="en" aria-pressed="false">② 只看中文</button>
+      <button type="button" data-m="all" aria-pressed="false">③ 全盖住</button>
+    </span>
+    <span class="hint">你已经脱稿了，直接用 ③</span>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 2</span><span class="gt">复述</span><span class="gs">✓ 稳定</span>
+      <span class="gd">三件事全说了：<b>unknown size</b> / <b>sorted ascending</b> / 返回<b>下标</b>、找不到 −1。这一步连续三题稳定，可以不用再想了。</span></div>
+    <div class="ln"><div class="when">1:00<span class="pt">① ②</span></div>
+      <div class="zh veil">为了确认我理解对了——给我们一个<strong>长度未知</strong>的整数字典 A，里面的数按<strong>升序</strong>排列</div>
+      <div class="en veil">To make sure I fully understand — we're given an integer dictionary A of <strong>unknown size</strong>, where the numbers are sorted in <strong>ascending order</strong>.</div></div>
+    <div class="ln"><div class="when">1:20</div>
+      <div class="zh veil">我要返回 target 在 A 里的<strong>下标</strong>；题目说如果找不到就返回 −1</div>
+      <div class="en veil">I need to return the <strong>index</strong> of the target in A. The problem mentions that if the target <strong>isn't found</strong>, I return <strong>minus one</strong>.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 3</span><span class="gt">提问　★ 新品种</span><span class="gs">★ 第一个 API 契约问题</span>
+      <span class="gd">第 ② 条是九题以来第一个<b>不是边界问题</b>的问题。这一类最值钱。<b>第 ③ 条是这题最该问、你没问的那个</b>——它决定了整道题存在的理由。</span></div>
+    <div class="ln"><div class="when">2:00 ① 你问了</div>
+      <div class="zh veil">字典是 null 或者长度为 0 的时候，我返回 −1 可以吗</div>
+      <div class="en veil">Should I return minus one when the dictionary is null or its length is zero — <strong>is that fair?</strong> <span style="color:var(--muted)">〔停 2 秒〕</span></div></div>
+    <div class="ln"><div class="when">2:20 ② 你问了 ★</div>
+      <div class="zh veil">题目给了 Dictionary 的接口，<strong>我可以直接用吗</strong></div>
+      <div class="en veil">The problem gives us the <strong>Dictionary interface</strong> — <strong>can I just use it directly?</strong></div></div>
+    <div class="ln"><div class="when">2:20 ③ <strong>该问没问 · 关键</strong></div>
+      <div class="zh veil"><code>get</code> 有多贵？是本地数组还是<strong>远程调用</strong>？如果贵，我会尽量减少调用次数</div>
+      <div class="en veil">How <strong>expensive</strong> is <code>get</code> — is it a local array, or a <strong>remote call</strong>? If it's expensive, I'll want to <strong>minimise the number of calls</strong>. <span style="color:var(--muted)">〔问了这句，后面「一轮只调一次 get」就变成有理有据的设计，而不是随手写的〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 4</span><span class="gt">归约　半步 · 这题的全部教训</span><span class="gs">前两环 ✓，第三环没说</span>
+      <span class="gd">前两句你说得很好。<b>第三句是你没说、然后就写错的那一句。</b>把它说出来，代码自然就对了——因为你会意识到这不是经典二分。</span></div>
+    <div class="ln"><div class="when">3:00 ① 你说了</div>
+      <div class="zh veil">因为要在<strong>长度未知</strong>的升序数组里找下标，所以我先找到<strong>第一个越界的下标</strong>——也就是字典返回 null 的位置，把它当成 right</div>
+      <div class="en veil">Since we need the index in a sorted array of <strong>unknown size</strong>, I'll first find the <strong>first index that's out of bounds</strong> — the one where the dictionary returns null — and <strong>treat that as my right boundary</strong>.</div></div>
+    <div class="ln"><div class="when">3:30 ② 你说了</div>
+      <div class="zh veil">怎么找：从 1 开始，每次<strong>翻倍</strong>，直到 <code>get</code> 返回 null。这一步是 O(log n)</div>
+      <div class="en veil">To find it, I start at one and <strong>double it</strong> each time until <code>get</code> returns null. That's <code>O(log n)</code>.</div></div>
+    <div class="ln"><div class="when">4:00 ③ <strong>没说 · 补上</strong></div>
+      <div class="zh veil">注意这个 right <strong>本身就是越界的</strong>，所以二分过程中 <code>mid</code> 也可能越界。我<strong>把 null 当成正无穷</strong>——它和「值太大」走同一条分支，都往左收。因为数组升序、前缀连续，<strong>null 只可能出现在右段</strong>，所以这样永远安全</div>
+      <div class="en veil">Note that <code>right</code> is itself <strong>out of bounds</strong>, so <code>mid</code> can be out of bounds too. I'll <strong>treat null as positive infinity</strong> — it takes the <strong>same branch</strong> as "too large", so we move left. Since the array is sorted and the valid prefix is contiguous, <strong>null can only appear in the right part</strong>, so that's always safe.</div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 5</span><span class="gt">边界　半步</span><span class="gs">说的和挂你的不是同一个</span>
+      <span class="gd">你说的是「空」，挂你的是「<b>只有一个元素</b>」（<code>dict=[1], T=2</code> 的 NPE）。09 也是这样。<b>边界不能只想「没有」，还要想「刚好一个」和「刚好在端点」。</b></span></div>
+    <div class="ln"><div class="when">4:30 你说了</div>
+      <div class="zh veil">字典为空 → <code>get(0)</code> 就是 null → 返回 −1</div>
+      <div class="en veil">If the dictionary is <strong>empty</strong>, <code>get(0)</code> is already null, so we return minus one.</div></div>
+    <div class="ln"><div class="when">4:45 <strong>该说没说</strong></div>
+      <div class="zh veil"><strong>只有一个元素</strong>的字典——right 会是 1，二分会取到越界的 mid，正好走 null 那条分支</div>
+      <div class="en veil">With a <strong>single-element</strong> dictionary, <code>right</code> comes out as one, so <code>mid</code> can land out of bounds — that's exactly the case the <strong>null branch</strong> covers.</div></div>
+    <div class="ln"><div class="when">4:45 <strong>该说没说</strong></div>
+      <div class="zh veil">target 比<strong>所有元素都大</strong>——二分会一路往右，最后撞上 null，正确返回 −1</div>
+      <div class="en veil">If the target is <strong>larger than every element</strong>, the search keeps moving right until it hits null, and correctly returns minus one.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 6</span><span class="gt">复杂度 · 递球</span><span class="gs">✓ 递球连续第 5 题</span>
+      <span class="gd">你把<b>两段分别</b>解释了（倍增每次翻倍 / 二分每次砍半），这是最完整的一次复杂度分析。<b>但漏了这题独有的那个数字：get 一共调了多少次。</b>另外中间你把 "time complexity is O(1)" 说出来了一次，是想说 space——<b>time 和 space 分成两句说，别连着。</b></span></div>
+    <div class="ln"><div class="when">6:00</div>
+      <div class="zh veil">倍增最多 log n 轮；二分区间最长是 2n，所以也是 log n 轮。<strong>总的 O(log n)</strong></div>
+      <div class="en veil">The doubling phase takes at most <code>log n</code> steps, and the search range is at most <code>2n</code>, so the binary search is <code>log n</code> as well. <strong>Overall <code>O(log n)</code>.</strong></div></div>
+    <div class="ln"><div class="when">6:20 <strong>加这句</strong></div>
+      <div class="zh veil">空间 O(1)。另外——<strong>一共调了大约 2 log n 次 <code>get</code></strong>，倍增 log n 次，二分每轮 1 次</div>
+      <div class="en veil">Space is <code>O(1)</code>. And in terms of <code>get</code> calls specifically — it's about <strong>two log n calls</strong>: <code>log n</code> for the doubling, and <strong>one per iteration</strong> of the search.</div></div>
+    <div class="ln"><div class="when">6:40 递球</div>
+      <div class="zh veil">要我再走一个例子，还是可以往下走了</div>
+      <div class="en veil"><strong>Would you like me to walk through another case, or shall I move on?</strong> <span style="color:var(--muted)">〔<s>Do I need to work through more test cases or do you think I should be optimize</s>　第 2 次〕</span></div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">写码中</span><span class="gt">只说意图</span><span class="gs">两句</span>
+      <span class="gd">第一句是把第 ③ 环<b>再说一遍</b>——写到那一行的时候说，手就不会写成经典二分。</span></div>
+    <div class="ln"><div class="when">写码时 <strong>关键</strong></div>
+      <div class="zh veil">我先把值取出来存成一个变量，<strong>一轮只调一次 <code>get</code></strong>。然后 null 和「太大」<strong>合并成一条分支</strong></div>
+      <div class="en veil">I'll pull the value into a local variable first, so I only call <code>get</code> <strong>once per iteration</strong>. Then null and "too large" <strong>share the same branch</strong>.</div></div>
+    <div class="ln"><div class="when">写码时</div>
+      <div class="zh veil">倍增那里 <code>right *= 2</code> 理论上会溢出，实际数据量到不了，要防的话可以加个上限</div>
+      <div class="en veil">Doubling could <strong>overflow</strong> in theory — in practice the data never gets that large, but I could cap it if you'd like.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 7</span><span class="gt">测试</span><span class="gs">✓ 走了，但没覆盖坏分支</span>
+      <span class="gd">主例子走得干净、每步值都报了。<b>下次加第二个例子，专打你最不确定的那条分支。</b></span></div>
+    <div class="ln"><div class="when">走例子 ①</div>
+      <div class="zh veil"><code>A={1,2,5,9}</code> T=5：right 从 1 → 2 → 4，<code>get(4)</code> 是 null 所以停。二分 <code>[0,4]</code>，mid=2，<code>get(2)=5</code> 命中，<strong>返回 2</strong></div>
+      <div class="en veil">Right goes one, two, four — <code>get</code> of four is null, so we stop there. Then we search zero through four: mid is two, <code>get</code> of two is five, which <strong>matches the target</strong>, so we return two.</div></div>
+    <div class="ln"><div class="when">走例子 ② <strong>补上</strong></div>
+      <div class="zh veil">再走一个<strong>专门打 null 分支</strong>的：<code>A={1,2,5,9}</code> T=100 → 一路往右 → mid=4 → <code>get(4)</code> 是 null → right 收到 3 → 退出 → <strong>−1</strong></div>
+      <div class="en veil">Let me run one more that <strong>specifically exercises the null branch</strong> — with a target larger than every element, the search keeps moving right until <code>mid</code> lands out of bounds, <code>get</code> returns null, we shrink right, and we correctly return minus one.</div></div>
+  </div>
+
+  <h3 class="sec">这次要改的说法</h3>
+  <div class="four">
+    <div><span class="a">二分查找　<strong>这一章说了几百次</strong></span><span class="b">binary <strong>search</strong> /sɜːrtʃ/　<em>你反复读成 "binary research"，多了一个 re-。search 是一个音节。这是这一章你说得最多的词，值得单独纠</em></span></div>
+    <div><span class="a">升序 / 降序（第 2 次）</span><span class="b">ascending <strong>order</strong> /ˈɔːrdər/　<em>还是读成 older。/ɔːr/ 不是 /oʊ/。09 就标过，这次又出现 3 次</em></span></div>
+    <div><span class="a">每次翻倍</span><span class="b">I <strong>double</strong> it each time　<em>不是 "times two to expand"。double 是动词，一个词说完</em></span></div>
+    <div><span class="a">越界</span><span class="b">out of <strong>bounds</strong>　<em>复数，而且不加 the。不是 "out of the bound"</em></span></div>
+    <div><span class="a">把它当作右边界（第 7 次）</span><span class="b"><strong>treat that as</strong> my right <strong>boundary</strong>　<em>不是 "take this index to be right bar"。bar 累计 7 次了</em></span></div>
+    <div><span class="a">已经是最优了（第 2 次）</span><span class="b">this is <strong>already optimal</strong>　<em>不是 "the time complexity has been optimized"——主语是代码，不是你</em></span></div>
+    <div><span class="a">说复杂度的顺序</span><span class="b">句号断开：<strong>Time is O(log n). Space is O(1).</strong>　<em>你连着说的时候把 time 说成了 O(1)。两句话，两个句号，不会串</em></span></div>
+    <div><span class="a">中文语气词　<strong>本周只盯</strong></span><span class="b"><strong>0 次</strong>　<em>06 是 2 次，09 是 4 次，这次归零。这一条可以毕业了</em></span></div>
+  </div>
+
+  <h3 class="sec">代码 · AC 版</h3>
+<pre><span class="k">public int</span> search(Dictionary dict, <span class="k">int</span> target) {
+  <span class="c">// 两个开头特判都是死代码，删掉了：空字典会在下面自然走到 -1</span>
+
+  <span class="k">int</span> left = 0, right = findRight(dict);
+
+  <span class="k">while</span> (left &lt;= right) {
+    <span class="k">int</span> mid = left + (right - left) / 2;
+    Integer cur = dict.get(mid);                       <span class="c">// ← 一轮只调一次</span>
+    <span class="k">if</span> (cur == <span class="k">null</span> <span class="hl">||</span> cur &gt; target) right = mid - 1;  <span class="c">// null 视为 +∞</span>
+    <span class="k">else if</span> (cur &lt; target)           left  = mid + 1;
+    <span class="k">else</span>                             <span class="k">return</span> mid;
+  }
+  <span class="k">return</span> -1;
+}
+
+<span class="c">// ① 倍增造右边界。返回值是越界的下标 —— 故意的</span>
+<span class="k">private int</span> findRight(Dictionary dict) {
+  <span class="k">int</span> right = 1;
+  <span class="k">while</span> (dict.get(right) != <span class="k">null</span>) right *= 2;
+  <span class="k">return</span> right;                     <span class="c">// 无特判：get(1)==null 时循环不进，直接返回 1</span>
+}
+<span class="c">// TC O(log n)　SC O(1)　get 调用约 2 log n 次</span></pre>
+
+  <h3 class="sec">Binary Search 一章 · 十道题的一张表</h3>
+  <div class="trend">
+    <table>
+      <thead><tr><th>题</th><th>翻译成的那个「单调判断」</th><th>模版</th></tr></thead>
+      <tbody>
+        <tr><td class="id">01</td><td>找精确值　<code>a[mid] == target</code></td><td class="tpl">A</td></tr>
+        <tr><td class="id">02</td><td>二维 → 一维：<code>row = i/n, col = i%n</code>，然后就是 01</td><td class="tpl">A</td></tr>
+        <tr><td class="id">03</td><td>收缩到<strong>相邻两个</strong>，后处理取更近的</td><td class="tpl">B</td></tr>
+        <tr><td class="id">04</td><td><code>a[i] &gt;= target</code> → 找第一个 true</td><td class="tpl">B / 混合</td></tr>
+        <tr><td class="id">05</td><td>04 的镜像 → 找最后一个 true</td><td class="tpl">B</td></tr>
+        <tr><td class="id">06</td><td>最近的 K 个必<strong>连续</strong> → 二分到锚点 + 两指针向外取 K 次</td><td class="tpl">B + 双指针</td></tr>
+        <tr><td class="id">07</td><td>要<strong>严格大于</strong> ⇒ <code>==</code> 和 <code>&lt;</code> 合并，三分支变两分支</td><td class="tpl">B</td></tr>
+        <tr><td class="id">08</td><td><code>a[i] − i</code> 前面恒为 1、后面恒为 2 → 找第一个 2</td><td class="tpl">B</td></tr>
+        <tr><td class="id">09</td><td><code>a[i] &gt;= a[i+1]</code>（上升停止）→ 找第一个 true</td><td class="tpl">收敛式</td></tr>
+        <tr><td class="id">20</td><td>越界 = <strong>+∞</strong>，null 并进「太大」→ 特殊分支消失</td><td class="tpl">A + 倍增</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:14px;color:var(--ink-2);margin-top:16px;line-height:1.65">十道题，<strong style="color:var(--ink)">十种翻译方式，一件事</strong>：<br><strong style="color:var(--ink);font-size:15px">把问题翻译成一个「前面全假、后面全真」的判断，然后找那个分界点。</strong><br><br>难的从来不是二分本身——模版 A、模版 B 两页纸就写完了。难的是<strong style="color:var(--ink)">第一步的翻译</strong>。08 的 <code>a[i]−i</code>、09 的「上升停止」、20 的「null 当 +∞」，都是翻译。<br>所以下一道二分题拿到手，第一句话不是「用二分」，而是：<strong style="color:var(--ink)">我要判断的那个真假条件是什么？它单调吗？</strong></p>
+
+  <h3 class="sec">这次确实进步了的</h3>
+  <div class="won">
+    <div><strong>中文语气词归零。</strong>06 是 2 次，09 是 4 次，这次 0 次。「本周只盯」的那一条，做到了——可以换下一条了。</div>
+    <div><strong>STEP 3 出现了新品种的问题</strong>：API 契约问题（"can I just use the interface?"），不是边界问题。这是九题以来第一次。</div>
+    <div><strong>复杂度分析最完整的一次</strong>——把倍增和二分<strong>分开</strong>论证了，不是笼统说一句 O(log n)。</div>
+    <div><strong>递球连续第 5 题</strong>，这个动作已经不需要想了。</div>
+    <div><strong>收缩 ① 的表述很干净</strong>："find the first index that's out of bounds, and treat that as right" ——一句话说完了倍增的目的。</div>
+    <div><strong>防溢出写法自动出现</strong>，而且顺口说了理由。这条早就毕业了，现在是肌肉记忆。</div>
+  </div>
+
+  <h3 class="sec">十题趋势</h3>
+  <div class="trend">
+    <table>
+      <thead><tr><th></th><th>01</th><th>02</th><th>03</th><th>04</th><th>05</th><th>06</th><th>09</th><th>20</th></tr></thead>
+      <tbody>
+        <tr><td>七步</td><td class="n">4</td><td class="n">2.5</td><td class="n">6.5</td><td class="n">7</td><td class="n">7</td><td class="n">7</td><td class="n">6</td><td class="n">6</td></tr>
+        <tr><td>看小抄</td><td class="n">—</td><td class="n">—</td><td class="n">否</td><td class="n bad">是</td><td class="n">否</td><td class="n">否</td><td class="n">否</td><td class="n hi">否</td></tr>
+        <tr><td>STEP 3 真问句</td><td class="n">—</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">2</td><td class="n bad">0</td><td class="n hi">1</td></tr>
+        <tr><td>走了例子</td><td class="n bad">否</td><td class="n bad">否</td><td class="n">是</td><td class="n">是</td><td class="n">是</td><td class="n">是</td><td class="n hi">2 个</td><td class="n">1 个</td></tr>
+        <tr><td>例子打到坏分支</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n hi">是</td><td class="n bad">否</td><td class="n bad">否</td></tr>
+        <tr><td>中文语气词</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">—</td><td class="n">2</td><td class="n bad">4</td><td class="n hi">0</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:13.5px;color:var(--ink-2);margin-top:14px">七步稳在 6，掉的位置<strong style="color:var(--ink)">从 09 的「提问+边界」换成了 20 的「归约+边界」</strong>——提问那一步自己回来了。<strong style="color:var(--ink)">边界是唯一连续两题都掉的一步，它是下一个「本周只盯」。</strong></p>
+
+  <h3 class="sec">下一章带走三件事</h3>
+  <ol class="take">
+    <li><strong>归约时，哪一环说得比别的短，就是雷。</strong>用了「就是经典 XX」「然后扩展一下」这类词，停下来把它说满再动手。06 / 09 / 20 三次命中，这是免费的预警器。</li>
+    <li><strong>边界要想三种，不是一种：「没有」「刚好一个」「刚好在端点」。</strong>你说的永远是第一种，挂你的永远是后两种。连续两题了——<strong>这是新的「本周只盯」</strong>（中文语气词已毕业）。</li>
+    <li><strong>走例子之前问：我最不确定哪一行？</strong>然后设计一个必须经过那一行的输入。题目自带的例子是用来说明题意的，不是用来测代码的。09 你做对过一次，让它变成每次。</li>
+  </ol>
+
+  <footer>
+    <span>ALG ROUND 3 · #20 · Binary Search 收官 10/10</span>
+    <span>本周只盯 → 边界的三种形态</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.seg button'),body=document.body;
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    body.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m?'true':'false');});
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){setMode(b.dataset.m);}); });
+  body.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))) v.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
