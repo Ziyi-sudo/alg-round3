@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>37 · Check If Linked List Has A Cycle</title>
+<meta name="description" content="把 36 的代码形状搬过来，还替搬来的赘肉编了理由——归约缺的第 ⑤ 样正是发现它的工具。">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<!--
+═══════════════════════════════════════════════════════════════
+  ALG ROUND 3 · 跟读卡模版　v3（Binary Search 十题后定稿）
+  用法：整个文件复制成 problems/NN-problem-name.html，只改 <body> 里的内容，CSS 一个字都不要动。
+
+  块清单（按出现顺序）—— ★必需　○按需
+  ★ header          题号 / 题名 / meta 一行
+  ★ head-find       头条发现。整张卡最重要的一块，写这次挖到的那一个东西。
+                    有跨题证据时用 .evid 表列出来（2 次以上才叫规律）。
+  ○ two             两遍对照 / 修改前后对照（重做的题、改代码的题用）
+  ★ rail            七步完成度 7 格：st（✓）/ st.half（半）/ st.up（★突破）
+  ★ chain           收缩链。原题 + 收缩①②③，卡住的那环加 .hot 和 <span class="tag">卡在这</span>
+  ○ hero            单点深挖。.hero.w = 红色（问题）／不加 = 绿色（突破）。一张卡 1–2 个，超过 2 个就稀释了
+  ★ cards           左：自检信号（.cd.die）　右：金句（.cd.gold）
+  ★ bar + grp       跟读区。bar 是三档遮盖开关，grp 按 STEP 分组
+                    .grp / .grp.half（这步只做到一半）/ .grp.aux（追问等非七步内容）
+                    每行 .ln = 时间点 + 中文 + 英文，两边都要 class="veil"
+  ★ four            "这次要改的说法"。左中右，右边只给正确形式 + <em>为什么</em>
+  ★ pre             代码。<span class="k">关键字 <span class="c">注释 <span class="hl">要盯的那一行
+  ○ trend(表)       任意对照表：跨题规律 / 一章总表 / 趋势
+  ○ won             这次确实进步了的（有真东西才写，没有就别凑）
+  ★ take            下一题只带走三件事。必须是三件，不能是五件
+  ★ footer
+
+  硬约束
+  · 中文正文用 --f-zh，英文台词用 --f-say，代码/标签用 --f-mono
+  · 颜色只用 token，不要写死 hex
+  · 主色 --speak 绿=会了/该说的　--warn 红=问题　--amber 黄=半步/教训
+  · 手机竖屏必须能读：rail 会降成 4 列再降 2 列，.ln 会堆成单列
+  · 每张卡只有一个头条。发现有三个的时候，选最能预测下一次的那个当头条，其余降为 hero
+═══════════════════════════════════════════════════════════════
+-->
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --warn:#A8412A; --warn-soft:#F7E7E2;
+  --amber:#8A6A1F; --amber-soft:#F5EDD8;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --warn:#E08A70; --warn-soft:#33201B;
+    --amber:#D9B45E; --amber-soft:#2C2617;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --warn:#E08A70; --warn-soft:#33201B;
+  --amber:#D9B45E; --amber-soft:#2C2617;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-zh);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:44px 24px 96px}
+
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--rule)}
+.crumb{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{font-family:var(--f-head);font-weight:700;font-size:clamp(25px,4.3vw,35px);line-height:1.12;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chapdone{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--speak);background:var(--speak-soft);border:1px solid var(--speak);border-radius:4px;padding:3px 9px}
+
+.head-find{margin-top:24px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:0 9px 9px 0;padding:22px 24px;box-shadow:var(--shadow)}
+.head-find .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--warn);font-weight:600}
+.head-find h2{font-family:var(--f-head);font-size:clamp(18px,2.9vw,22px);font-weight:700;margin:9px 0 6px;letter-spacing:-.015em;line-height:1.28}
+.head-find .sub{font-size:13.5px;color:var(--ink-2);margin:0 0 17px;line-height:1.62}
+.head-find .sub b{color:var(--ink);font-weight:600}
+.head-find .close{margin:17px 0 0;font-size:13.5px;color:var(--ink-2);line-height:1.62;padding-top:15px;border-top:1px dashed var(--rule)}
+.head-find .close b{color:var(--ink);font-weight:600}
+.evid{width:100%;border-collapse:collapse;font-size:13px}
+.evid th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 11px 8px;border-bottom:1px solid var(--rule)}
+.evid td{padding:11px;border-bottom:1px solid var(--rule-soft);vertical-align:top;line-height:1.55}
+.evid td.q{font-family:var(--f-mono);font-weight:600;color:var(--speak);width:1%;white-space:nowrap}
+.evid td.said{font-family:var(--f-say);color:var(--ink)}
+.evid td.out{color:var(--warn);font-weight:600;width:31%}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+.pass{border:1px solid var(--rule);border-radius:9px;padding:17px 19px;box-shadow:var(--shadow)}
+.pass.a{background:var(--warn-soft);border-left:3px solid var(--warn)}
+.pass.b{background:var(--speak-soft);border-left:3px solid var(--speak)}
+.pass .lb{font-family:var(--f-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:600}
+.pass.a .lb{color:var(--warn)} .pass.b .lb{color:var(--speak)}
+.pass .h{font-family:var(--f-head);font-size:17px;font-weight:700;margin:6px 0 9px;letter-spacing:-.01em}
+.pass ul{margin:0;padding-left:17px;font-size:13px;color:var(--ink-2);line-height:1.6}
+.pass li + li{margin-top:4px}
+.pass b{color:var(--ink);font-weight:600}
+.pass pre.mini{background:transparent;border:0;box-shadow:none;padding:9px 0 4px;font-size:12px;line-height:1.6;margin:0}
+
+.rail-wrap{margin-top:26px}
+.rail-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.rail-head .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.rail-head .score{font-family:var(--f-mono);font-size:15px;color:var(--speak);font-weight:600;font-variant-numeric:tabular-nums}
+.rail{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.st{border:1px solid var(--rule);border-radius:7px;padding:11px 10px 10px;display:flex;flex-direction:column;gap:5px;min-width:0;border-top:3px solid var(--speak);background:var(--speak-soft)}
+.st .n{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--speak)}
+.st .nm{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.st .mk{font-family:var(--f-mono);font-size:14px;line-height:1;margin-top:2px;color:var(--speak)}
+.st.half{border-top-color:var(--amber);background:var(--amber-soft)}
+.st.half .n,.st.half .mk{color:var(--amber)}
+.st.up{border-top-color:var(--speak);background:var(--speak);color:#fff}
+.st.up .n,.st.up .nm,.st.up .mk{color:#fff}
+.rail-note{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.rail-note b{color:var(--ink-2);font-weight:600}
+
+.chain{margin-top:26px;border:1px solid var(--rule);border-radius:9px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+.chain .ch{padding:14px 19px;border-bottom:1px solid var(--rule);background:var(--rule-soft)}
+.chain .ch .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.chain .ch .q{font-size:13.5px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.chain .ch .q b{color:var(--ink);font-weight:600}
+.stp{display:grid;grid-template-columns:112px 1fr;gap:0 18px;padding:15px 19px;border-bottom:1px solid var(--rule-soft);align-items:start}
+.stp:last-child{border-bottom:0}
+.stp .k{font-family:var(--f-mono);font-size:11px;color:var(--speak);font-weight:600;padding-top:2px;letter-spacing:.04em}
+.stp .arrow{font-family:var(--f-head);font-size:14.5px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.stp .why{font-size:13px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.stp .why b{color:var(--ink);font-weight:600}
+.stp .tc{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-top:5px}
+.stp.hot{background:var(--warn-soft)}
+.stp.hot .k{color:var(--warn)}
+.stp .tag{display:inline-block;font-family:var(--f-mono);font-size:9.5px;font-weight:600;color:var(--warn);background:var(--card);border:1px solid var(--warn);border-radius:3px;padding:1px 5px;margin-left:8px;vertical-align:2px;letter-spacing:.06em}
+
+.hero{margin-top:22px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--speak);border-radius:0 9px 9px 0;padding:20px 22px;box-shadow:var(--shadow)}
+.hero.w{border-left-color:var(--warn)}
+.hero .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--speak);font-weight:600}
+.hero.w .lb{color:var(--warn)}
+.hero h3{font-family:var(--f-head);font-size:17px;font-weight:600;margin:8px 0 12px;letter-spacing:-.01em}
+.hero .said{font-family:var(--f-say);font-size:16px;line-height:1.5;color:var(--ink);padding:12px 16px;background:var(--speak-soft);border-radius:7px;margin:0 0 11px}
+.hero.w .said{background:var(--warn-soft)}
+.hero .said b{color:var(--speak);font-weight:600}
+.hero.w .said b{color:var(--warn)}
+.hero .said s{color:var(--warn);text-decoration-thickness:1px}
+.hero p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero p + p{margin-top:9px}
+.hero p b{color:var(--ink);font-weight:600}
+.hero ol{margin:10px 0 0;padding-left:19px;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero ol li + li{margin-top:7px}
+.hero ol b{color:var(--ink);font-weight:600}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.sp{border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.sp.you{background:var(--speak-soft);border-left:3px solid var(--speak)}
+.sp.code{background:var(--warn-soft);border-left:3px solid var(--warn)}
+.sp .t{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:9px}
+.sp.you .t{color:var(--speak)} .sp.code .t{color:var(--warn)}
+.sp ol{margin:0;padding-left:17px;font-family:var(--f-mono);font-size:12px;line-height:1.85;color:var(--ink-2)}
+.sp ol b{color:var(--ink);font-weight:600}
+.sp .res{margin:11px 0 0;font-size:12.5px;color:var(--ink);font-weight:600;padding-top:9px;border-top:1px dashed var(--rule)}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.cd{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;box-shadow:var(--shadow)}
+.cd h3{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
+.cd.die{border-left:3px solid var(--amber)}
+.cd.die h3{color:var(--amber)}
+.cd.gold{border-left:3px solid var(--speak);background:var(--speak-soft)}
+.cd.gold h3{color:var(--speak)}
+.cd p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-2)}
+.cd p + p{margin-top:9px}
+.cd p strong{color:var(--ink);font-weight:600}
+.cd .quote{font-family:var(--f-say);font-size:16px;line-height:1.45;color:var(--ink);margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--rule-soft);padding:1px 5px;border-radius:3px}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0 6px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{font-family:var(--f-mono);font-size:11.5px;background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+.grp{margin-top:26px}
+.grp:first-of-type{margin-top:10px}
+.ghead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding:9px 13px;border-radius:7px 7px 0 0;border-left:3px solid var(--speak);background:var(--speak-soft)}
+.ghead .gn{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--speak);font-weight:600}
+.ghead .gt{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--ink)}
+.ghead .gs{font-family:var(--f-mono);font-size:11.5px;margin-left:auto;color:var(--speak)}
+.ghead .gd{font-size:12px;color:var(--muted);width:100%;line-height:1.5}
+.ghead .gd b{color:var(--ink-2);font-weight:600}
+.grp.aux .ghead{border-left-color:var(--rule);background:var(--rule-soft)}
+.grp.aux .ghead .gn,.grp.aux .ghead .gs{color:var(--muted)}
+.grp.half .ghead{border-left-color:var(--amber);background:var(--amber-soft)}
+.grp.half .ghead .gn,.grp.half .ghead .gs{color:var(--amber)}
+
+.ln{display:grid;grid-template-columns:120px 1fr 1.32fr;gap:0 20px;padding:15px 13px;border-bottom:1px solid var(--rule-soft);align-items:start;border-left:3px solid var(--speak-soft)}
+.grp.aux .ln{border-left-color:var(--rule-soft)}
+.grp.half .ln{border-left-color:var(--amber-soft)}
+.when{font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:3px;font-variant-numeric:tabular-nums}
+.pt{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--speak);background:var(--speak-soft);border-radius:3px;padding:1px 5px;margin-top:5px}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.zh strong{color:var(--ink);font-weight:600}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.48;color:var(--ink)}
+.en strong{font-weight:600;color:var(--speak)}
+.en s{color:var(--warn);text-decoration-thickness:1px}
+
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){color:transparent;background:var(--rule-soft);min-height:1.5em;user-select:none}
+:root.m-en .en.veil:not(.show) strong,
+:root.m-all .en.veil:not(.show) strong,
+:root.m-all .zh.veil:not(.show) strong{color:transparent}
+:root.m-en .en.veil:not(.show):hover,:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+h3.sec{font-family:var(--f-head);font-weight:600;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:52px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.four{display:flex;flex-direction:column;gap:0}
+.four div{display:grid;grid-template-columns:1fr 1.35fr;gap:20px;padding:12px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.four .a{font-size:13.5px;color:var(--ink-2)}
+.four .b{font-family:var(--f-say);font-size:15px;color:var(--ink)}
+.four .b strong{color:var(--speak);font-weight:600}
+.four .b em{font-style:normal;color:var(--muted);font-size:13px}
+
+pre{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;overflow-x:auto;box-shadow:var(--shadow);font-family:var(--f-mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:0}
+pre .c{color:var(--muted)}
+pre .k{color:var(--speak);font-weight:500}
+pre .hl{color:var(--warn);font-weight:600}
+pre + pre{margin-top:14px}
+
+ol.take{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:14px}
+ol.take li{counter-increment:t;position:relative;padding-left:34px;font-size:14px;color:var(--ink-2);line-height:1.6}
+ol.take li::before{content:counter(t);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--speak-soft);color:var(--speak);font-family:var(--f-mono);font-size:11px;font-weight:600;display:grid;place-items:center}
+ol.take strong{color:var(--ink);font-weight:600}
+
+.won{display:flex;flex-direction:column;gap:10px}
+.won div{font-size:13.5px;color:var(--ink-2);padding-left:24px;position:relative}
+.won div::before{content:"✓";position:absolute;left:0;color:var(--speak);font-weight:700}
+.won strong{color:var(--ink);font-weight:600}
+
+.trend{overflow-x:auto;margin-top:4px}
+.trend table{width:100%;border-collapse:collapse;font-size:13.5px}
+.trend th{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 10px 8px;border-bottom:1px solid var(--rule)}
+.trend td{padding:10px;border-bottom:1px solid var(--rule-soft);line-height:1.55}
+.trend td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:center;width:1%;white-space:nowrap}
+.trend td.hi{color:var(--speak);font-weight:600}
+.trend td.bad{color:var(--warn);font-weight:600}
+.trend td.id{font-family:var(--f-mono);font-weight:600;color:var(--muted);width:1%;text-align:center}
+.trend td.tpl{font-family:var(--f-mono);font-size:11.5px;color:var(--speak);white-space:nowrap;width:1%}
+
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:820px){ .rail{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:760px){
+  .wrap{padding:30px 17px 72px}
+  .cards,.two,.split{grid-template-columns:1fr}
+  .ln{grid-template-columns:1fr;gap:7px}
+  .stp{grid-template-columns:1fr;gap:5px}
+  .when{padding-top:0}
+  .four div{grid-template-columns:1fr;gap:5px}
+  .hint{margin-left:0;width:100%}
+  .ghead .gs{margin-left:0}
+  .evid td.out{width:auto}
+}
+@media (max-width:460px){ .rail{grid-template-columns:repeat(2,1fr)} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:11pt}.wrap{max-width:none;padding:0}
+  .ln,.cd,pre,.grp,.st,.hero,.sp,.stp,.head-find,.pass{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb"><a href="../">alg-round3</a><span>/</span><span>problems</span><span>/</span><span>37</span></div>
+    <h1>Check If Linked List Has A Cycle</h1>
+    <div class="meta">Linked List 第 3 题 · A 类（Floyd 判环）· 脱稿 · 一遍 AC 8 / 8 · 用时 14:07 · 七步连续第三题上涨</div>
+  </header>
+
+  <section class="head-find">
+    <span class="lb">这次的头条发现 · 三条证据一个根</span>
+    <h2>你把 36 的代码形状整个搬过来了，然后<b>为搬过来的东西补了一个理由</b>——而不是重新推一遍、发现它在这题根本不需要。</h2>
+    <p class="sub">这不是「抄自己的代码」的问题，抄是对的。问题是<b>抄完之后你的嘴替它辩护了</b>：你在写码中说意图时给三条件循环编了一个理由，而那个理由不成立。<b>一旦嘴替代码辩护，你就再也发现不了它是多余的。</b></p>
+    <div style="overflow-x:auto">
+    <table class="evid">
+      <thead><tr><th>搬来的东西</th><th>它在 36 里干什么</th><th>它在 37 里干什么</th></tr></thead>
+      <tbody>
+        <tr><td class="q">条件③<br><code>fast.next.next != null</code></td><td class="said">决定取中间两个里的<b>前一个还是后一个</b>——去掉它答案就错。<b>载重的。</b></td><td class="out">什么都不管。有环时 fast 永远不为 null；无环时前两个条件已经够了</td></tr>
+        <tr><td class="q">你给的理由</td><td class="said">—</td><td class="out">"because we want to move fast to fast.next.next, so we also need to check fast.next.next is not null" —— 移动只需要前两个条件，<b>fast.next.next 是 null 恰恰是允许的</b></td></tr>
+        <tr><td class="q">特判<br><code>if(head==null||head.next==null)</code></td><td class="said">36 你<b>一个特判都没写</b>，全折进循环条件（昨天那张卡专门表扬过）</td><td class="out">回来了，而且还是死代码。<b>「第一个不特殊」第 5 次</b></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="close"><b>反过来用：</b>发现自己在写「上一题那样的循环条件」时，停一下，对<b>每一个判断</b>问同一句话：<b>「这一条，在这一题里挡的是哪一个具体的输入？」</b>答得出（"两个节点的时候"）就留着，答不出就注释掉跑一遍。<code>_SYSTEM</code> 里那条「写完特判注释掉跑一遍」现在要扩到<b>循环条件里的每一项</b>。</p>
+  </section>
+
+  <section class="two">
+    <div class="pass a">
+      <span class="lb">你提交的 · AC 但有两处赘肉</span>
+      <div class="h">36 的形状，原样搬</div>
+<pre class="mini"><span class="hl">if (head==null || head.next==null) return false;</span>
+<span class="k">while</span> (fast!=<span class="k">null</span> &amp;&amp; fast.next!=<span class="k">null</span>
+       &amp;&amp; <span class="hl">fast.next.next!=null</span>) {</pre>
+      <ul>
+        <li>❌ 特判：<code>head==null</code> 被条件①挡住，单节点被条件②挡住 —— <b>两句都跑不到</b></li>
+        <li>❌ 条件③：这题没有任何输入需要它</li>
+      </ul>
+    </div>
+    <div class="pass b">
+      <span class="lb">重新推一遍的版本</span>
+      <div class="h">每一项都答得出「它挡谁」</div>
+<pre class="mini"><span class="k">while</span> (fast != <span class="k">null</span> &amp;&amp; fast.next != <span class="k">null</span>) {
+  slow = slow.next;
+  fast = fast.next.next;
+  <span class="k">if</span> (slow == fast) <span class="k">return</span> <span class="k">true</span>;
+}
+<span class="k">return</span> <span class="k">false</span>;</pre>
+      <ul>
+        <li>✓ <code>fast != null</code> 挡空链表和奇数长度走到头</li>
+        <li>✓ <code>fast.next != null</code> 挡偶数长度走到头</li>
+        <li>✓ 有环时两个条件都不会成立，循环只能从 <code>slow == fast</code> 出去</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="rail-wrap">
+    <div class="rail-head"><span class="t">脱稿完成度</span><span class="score">5.5 / 7</span><span class="t">34 → 4.5　36 → 5.0　37 → 5.5</span></div>
+    <div class="rail">
+      <div class="st"><span class="n">STEP 1</span><span class="nm">开场</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 2</span><span class="nm">复述</span><span class="mk">✓</span></div>
+      <div class="st half"><span class="n">STEP 3</span><span class="nm">提问　3 个</span><span class="mk">半</span></div>
+      <div class="st half"><span class="n">STEP 4</span><span class="nm">归约</span><span class="mk">半</span></div>
+      <div class="st half"><span class="n">STEP 5</span><span class="nm">边界</span><span class="mk">半</span></div>
+      <div class="st"><span class="n">STEP 6</span><span class="nm">复杂度·递球</span><span class="mk">✓</span></div>
+      <div class="st up"><span class="n">STEP 7</span><span class="nm">测试</span><span class="mk">★</span></div>
+    </div>
+    <p class="rail-note"><b>★ 是什么突破</b>：走例子<b>一次走对，三轮无误</b>，而且走的是有环的 <code>1→2→3→1</code>，最容易绕晕的那种。34 是「trace 通过但代码挂了」，36 是「串了 case 自己抓住」，37 是「一次走对」——<b>三题连着往好的方向动，这条结构反射在退场。</b><br><b>STEP 2 这次是满分</b>：你没有只说 "return a boolean"，而是把 true 和 false <b>分别</b>是什么意思都说清了。<br><b>三个半步</b>：3 是真问句仍为 0，4 是五样缺两样，5 是边界 2 / 3 连续第 5 题。</p>
+  </section>
+
+  <section class="chain">
+    <div class="ch">
+      <span class="t">收缩链</span>
+      <div class="q"><b>原题</b>　给一条单链表的 head，判断它有没有环，返回 true / false。题目额外给了一条假设：链表里没有重复值。</div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ①</span>
+      <div>
+        <div class="arrow">「有没有环」→「有没有一个节点被走到第二次」</div>
+        <div class="why">环的定义就是「顺着 next 一直走，会回到走过的地方」。<br><b>这里有个分岔，而分岔正是题目那条假设的用处</b>：要知道「走过」，可以<b>记下来</b>（HashSet 存节点，O(n) 空间），也可以<b>用两个速度不同的指针</b>（O(1) 空间）。<b>"no duplicate value" 是给第一条路准备的</b>——存值而不是存引用时才需要它。你选了第二条路，所以这条假设用不上。</div>
+        <div class="tc">这一环决定了后面所有事，也是 STEP 3 该说清的那句</div>
+      </div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ②</span>
+      <div>
+        <div class="arrow">「有没有节点被走两次」→「fast 会不会追上 slow」</div>
+        <div class="why">无环时链表是一条直线，快的先到头、永远追不上；有环时两个都进环，跑道有限，快的必然从后面绕回来。<span style="color:var(--speak)">这一环你说得很清楚，而且 <span style="font-family:var(--f-say)">"if fast falls off the end of the list"</span> 这个说法很地道，不是中式英语。</span></div>
+        <div class="tc">O(n) 时间　O(1) 空间</div>
+      </div>
+    </div>
+    <div class="stp hot">
+      <span class="k">收缩 ③</span>
+      <div>
+        <div class="arrow">「会不会追上」→「fast 每轮相对 slow 前进<b>正好 1 步</b>，所以一定不多不少地追上」<span class="tag">没说这环</span></div>
+        <div class="why"><b>不变量：进环之后，fast 和 slow 的距离每轮缩小正好 1。</b>距离是有限的（不超过环长），所以有限轮内必定变成 0——也就是相遇。<br><b>为什么必须是「1 步」</b>：如果 fast 每轮多走 2 步，距离每轮减 2，可能从 1 直接变成 −1，<b>跨过去而不相遇</b>。快 1 步就跳不过去。<br><b>这一句就是「为什么是这个停法」，也是 Floyd 这个名字的全部内容。</b>你没说它——所以循环条件里多出一个判断，你也没有工具去发现它是多余的。</div>
+        <div class="tc">归约五样里缺的第 ⑤ 样</div>
+      </div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ④</span>
+      <div>
+        <div class="arrow">什么时候停</div>
+        <div class="why">· 无环：fast 走到头 → <code>fast == null</code> 或 <code>fast.next == null</code>，<b>这两个就够了</b><br>· 有环：<code>slow == fast</code> → return true<br><b><code>fast.next.next != null</code> 不属于上面任何一种</b>——它是 36 的零件，装到 37 上没接线。</div>
+        <div class="tc">O(1)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero w">
+    <span class="lb">STEP 3 · 真问句连续三题为 0</span>
+    <h3>题目给你的假设，你要么用它，要么说明为什么用不上——照单念一遍不算处理</h3>
+    <p class="said">"The problem mentions that I can assume there is <b>no duplicate value</b>, so I will just assume each node … is that fair?"</p>
+    <p>你注意到了题目那条 Assumption，这是好的——很多人直接跳过。<b>但你把它当成一个要「确认」的东西问了出来，而它其实是一个要「用掉或退掉」的东西。</b></p>
+    <p><b>机制</b>：Floyd 比的是 <code>slow == fast</code>，也就是<b>节点引用</b>相不相同，跟节点里存什么值毫无关系。所以「没有重复值」这条假设对你的解法<b>一点用都没有</b>。它是出题人留给「用 HashSet 存值来判重」那条路的提示。你说清这一点，等于当场告诉面试官：我知道有两条路，我选了空间更省的那条。</p>
+    <div class="split" style="margin-top:13px">
+      <div class="sp you"><div class="t">你这次问的三个</div><ol><li>空链表返回 false，行吗</li><li>单节点返回 false，行吗</li><li>可以假设没有重复值，行吗</li></ol><p class="res">→ 三个全是「带假设」，真问句 0 个</p></div>
+      <div class="sp code"><div class="t">34 / 36 / 37 三题累计</div><ol><li>34：提问 <b>0</b> 个</li><li>36：<b>2</b> 个，全带假设</li><li>37：<b>3</b> 个，全带假设</li></ol><p class="res">→ 数量在涨，<b>真问句连续三题是 0</b></p></div>
+    </div>
+  </section>
+
+  <section class="hero">
+    <span class="lb">这一轮最明确的一条上升曲线</span>
+    <h3>走例子：34 走错了没发现 → 36 走串了自己抓住 → 37 一次走对，三轮无误</h3>
+    <p class="said">"At the beginning slow and fast equal one. After one round slow equals <b>two</b>, fast equals <b>three</b>. And because there's a cycle, three points back to one — then slow equals <b>three</b>, fast equals <b>two</b>. And that round slow equals <b>one</b> and fast equals <b>one</b> — fast and slow <b>meet</b>."</p>
+    <p>我把这三轮逐个对着代码跑了一遍：<b>全对。</b>而且你走的是有环的 <code>1→2→3→1</code>——指针会绕回去，是最容易在脑子里绕晕的那一类，你一次说通了。</p>
+    <p>34 那张卡的红色头条是「走例子走的是脑子里的代码」。三题下来它已经从「没发现」变成「自己抓住」再变成「不再发生」。<b>这条结构反射可以准备毕业了——再稳一题就移进已毕业区。</b></p>
+  </section>
+
+  <section class="cards">
+    <div class="cd die">
+      <h3>可以带走的自检信号</h3>
+      <p><strong>循环条件里的每一个判断，都要能答出「它挡的是哪一个具体的输入」。</strong></p>
+      <p>答得出（"两个节点的时候" / "奇数长度走到头的时候"）就留着；答不出、或者答案是「为了安全」「因为上一题这么写」——<strong>注释掉跑一遍，能过就删</strong>。</p>
+      <p style="margin-top:11px"><strong>为什么这个信号比「检查特判」更值钱：</strong>特判在代码开头，一眼就看得见；<strong>循环条件里的赘肉藏在一行里，而且长得跟必要的判断一模一样</strong>。这次三个 <code>&amp;&amp;</code> 排在一起，你自己都替第三个编了理由。</p>
+    </div>
+    <div class="cd gold">
+      <h3>这道题的金句</h3>
+      <p class="quote">In a cycle, fast gains exactly one step on slow each round — so it can never jump over it.</p>
+      <p style="margin-top:11px;font-size:13px;color:var(--ink-2)"><strong>模型全名</strong>：Floyd's cycle detection（口语里也叫 tortoise and hare）。<strong>"two pointers, fast and slow" 是描述，不是名字</strong>——归约的第 ① 样要的是名字。<br>这一套还管：Cycle Node In Linked List（找环的入口）、Find the Duplicate Number、Happy Number。</p>
+    </div>
+  </section>
+
+  <div class="bar">
+    <span class="lab">跟读</span>
+    <span class="seg">
+      <button type="button" data-m="none" aria-pressed="true">① 看着念</button>
+      <button type="button" data-m="en" aria-pressed="false">② 只看中文</button>
+      <button type="button" data-m="all" aria-pressed="false">③ 全盖住</button>
+    </span>
+    <span class="hint">建议 ③（全盖住）：STEP 1 / 2 / 6 你已经稳了，重点练 STEP 3 和收缩 ③ 那一段</span>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 1 · 2</span><span class="gt">开场 + 复述</span><span class="gs">✓ ✓ 这两步不用再练</span>
+      <span class="gd">开场是库骨架，连续第 2 题一字不差。复述这次是<b>满分</b>：你没有只说 "return a boolean"，而是把 true 和 false <b>分别</b>代表什么都说清了——这正是这题唯一容易含糊的地方。</span></div>
+    <div class="ln"><div class="when">0:00<span class="pt">申请沉默</span></div>
+      <div class="zh veil">我先通读一遍，会安静一两分钟。</div>
+      <div class="en veil">Let me <strong>read through this once</strong> — I'll be <strong>quiet for a minute or two</strong>. <span style="color:var(--muted)">〔你今天原样说出来了〕</span></div></div>
+    <div class="ln"><div class="when">0:20<span class="pt">复述 · 输入输出</span></div>
+      <div class="zh veil">为了确认我理解对了：题目给了我们<strong>一条可能带环的单链表的头</strong>，要返回一个布尔值——<strong>true 表示有环，false 表示没有</strong>。</div>
+      <div class="en veil">So, to make sure I understand — we're given <strong>the head of a singly linked list that may contain a cycle</strong>, and we return a boolean: <strong>true if there is a cycle, false if there isn't</strong>. <span style="color:var(--muted)">〔cycle /ˈsaɪkl/：SY-kul，重音在第一个音节〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 3</span><span class="gt">提问　3 个</span><span class="gs">半步 · 真问句连续三题 0 个</span>
+      <span class="gd">数量在涨（0 → 2 → 3），<b>但三题的真问句都是 0</b>。下面前两句保留你今天问的（形状对），第三句是这题真正该说的——<b>题目给的假设要用掉或退掉，不能只确认一遍</b>。</span></div>
+    <div class="ln"><div class="when">1:00 ① 你问了<span class="pt">带假设</span></div>
+      <div class="zh veil">我假设链表<strong>为空</strong>时返回 false，<strong>只有一个节点</strong>时也返回 false，这样可以吗？</div>
+      <div class="en veil"><strong>I'll assume</strong> that an <strong>empty list</strong> returns false, and a <strong>single node</strong> returns false — is that fair? <span style="color:var(--muted)">〔I'll，不是 I。这是第 2 次订正〕</span></div></div>
+    <div class="ln"><div class="when">1:20 ② <strong>该说没说 · 把假设用掉或退掉</strong></div>
+      <div class="zh veil">题目说可以假设<strong>没有重复值</strong>。我打算<strong>比较节点本身而不是值</strong>，所以这条假设我其实用不上——它是给「用哈希表存值来判重」那条路准备的。</div>
+      <div class="en veil">The problem says we can assume <strong>no duplicate values</strong>. I'm going to compare <strong>the nodes themselves, not their values</strong>, so I actually <strong>don't need that assumption</strong> — it would matter if I hashed the values instead. <span style="color:var(--muted)">〔说出这句 = 告诉面试官你知道有两条路，并且选了空间更省的那条〕</span></div></div>
+    <div class="ln"><div class="when">1:40 ③ <strong>该问没问 · 真问句</strong></div>
+      <div class="zh veil">是只要判断<strong>有没有</strong>环，还是之后还需要<strong>找出环的入口节点</strong>？</div>
+      <div class="en veil">Do you just need to know <strong>whether</strong> there's a cycle, or will you also want <strong>the node where the cycle starts</strong>? <span style="color:var(--muted)">〔句式库「Should I ___, or ___?」的变体 · 两个答案你都能接（第二个是 Floyd 第二阶段），所以必须是真问句〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 4</span><span class="gt">归约　半步</span><span class="gs">五样说了 3 样</span>
+      <span class="gd">③ 每步做什么、④ 什么时候停，你都说清楚了。<b>缺 ① 的专名</b>（说了描述没说名字）和 <b>⑤ 为什么是这个停法</b>——而缺的第 ⑤ 样，正是让你看不出条件③多余的原因。</span></div>
+    <div class="ln"><div class="when">2:00 ① <strong>模型全名</strong></div>
+      <div class="zh veil">这归约成 <strong>Floyd 判环</strong>——也就是快慢指针，口语里叫龟兔赛跑。</div>
+      <div class="en veil">This reduces to <strong>Floyd's cycle detection</strong> — a fast pointer and a slow pointer, sometimes called <strong>tortoise and hare</strong>. <span style="color:var(--muted)">〔"two pointers fast and slow" 是描述；第 ① 样要的是<b>名字</b>〕</span></div></div>
+    <div class="ln"><div class="when">2:15 ② 初始值 + 每步</div>
+      <div class="zh veil">两个都<strong>从 head 出发</strong>；fast 每次走<strong>两步</strong>，slow 每次走<strong>一步</strong>。</div>
+      <div class="en veil">Both <strong>start at the head</strong>. Fast moves <strong>two nodes</strong> each round, slow moves <strong>one</strong>.</div></div>
+    <div class="ln"><div class="when">2:30 ③ 什么时候停</div>
+      <div class="zh veil">如果 fast <strong>走出链表末尾</strong>，说明没有环；如果 fast 和 slow <strong>相遇</strong>，说明有环。</div>
+      <div class="en veil">If fast <strong>falls off the end of the list</strong>, there's no cycle. If fast and slow <strong>meet</strong>, there is one. <span style="color:var(--muted)">〔"falls off the end" 是你今天自己说出来的，很地道，留着〕</span></div></div>
+    <div class="ln"><div class="when">2:45 ④ <strong>该说没说 · 为什么是这个停法</strong></div>
+      <div class="zh veil">不变量是：<strong>进环之后，两个指针的距离每一轮正好缩小 1</strong>。距离不超过环长，所以有限轮之内一定变成 0。<strong>正因为每轮只缩 1，fast 不可能跨过 slow。</strong></div>
+      <div class="en veil">The invariant is: <strong>once both are inside the cycle, the gap between them shrinks by exactly one each round</strong>. The gap is at most the cycle length, so it has to reach zero. <strong>Because it shrinks by one and not two, fast can never jump over slow.</strong> <span style="color:var(--muted)">〔这一句说出来，你就有工具去检查循环条件里每一项是不是必要的〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 5</span><span class="gt">边界　半步</span><span class="gs">2 / 3　本周只盯 · 连续第 5 题</span>
+      <span class="gd">还是「没有」和「刚好一个」。<b>这题的第三种是「最小的环」：一个节点自己指自己。</b>09 / 20 / 34 / 36 / 37，五题同一个位置，这一项还一次都没降过。</span></div>
+    <div class="ln"><div class="when">3:00 ① 没有</div>
+      <div class="zh veil">写代码之前，说一个边界：<strong>链表为空</strong>的时候返回 <strong>false</strong>。</div>
+      <div class="en veil">Before I code — one edge case: <strong>if the list is empty</strong>, we return <strong>false</strong>.</div></div>
+    <div class="ln"><div class="when">3:10 ② 刚好一个</div>
+      <div class="zh veil">只有一个节点、而且它的 next 是 null，返回 <strong>false</strong>。</div>
+      <div class="en veil">With <strong>a single node whose next is null</strong>, we return <strong>false</strong>.</div></div>
+    <div class="ln"><div class="when">3:20 ③ <strong>该说没说 · 最小的环</strong></div>
+      <div class="zh veil">具体来说，<strong>一个节点指向它自己</strong>是最小的环——第一轮 fast 和 slow 就会在同一个节点上，答案是 <strong>true</strong>。</div>
+      <div class="en veil">Concretely, <strong>a single node pointing to itself</strong> is the smallest cycle — after one round both pointers land on it, so the answer is <strong>true</strong>. <span style="color:var(--muted)">〔句式库「Concretely, for ___ the answer is ___.」· 这是这题的「刚好在端点」〕</span></div></div>
+  </div>
+
+  <div class="grp aux">
+    <div class="ghead"><span class="gn">写码中</span><span class="gt">只说意图</span><span class="gs">你说了，但替赘肉辩护了</span>
+      <span class="gd">写码时开口是对的，<b>但这次你解释的是「我写了什么」而不是「为什么这一行必须这么写」</b>——差别就在于后者会逼你发现条件③没有主人。</span></div>
+    <div class="ln"><div class="when">意图 ①</div>
+      <div class="zh veil">这个条件挡的是<strong>走到链表末尾</strong>的情况——奇数长度停在 <code>fast == null</code>，偶数长度停在 <code>fast.next == null</code>。</div>
+      <div class="en veil">These two conditions guard against <strong>running off the end</strong> — an odd-length list stops at <code>fast == null</code>, an even-length one at <code>fast.next == null</code>.</div></div>
+    <div class="ln"><div class="when">意图 ②</div>
+      <div class="zh veil">我比较的是<strong>节点本身</strong>，不是节点的值——所以重复值有没有都不影响。</div>
+      <div class="en veil">I'm comparing <strong>the node references</strong>, not their values — so duplicate values wouldn't matter either way.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 6</span><span class="gt">复杂度 · 递球</span><span class="gs">✓ 递了两次</span>
+      <span class="gd">两个复杂度都给了理由。昨天你把 space 说成了 time，<b>今天 ASR 转成 "weeks complexity"——像是说对了 space，回放确认一下。</b></span></div>
+    <div class="ln"><div class="when">4:00 ① 复杂度</div>
+      <div class="zh veil">时间 <strong>O(n)</strong>；<strong>空间</strong> <strong>O(1)</strong>，因为只用了两个指针。</div>
+      <div class="en veil">Time is <strong>big O of n</strong>. <strong>Space</strong> is <strong>O(1)</strong>, because we only keep two pointers.</div></div>
+    <div class="ln"><div class="when">4:15 ② 递球</div>
+      <div class="zh veil">开始写之前，你觉得这个方向可以吗？</div>
+      <div class="en veil">Does that sound <strong>reasonable</strong> before I start coding?</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 7</span><span class="gt">测试　★ 突破</span><span class="gs">一次走对，三轮无误</span>
+      <span class="gd">下面三行是<b>你今天真的说出来的</b>，逐轮核对过，全对。留在这里当参照——这就是「走的是纸上的代码」长什么样。</span></div>
+    <div class="ln"><div class="when">6:00 ① 开场</div>
+      <div class="zh veil">我走一个例子：一二三，然后三指回一。</div>
+      <div class="en veil">Let me <strong>walk through a case</strong>: one, two, three — and three points back to one.</div></div>
+    <div class="ln"><div class="when">6:15 ② 三轮</div>
+      <div class="zh veil">开始时两个都在 1。第一轮 slow 到 <strong>2</strong>、fast 到 <strong>3</strong>；第二轮 slow 到 <strong>3</strong>、fast 绕回到 <strong>2</strong>；第三轮两个都到 <strong>1</strong>，<strong>相遇</strong>，返回 true。</div>
+      <div class="en veil">Both start at one. After the first round slow is at <strong>two</strong> and fast at <strong>three</strong>; after the second, slow is at <strong>three</strong> and fast has wrapped around to <strong>two</strong>; after the third they are <strong>both at one</strong> — they <strong>meet</strong>, so we return true.</div></div>
+    <div class="ln"><div class="when">7:00 ③ <strong>该走没走 · 最小的环</strong></div>
+      <div class="zh veil">而<strong>一个节点指向自己</strong>这个 case，如果我把相遇检查放在移动之前就会挂——它是唯一能一轮就相遇的输入，我逐行走一遍。</div>
+      <div class="en veil">And <strong>a single node pointing to itself</strong> is the case that breaks if <strong>I check for a meeting before moving instead of after</strong> — it's the only input that meets in one round, so let me <strong>trace through it line by line</strong>.</div></div>
+    <div class="ln"><div class="when">7:30 ④ 递球</div>
+      <div class="zh veil">时间快到了，你希望我优化，还是多走几个例子？</div>
+      <div class="en veil">Given the time, should I <strong>optimize</strong>, or <strong>walk through more test cases</strong>? <span style="color:var(--muted)">〔连续第 2 题说出这句〕</span></div></div>
+  </div>
+
+  <h3 class="sec">这次要改的说法</h3>
+  <div class="four">
+    <div><span class="a">模型全名　<strong>归约第 ① 样</strong></span><span class="b"><strong>Floyd's cycle detection</strong>（tortoise and hare）　<em>"two pointers, fast and slow" 是描述，第 ① 样要的是名字</em></span></div>
+    <div><span class="a">我假设……可以吗　<strong>第 2 次</strong></span><span class="b"><strong>I'll assume</strong> ___ — is that fair?　<em>还是漏了 'll。昨天订过一次</em></span></div>
+    <div><span class="a">环　<strong>发音</strong></span><span class="b">a <strong>cycle</strong> /ˈsaɪkl/　<em>SY-kul，重音在第一音节，两个音节。ASR 认成 "secle / cychle / sechle"</em></span></div>
+    <div><span class="a">相遇</span><span class="b">they <strong>meet</strong> /miːt/　<em>长音。ASR 认成 "mit"，听起来像 mitt</em></span></div>
+    <div><span class="a">链表　<strong>第 3 次</strong></span><span class="b">a singly <strong>linked list</strong> /lɪŋkt lɪst/　<em>ASR 这次认成 "lankules / linkules / lingdelis"，比前两次更散。这个词值得单独录十遍</em></span></div>
+    <div><span class="a">空 · null　<strong>第 3 次 · 发音</strong></span><span class="b"><strong>null</strong> /nʌl/　<em>ASR 仍然全程认成 now / non</em></span></div>
+    <div><span class="a">中文语气词　<strong>疑似 1 次</strong></span><span class="b"><strong>回放确认</strong>　<em>"…equals null 但 I initialize…" 中间那个音 ASR 打成了「但」。开头的「怎」大概率是 "So, to" 的误转，不计入</em></span></div>
+    <div><span class="a">本周只盯　<strong>边界三种形态</strong></span><span class="b"><strong>2 / 3　连续第 5 题</strong>　<em>09 / 20 / 34 / 36 / 37。这一项一次都没降过，是目前最顽固的一条</em></span></div>
+  </div>
+
+  <h3 class="sec">代码 · 精简版</h3>
+<pre><span class="k">public boolean</span> hasCycle(ListNode head) {
+  <span class="c">// 不需要特判：head==null 被条件① 挡住，单节点被条件② 挡住</span>
+  <span class="k">ListNode</span> slow = head;
+  <span class="k">ListNode</span> fast = head;
+
+  <span class="c">// 条件①：奇数长度走到头　条件②：偶数长度走到头</span>
+  <span class="c">// 有环时这两个永远不成立 —— 循环只能从下面的相遇出去</span>
+  <span class="k">while</span> (fast != <span class="k">null</span> &amp;&amp; fast.next != <span class="k">null</span>) {
+    slow = slow.next;
+    fast = fast.next.next;
+    <span class="hl">if (slow == fast) return true;</span>   <span class="c">// 比引用，不比值 —— 所以「无重复值」用不上</span>
+  }
+  <span class="k">return</span> <span class="k">false</span>;
+}
+<span class="c">// TC O(n)　SC O(1)</span></pre>
+
+<pre><span class="c">// 为什么相遇检查必须放在移动之后，不能放在前面：</span>
+<span class="c">// slow 和 fast 一开始就都在 head，先检查的话第一轮就 slow==fast，任何链表都返回 true。</span>
+<span class="c">// 这也是「一个节点指向自己」那个用例真正能测到的东西。</span></pre>
+
+  <h3 class="sec">34 / 36 / 37 三题对照</h3>
+  <div class="trend">
+    <table>
+      <thead><tr><th></th><th>34 Reverse</th><th>36 Middle</th><th>37 Cycle</th></tr></thead>
+      <tbody>
+        <tr><td>七步</td><td class="n bad">4.5</td><td class="n">5.0</td><td class="n hi">5.5</td></tr>
+        <tr><td>归约五样</td><td class="n bad">1 / 5</td><td class="n hi">5 / 5</td><td class="n">3 / 5</td></tr>
+        <tr><td>开头特判</td><td class="bad">死代码</td><td class="hi">零特判</td><td class="bad">死代码（复发）</td></tr>
+        <tr><td>走例子</td><td class="bad">走的是脑内代码，挂</td><td>串了 case，自己抓住</td><td class="hi">一次走对，三轮无误</td></tr>
+        <tr><td>STEP 3 提问</td><td class="bad">0 个</td><td>2 个，全带假设</td><td>3 个，全带假设</td></tr>
+        <tr><td>真问句</td><td class="bad">0</td><td class="bad">0</td><td class="bad">0</td></tr>
+        <tr><td>边界形态</td><td class="bad">2 / 3</td><td class="bad">2 / 3</td><td class="bad">2 / 3</td></tr>
+        <tr><td>结果</td><td class="bad">挂 1 次</td><td class="hi">一遍 AC</td><td class="hi">一遍 AC</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="rail-note" style="margin-top:14px"><b>归约五样</b> = ① 模型全名　② 初始值　③ 每步做什么　④ 什么时候停　⑤ 为什么是这个停法。<br><b>会动的和不动的分得很清楚</b>：走例子、七步总分、提问数量三题连涨；<b>真问句和边界形态三题纹丝不动</b>，两个都是 STEP 3 / 5 的事。下一题的力气就花在这两格上。</p>
+
+  <h3 class="sec">这次确实进步了的</h3>
+  <div class="won">
+    <div><strong>走例子一次走对，三轮无误。</strong>我把 <code>1→2→3→1</code> 逐轮对着代码核过：slow 2 / fast 3 → slow 3 / fast 2 → 都到 1 相遇，全对。<strong>而且走的是有环的例子</strong>，指针会绕回去，最容易在脑子里绕晕。</div>
+    <div><strong>复述这次是满分。</strong>你没有只说 "return a boolean"，而是把 <strong>true 是什么意思、false 是什么意思</strong>分别说清了——这题唯一容易含糊的地方就在这儿。</div>
+    <div><strong>"if fast falls off the end of the list"</strong> —— 这是地道说法，不是从中文翻过来的。留着。</div>
+    <div><strong>注意到了题目的 Assumption。</strong>大多数人会直接跳过那一段。你问了出来——下一步是把它<strong>用掉或退掉</strong>，而不只是确认。</div>
+    <div><strong>递球连续第 2 题说出库里那句</strong>："Given the time, do I need to optimize, or should I work through more cases?"</div>
+  </div>
+
+  <h3 class="sec">下一题只带走三件事</h3>
+  <ol class="take">
+    <li><strong>写循环条件时，逐个判断问「它挡的是哪一个具体输入」。</strong>答不出来的那一条，注释掉跑一遍。这次三个 <code>&amp;&amp;</code> 里第三个没有主人，而你替它编了理由。</li>
+    <li><strong>归约补上第 ⑤ 样：为什么是这个停法。</strong>36 五样全说满 → 一遍 AC 且零赘肉；37 缺了第 ⑤ 样 → AC 但多了两处不需要的东西。<strong>第 ⑤ 样是你检查代码的工具，不是给面试官听的装饰。</strong></li>
+    <li><strong>STEP 5 的第三种，链表章固定问自己「这题最小的非平凡结构是什么」。</strong>Middle 是两个节点，Cycle 是一个节点指向自己。连续 5 题 2 / 3，下一题必须是 3 / 3。</li>
+  </ol>
+
+  <footer>
+    <span>ALG ROUND 3 · #37 · Linked List 03 · 搬了 36 的形状，还替它辩护了</span>
+    <span>本周只盯 边界三种形态 · 2 / 3 · 连续第 5 题</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.seg button'),body=document.body;
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    body.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m?'true':'false');});
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){setMode(b.dataset.m);}); });
+  body.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))) v.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
