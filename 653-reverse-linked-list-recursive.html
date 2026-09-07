@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>653 · Reverse Linked List (recursive)</title>
+<meta name="description" content="你在 STEP 6 亲口算出了 O(n²)，然后照着 O(n²) 写了下去——根在归约缺的半句：递归之后我手上还握着谁。">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<!--
+═══════════════════════════════════════════════════════════════
+  ALG ROUND 3 · 跟读卡模版　v3（Binary Search 十题后定稿）
+  用法：整个文件复制成 problems/NN-problem-name.html，只改 <body> 里的内容，CSS 一个字都不要动。
+
+  块清单（按出现顺序）—— ★必需　○按需
+  ★ header          题号 / 题名 / meta 一行
+  ★ head-find       头条发现。整张卡最重要的一块，写这次挖到的那一个东西。
+                    有跨题证据时用 .evid 表列出来（2 次以上才叫规律）。
+  ○ two             两遍对照 / 修改前后对照（重做的题、改代码的题用）
+  ★ rail            七步完成度 7 格：st（✓）/ st.half（半）/ st.up（★突破）
+  ★ chain           收缩链。原题 + 收缩①②③，卡住的那环加 .hot 和 <span class="tag">卡在这</span>
+  ○ hero            单点深挖。.hero.w = 红色（问题）／不加 = 绿色（突破）。一张卡 1–2 个，超过 2 个就稀释了
+  ★ cards           左：自检信号（.cd.die）　右：金句（.cd.gold）
+  ★ bar + grp       跟读区。bar 是三档遮盖开关，grp 按 STEP 分组
+                    .grp / .grp.half（这步只做到一半）/ .grp.aux（追问等非七步内容）
+                    每行 .ln = 时间点 + 中文 + 英文，两边都要 class="veil"
+  ★ four            "这次要改的说法"。左中右，右边只给正确形式 + <em>为什么</em>
+  ★ pre             代码。<span class="k">关键字 <span class="c">注释 <span class="hl">要盯的那一行
+  ○ trend(表)       任意对照表：跨题规律 / 一章总表 / 趋势
+  ○ won             这次确实进步了的（有真东西才写，没有就别凑）
+  ★ take            下一题只带走三件事。必须是三件，不能是五件
+  ★ footer
+
+  硬约束
+  · 中文正文用 --f-zh，英文台词用 --f-say，代码/标签用 --f-mono
+  · 颜色只用 token，不要写死 hex
+  · 主色 --speak 绿=会了/该说的　--warn 红=问题　--amber 黄=半步/教训
+  · 手机竖屏必须能读：rail 会降成 4 列再降 2 列，.ln 会堆成单列
+  · 每张卡只有一个头条。发现有三个的时候，选最能预测下一次的那个当头条，其余降为 hero
+═══════════════════════════════════════════════════════════════
+-->
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --warn:#A8412A; --warn-soft:#F7E7E2;
+  --amber:#8A6A1F; --amber-soft:#F5EDD8;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --warn:#E08A70; --warn-soft:#33201B;
+    --amber:#D9B45E; --amber-soft:#2C2617;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --warn:#E08A70; --warn-soft:#33201B;
+  --amber:#D9B45E; --amber-soft:#2C2617;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-zh);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:44px 24px 96px}
+
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--rule)}
+.crumb{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{font-family:var(--f-head);font-weight:700;font-size:clamp(25px,4.3vw,35px);line-height:1.12;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chapdone{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--speak);background:var(--speak-soft);border:1px solid var(--speak);border-radius:4px;padding:3px 9px}
+
+.head-find{margin-top:24px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:0 9px 9px 0;padding:22px 24px;box-shadow:var(--shadow)}
+.head-find .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--warn);font-weight:600}
+.head-find h2{font-family:var(--f-head);font-size:clamp(18px,2.9vw,22px);font-weight:700;margin:9px 0 6px;letter-spacing:-.015em;line-height:1.28}
+.head-find .sub{font-size:13.5px;color:var(--ink-2);margin:0 0 17px;line-height:1.62}
+.head-find .sub b{color:var(--ink);font-weight:600}
+.head-find .close{margin:17px 0 0;font-size:13.5px;color:var(--ink-2);line-height:1.62;padding-top:15px;border-top:1px dashed var(--rule)}
+.head-find .close b{color:var(--ink);font-weight:600}
+.evid{width:100%;border-collapse:collapse;font-size:13px}
+.evid th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 11px 8px;border-bottom:1px solid var(--rule)}
+.evid td{padding:11px;border-bottom:1px solid var(--rule-soft);vertical-align:top;line-height:1.55}
+.evid td.q{font-family:var(--f-mono);font-weight:600;color:var(--speak);width:1%;white-space:nowrap}
+.evid td.said{font-family:var(--f-say);color:var(--ink)}
+.evid td.out{color:var(--warn);font-weight:600;width:31%}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+.pass{border:1px solid var(--rule);border-radius:9px;padding:17px 19px;box-shadow:var(--shadow)}
+.pass.a{background:var(--warn-soft);border-left:3px solid var(--warn)}
+.pass.b{background:var(--speak-soft);border-left:3px solid var(--speak)}
+.pass .lb{font-family:var(--f-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:600}
+.pass.a .lb{color:var(--warn)} .pass.b .lb{color:var(--speak)}
+.pass .h{font-family:var(--f-head);font-size:17px;font-weight:700;margin:6px 0 9px;letter-spacing:-.01em}
+.pass ul{margin:0;padding-left:17px;font-size:13px;color:var(--ink-2);line-height:1.6}
+.pass li + li{margin-top:4px}
+.pass b{color:var(--ink);font-weight:600}
+.pass pre.mini{background:transparent;border:0;box-shadow:none;padding:9px 0 4px;font-size:12px;line-height:1.6;margin:0}
+
+.rail-wrap{margin-top:26px}
+.rail-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.rail-head .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.rail-head .score{font-family:var(--f-mono);font-size:15px;color:var(--speak);font-weight:600;font-variant-numeric:tabular-nums}
+.rail{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.st{border:1px solid var(--rule);border-radius:7px;padding:11px 10px 10px;display:flex;flex-direction:column;gap:5px;min-width:0;border-top:3px solid var(--speak);background:var(--speak-soft)}
+.st .n{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--speak)}
+.st .nm{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.st .mk{font-family:var(--f-mono);font-size:14px;line-height:1;margin-top:2px;color:var(--speak)}
+.st.half{border-top-color:var(--amber);background:var(--amber-soft)}
+.st.half .n,.st.half .mk{color:var(--amber)}
+.st.up{border-top-color:var(--speak);background:var(--speak);color:#fff}
+.st.up .n,.st.up .nm,.st.up .mk{color:#fff}
+.rail-note{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.rail-note b{color:var(--ink-2);font-weight:600}
+
+.chain{margin-top:26px;border:1px solid var(--rule);border-radius:9px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+.chain .ch{padding:14px 19px;border-bottom:1px solid var(--rule);background:var(--rule-soft)}
+.chain .ch .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.chain .ch .q{font-size:13.5px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.chain .ch .q b{color:var(--ink);font-weight:600}
+.stp{display:grid;grid-template-columns:112px 1fr;gap:0 18px;padding:15px 19px;border-bottom:1px solid var(--rule-soft);align-items:start}
+.stp:last-child{border-bottom:0}
+.stp .k{font-family:var(--f-mono);font-size:11px;color:var(--speak);font-weight:600;padding-top:2px;letter-spacing:.04em}
+.stp .arrow{font-family:var(--f-head);font-size:14.5px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.stp .why{font-size:13px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.stp .why b{color:var(--ink);font-weight:600}
+.stp .tc{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-top:5px}
+.stp.hot{background:var(--warn-soft)}
+.stp.hot .k{color:var(--warn)}
+.stp .tag{display:inline-block;font-family:var(--f-mono);font-size:9.5px;font-weight:600;color:var(--warn);background:var(--card);border:1px solid var(--warn);border-radius:3px;padding:1px 5px;margin-left:8px;vertical-align:2px;letter-spacing:.06em}
+
+.hero{margin-top:22px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--speak);border-radius:0 9px 9px 0;padding:20px 22px;box-shadow:var(--shadow)}
+.hero.w{border-left-color:var(--warn)}
+.hero .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--speak);font-weight:600}
+.hero.w .lb{color:var(--warn)}
+.hero h3{font-family:var(--f-head);font-size:17px;font-weight:600;margin:8px 0 12px;letter-spacing:-.01em}
+.hero .said{font-family:var(--f-say);font-size:16px;line-height:1.5;color:var(--ink);padding:12px 16px;background:var(--speak-soft);border-radius:7px;margin:0 0 11px}
+.hero.w .said{background:var(--warn-soft)}
+.hero .said b{color:var(--speak);font-weight:600}
+.hero.w .said b{color:var(--warn)}
+.hero .said s{color:var(--warn);text-decoration-thickness:1px}
+.hero p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero p + p{margin-top:9px}
+.hero p b{color:var(--ink);font-weight:600}
+.hero ol{margin:10px 0 0;padding-left:19px;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero ol li + li{margin-top:7px}
+.hero ol b{color:var(--ink);font-weight:600}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.sp{border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.sp.you{background:var(--speak-soft);border-left:3px solid var(--speak)}
+.sp.code{background:var(--warn-soft);border-left:3px solid var(--warn)}
+.sp .t{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:9px}
+.sp.you .t{color:var(--speak)} .sp.code .t{color:var(--warn)}
+.sp ol{margin:0;padding-left:17px;font-family:var(--f-mono);font-size:12px;line-height:1.85;color:var(--ink-2)}
+.sp ol b{color:var(--ink);font-weight:600}
+.sp .res{margin:11px 0 0;font-size:12.5px;color:var(--ink);font-weight:600;padding-top:9px;border-top:1px dashed var(--rule)}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.cd{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;box-shadow:var(--shadow)}
+.cd h3{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
+.cd.die{border-left:3px solid var(--amber)}
+.cd.die h3{color:var(--amber)}
+.cd.gold{border-left:3px solid var(--speak);background:var(--speak-soft)}
+.cd.gold h3{color:var(--speak)}
+.cd p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-2)}
+.cd p + p{margin-top:9px}
+.cd p strong{color:var(--ink);font-weight:600}
+.cd .quote{font-family:var(--f-say);font-size:16px;line-height:1.45;color:var(--ink);margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--rule-soft);padding:1px 5px;border-radius:3px}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0 6px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{font-family:var(--f-mono);font-size:11.5px;background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+.grp{margin-top:26px}
+.grp:first-of-type{margin-top:10px}
+.ghead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding:9px 13px;border-radius:7px 7px 0 0;border-left:3px solid var(--speak);background:var(--speak-soft)}
+.ghead .gn{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--speak);font-weight:600}
+.ghead .gt{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--ink)}
+.ghead .gs{font-family:var(--f-mono);font-size:11.5px;margin-left:auto;color:var(--speak)}
+.ghead .gd{font-size:12px;color:var(--muted);width:100%;line-height:1.5}
+.ghead .gd b{color:var(--ink-2);font-weight:600}
+.grp.aux .ghead{border-left-color:var(--rule);background:var(--rule-soft)}
+.grp.aux .ghead .gn,.grp.aux .ghead .gs{color:var(--muted)}
+.grp.half .ghead{border-left-color:var(--amber);background:var(--amber-soft)}
+.grp.half .ghead .gn,.grp.half .ghead .gs{color:var(--amber)}
+
+.ln{display:grid;grid-template-columns:120px 1fr 1.32fr;gap:0 20px;padding:15px 13px;border-bottom:1px solid var(--rule-soft);align-items:start;border-left:3px solid var(--speak-soft)}
+.grp.aux .ln{border-left-color:var(--rule-soft)}
+.grp.half .ln{border-left-color:var(--amber-soft)}
+.when{font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:3px;font-variant-numeric:tabular-nums}
+.pt{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--speak);background:var(--speak-soft);border-radius:3px;padding:1px 5px;margin-top:5px}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.zh strong{color:var(--ink);font-weight:600}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.48;color:var(--ink)}
+.en strong{font-weight:600;color:var(--speak)}
+.en s{color:var(--warn);text-decoration-thickness:1px}
+
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){color:transparent;background:var(--rule-soft);min-height:1.5em;user-select:none}
+:root.m-en .en.veil:not(.show) strong,
+:root.m-all .en.veil:not(.show) strong,
+:root.m-all .zh.veil:not(.show) strong{color:transparent}
+:root.m-en .en.veil:not(.show):hover,:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+h3.sec{font-family:var(--f-head);font-weight:600;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:52px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.four{display:flex;flex-direction:column;gap:0}
+.four div{display:grid;grid-template-columns:1fr 1.35fr;gap:20px;padding:12px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.four .a{font-size:13.5px;color:var(--ink-2)}
+.four .b{font-family:var(--f-say);font-size:15px;color:var(--ink)}
+.four .b strong{color:var(--speak);font-weight:600}
+.four .b em{font-style:normal;color:var(--muted);font-size:13px}
+
+pre{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;overflow-x:auto;box-shadow:var(--shadow);font-family:var(--f-mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:0}
+pre .c{color:var(--muted)}
+pre .k{color:var(--speak);font-weight:500}
+pre .hl{color:var(--warn);font-weight:600}
+pre + pre{margin-top:14px}
+
+ol.take{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:14px}
+ol.take li{counter-increment:t;position:relative;padding-left:34px;font-size:14px;color:var(--ink-2);line-height:1.6}
+ol.take li::before{content:counter(t);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--speak-soft);color:var(--speak);font-family:var(--f-mono);font-size:11px;font-weight:600;display:grid;place-items:center}
+ol.take strong{color:var(--ink);font-weight:600}
+
+.won{display:flex;flex-direction:column;gap:10px}
+.won div{font-size:13.5px;color:var(--ink-2);padding-left:24px;position:relative}
+.won div::before{content:"✓";position:absolute;left:0;color:var(--speak);font-weight:700}
+.won strong{color:var(--ink);font-weight:600}
+
+.trend{overflow-x:auto;margin-top:4px}
+.trend table{width:100%;border-collapse:collapse;font-size:13.5px}
+.trend th{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 10px 8px;border-bottom:1px solid var(--rule)}
+.trend td{padding:10px;border-bottom:1px solid var(--rule-soft);line-height:1.55}
+.trend td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:center;width:1%;white-space:nowrap}
+.trend td.hi{color:var(--speak);font-weight:600}
+.trend td.bad{color:var(--warn);font-weight:600}
+.trend td.id{font-family:var(--f-mono);font-weight:600;color:var(--muted);width:1%;text-align:center}
+.trend td.tpl{font-family:var(--f-mono);font-size:11.5px;color:var(--speak);white-space:nowrap;width:1%}
+
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:820px){ .rail{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:760px){
+  .wrap{padding:30px 17px 72px}
+  .cards,.two,.split{grid-template-columns:1fr}
+  .ln{grid-template-columns:1fr;gap:7px}
+  .stp{grid-template-columns:1fr;gap:5px}
+  .when{padding-top:0}
+  .four div{grid-template-columns:1fr;gap:5px}
+  .hint{margin-left:0;width:100%}
+  .ghead .gs{margin-left:0}
+  .evid td.out{width:auto}
+}
+@media (max-width:460px){ .rail{grid-template-columns:repeat(2,1fr)} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:11pt}.wrap{max-width:none;padding:0}
+  .ln,.cd,pre,.grp,.st,.hero,.sp,.stp,.head-find,.pass{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb"><a href="../">alg-round3</a><span>/</span><span>problems</span><span>/</span><span>653</span></div>
+    <h1>Reverse Linked List (recursive)</h1>
+    <div class="meta">Recursion 第 1 题 · 🚩 A 类新 pattern · 脱稿 · 一遍 AC 57 / 57 · 用时 15:37 · <b>七步 6.0 / 7，历史最高</b></div>
+  </header>
+
+  <section class="head-find">
+    <span class="lb">这次的头条发现 · 你自己已经知道答案了</span>
+    <h2>你在 STEP 6 亲口算出了 <b>O(n²)</b>，理由也完全正确——然后照着 O(n²) 写了下去，提交，AC。</h2>
+    <p class="sub">原话：<span style="font-family:var(--f-say)">"maybe time complexity will go to <b>big O of n squared</b>, this is because <b>for each subproblem we should traverse to the tail</b> and then connect our head."</span><br><b>这句话是对的，而且它已经指出了要删掉哪一行。</b>你说完它，下一句本该是 "let me see if I can avoid that walk"——但你直接进了编码。</p>
+    <div style="overflow-x:auto">
+    <table class="evid">
+      <thead><tr><th>你手上有的信息</th><th>你嘴里说出来了吗</th><th>变成动作了吗</th></tr></thead>
+      <tbody>
+        <tr><td class="q">递归返回<br>什么</td><td class="said">✓ 说满了：<span style="font-family:var(--f-say)">"we should return the new head"</span>，而且反复说了三次</td><td class="out" style="color:var(--speak)">是 —— 代码正确</td></tr>
+        <tr><td class="q">复杂度<br>是 O(n²)</td><td class="said">✓ 说满了，连原因都对：每层都要走到尾</td><td class="out">否 —— 照着 O(n²) 写完提交</td></tr>
+        <tr><td class="q"><code>head.next</code><br>没被动过</td><td class="said">✗ 一次都没说</td><td class="out">这半句才是根</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="close"><b>反过来用：</b>递归调用之后，先问一句「<b>哪些指针我这一层没动过</b>」。<code>reverse(head.next)</code> 只重排了 head 后面那条子链，<b><code>head.next</code> 这个字段从头到尾没有任何人碰过</b>——它还指着子链的<b>旧头</b>，也就是翻转之后的<b>尾</b>。<b>尾一直在你手上，不用去找。</b><br><b>更快的警报：如果你在递归里写了一个 <code>while</code> 去「找」什么东西，停一下——那个东西大概率就在你手上，递归已经把它交给你了。</b></p>
+  </section>
+
+  <section class="two">
+    <div class="pass a">
+      <span class="lb">你提交的 · AC 但 O(n²)</span>
+      <div class="h">每一层都走到尾去找</div>
+<pre class="mini">ListNode newHead = reverse(head.next);
+<span class="hl">ListNode tmp = newHead;
+while (tmp!=null &amp;&amp; tmp.next!=null) tmp = tmp.next;</span>
+tmp.next  = head;
+head.next = <span class="k">null</span>;
+<span class="k">return</span> newHead;</pre>
+      <ul>
+        <li>❌ 每层走 k 步，累加 1+2+…+n = <b>O(n²)</b></li>
+        <li>❌ 而你在归约里<b>已经算出来了</b></li>
+      </ul>
+    </div>
+    <div class="pass b">
+      <span class="lb">删掉两行 · O(n)</span>
+      <div class="h">尾就是 head.next</div>
+<pre class="mini">ListNode newHead = reverse(head.next);
+<span class="k">head.next.next = head;</span>
+head.next = <span class="k">null</span>;
+<span class="k">return</span> newHead;</pre>
+      <ul>
+        <li>✓ <code>head.next</code> 原来是子链的<b>头</b>，翻转后它是<b>尾</b></li>
+        <li>✓ 这个字段这一层没人改过，所以它还指着同一个节点</li>
+        <li>✓ 时间 O(n)，栈还是 O(n)</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="rail-wrap">
+    <div class="rail-head"><span class="t">脱稿完成度</span><span class="score">6.0 / 7</span><span class="t">34→4.5　36→5.0　37→5.5　39→5.0　41→5.0　653→<b>6.0</b></span></div>
+    <div class="rail">
+      <div class="st"><span class="n">STEP 1</span><span class="nm">开场</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 2</span><span class="nm">复述</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 3</span><span class="nm">提问　3 个</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 4</span><span class="nm">归约</span><span class="mk">✓</span></div>
+      <div class="st half"><span class="n">STEP 5</span><span class="nm">边界</span><span class="mk">半</span></div>
+      <div class="st up"><span class="n">STEP 6</span><span class="nm">复杂度·递球</span><span class="mk">★</span></div>
+      <div class="st half"><span class="n">STEP 7</span><span class="nm">测试</span><span class="mk">半</span></div>
+    </div>
+    <p class="rail-note"><b>★ 在 STEP 6</b>：你报完 O(n) 之后<b>主动推翻了自己</b>，改口说可能是 O(n²)，而且理由完全正确。<b>面试里这是极强的信号</b>——面试官看见的是一个会检查自己结论的人。这一步撑起了这次的最高分。<br><b>STEP 3 这次给满分</b>：三个问题都问在点上（单链表没有 prev / 空和单节点怎么办 / 无环），而且这题的真问句空间确实小。下面跟读区给了一个可以更好的版本，不是「你漏了」。<br><b>两个半步</b>：STEP 5 还是 2 / 3（第 8 次），STEP 7 走的例子碰不到那个能让你发现 O(n²) 的地方——两个其实是同一件事，见下面。</p>
+  </section>
+
+  <section class="chain">
+    <div class="ch">
+      <span class="t">收缩链</span>
+      <div class="q"><b>原题</b>　<b>递归地</b>反转一条单链表，返回新的头。不能用迭代。</div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ①</span>
+      <div>
+        <div class="arrow">反转整条 → 反转「head 后面那条」＋ 把 head 接到末尾</div>
+        <div class="why">减而治之：规模每次减一。<span style="color:var(--speak)"><b>这一环你说得非常好</b>，而且说出了递归的元认知：<span style="font-family:var(--f-say)">"I just focus on one node, because with recursion each node does the same thing — the difference is just the size of the problem."</span> 这是你六题里第一次说出「为什么可以只想一层」。</span></div>
+        <div class="tc">O(n) 层</div>
+      </div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ②</span>
+      <div>
+        <div class="arrow">定义递归契约 → <code>reverse(x)</code> 返回「以 x 开头那条子链翻转后的<b>新头</b>」</div>
+        <div class="why"><span style="color:var(--speak)">这一环你也说清楚了，而且反复说了三次「return the new head」。<b>我上一条预告说你会卡在这儿——预告错了</b>，见下面红色那块。</span></div>
+        <div class="tc">O(1)</div>
+      </div>
+    </div>
+    <div class="stp hot">
+      <span class="k">收缩 ③</span>
+      <div>
+        <div class="arrow">接回来 —— <b>尾在哪里？</b><span class="tag">卡在这</span></div>
+        <div class="why">❌ 原本：从 newHead 一路走到底去找尾。每层 O(k)，累加成 <b>O(n²)</b>。<br>✅ 正确：<b><code>head.next</code> 这一层没有任何人改过。</b>它原来是子链的<b>头</b>；子链翻转之后，头变成了尾。<b>所以 <code>head.next</code> 就是尾，它一直在你手上。</b><br><br><b>这就是递归第 ⑤ 样缺的后半句。</b>「这个函数<b>返回</b>什么」你说满了；「调用之后<b>我手上还握着谁</b>」你一次没说——而后半句才是这次 O(n²) 的全部原因。</div>
+        <div class="tc">改完 O(1)，总时间降到 O(n)</div>
+      </div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ④</span>
+      <div>
+        <div class="arrow">base case → 空链表 / 单节点，原样返回</div>
+        <div class="why">空链表返回 null，单节点返回它自己——两种都是「已经翻好了」。<span style="color:var(--speak)">这一环你说得干脆，而且这次特判<b>不是死代码</b>：没有它递归停不下来。</span></div>
+        <div class="tc">O(1)</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero">
+    <span class="lb">这次撑起最高分的两句话</span>
+    <h3>你推翻了自己刚报的复杂度，还说出了递归的元认知——两句都是质变</h3>
+    <p class="said">"the time complexity is big O of n… <b>and maybe time complexity will go to big O of n squared</b>, this is because <b>for each subproblem we should traverse to the tail</b> and then connect our head."</p>
+    <p><b>主动推翻自己刚说完的结论，并给出正确理由。</b>面试里这一下比答对复杂度值钱得多——它告诉面试官你会检查自己，不需要他来纠。前五题你报复杂度都是一口报完就过，这是第一次回头看。</p>
+    <p class="said" style="margin-top:15px">"I just focus on <b>one node</b>, because with recursion <b>each node does the same thing</b> — the difference is just <b>the size of the problem</b>."</p>
+    <p>这句是递归的本质，而且是你自己讲出来的，不是背的。<b>它正好是「归约五样」在递归里的第 ⑤ 样的前半</b>——为什么只想一层就够。整章接下来的题（Merge Sort、Quick Sort、Merge Sort Linked List）都靠这一句站住。<b>留着，一字不改。</b></p>
+  </section>
+
+  <section class="hero w">
+    <span class="lb">我上一条预告错了 · 「说了没用」第 2 次</span>
+    <h3>递归的第 ⑤ 样有两半，你说满了前一半</h3>
+    <p><b>先收回预告。</b>上一条我写「8 Reverse Recursive 你大概率会卡在『递归返回的是新头，不是当前节点』」。<b>错了</b>——你把返回值说得非常清楚，而且反复说了三次。真正卡住的是另一半：<b>「递归调用之后，我手上还握着谁。」</b></p>
+    <p>修正后的规律更锋利：<b>递归的第 ⑤ 样 =「它返回什么」＋「它没动什么」。</b>前一半决定代码对不对，<b>后一半决定代码快不快</b>。这次前一半满分，后一半零分，结果正好就是「AC 但 O(n²)」。</p>
+    <p style="margin-top:13px"><b>另一件事第 2 次出现了</b>：你说出口的正确信息，没有变成一个动作。</p>
+    <div class="split" style="margin-top:11px">
+      <div class="sp code"><div class="t">41 Reorder</div>
+        <ol>
+          <li>STEP 3 你亲口说：1→2→3 应该变成 1→3→2</li>
+          <li>STEP 5 没把它列成边界</li>
+          <li>STEP 7 没走它</li>
+        </ol>
+        <p class="res">→ 判题就拿它挂了你</p></div>
+      <div class="sp code"><div class="t">653 Reverse Recursive</div>
+        <ol>
+          <li>STEP 6 你亲口说：可能是 O(n²)</li>
+          <li>理由也说对了：每层都要走到尾</li>
+          <li>然后直接开始编码</li>
+        </ol>
+        <p class="res">→ 照着 O(n²) 写完提交</p></div>
+    </div>
+    <p style="margin-top:13px"><b>两次的形状一样：信息已经在你嘴里了，但没有触发下一个动作。</b>规矩是三次才写进头条——<b>下一题如果再来一次，它就是头条。</b>现在先记一条动作：<b>凡是自己说出「可能有问题 / 可能更慢 / 可能挂」，下一句必须是「让我看看能不能避开」，不许直接往下走。</b></p>
+  </section>
+
+  <section class="cards">
+    <div class="cd die">
+      <h3>可以带走的自检信号</h3>
+      <p><strong>递归调用之后，先问一句「哪些指针我这一层没动过」。</strong></p>
+      <p>没动过的字段还指着原来那个节点——<strong>你不用去找它，它在原地等你</strong>。653 里 <code>head.next</code> 从头到尾没人碰，所以它还是子链的旧头 = 翻转后的尾。</p>
+      <p style="margin-top:11px"><strong>更快的版本：如果你在递归里写了一个 <code>while</code> 去「找」什么，停一下。</strong>递归的每一层已经把该给你的都给你了；还需要去找，通常说明你忘了自己手上有什么。<strong>这条在树和回溯里同样成立。</strong></p>
+    </div>
+    <div class="cd gold">
+      <h3>这道题的金句</h3>
+      <p class="quote">The sublist's old head never moved — after the reversal it's the tail, and it's still head.next.</p>
+      <p style="margin-top:11px;font-size:13px;color:var(--ink-2)"><strong>识别信号</strong>：递归 + 链表 → 先问「这一层我没动过哪个指针」。<br>这一套还管：Reverse Linked List In Pairs、Swap Nodes in Pairs、Reverse Nodes in k-Group、Flatten Binary Tree to Linked List。</p>
+    </div>
+  </section>
+
+  <div class="bar">
+    <span class="lab">跟读</span>
+    <span class="seg">
+      <button type="button" data-m="none" aria-pressed="true">① 看着念</button>
+      <button type="button" data-m="en" aria-pressed="false">② 只看中文</button>
+      <button type="button" data-m="all" aria-pressed="false">③ 全盖住</button>
+    </span>
+    <span class="hint">建议 ③（全盖住）：1 / 2 / 3 / 6 你已经稳了，重点是 STEP 4 的第 ⑤ 样后半和 STEP 5 的第三种</span>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 1 · 2</span><span class="gt">开场 + 复述</span><span class="gs">✓ ✓ 复述这次是满分</span>
+      <span class="gd">开场连续第 5 题，而且<b>第一次用上了库里 STEP 1 的第二句</b>（"Still reading — there's a lot of setup here"）。复述<b>把约束说出来了</b>——必须递归、不能迭代，这正是 36 那次缺的东西。</span></div>
+    <div class="ln"><div class="when">0:00<span class="pt">申请沉默</span></div>
+      <div class="zh veil">我先通读一遍，会安静一两分钟。还在读，这题铺垫挺长。</div>
+      <div class="en veil">Let me <strong>read through this once</strong> — I'll be <strong>quiet for a minute or two</strong>. Still reading — <strong>there's a lot of setup here</strong>. <span style="color:var(--muted)">〔第二句是你今天第一次用，库里 STEP 1 的第二条〕</span></div></div>
+    <div class="ln"><div class="when">0:25<span class="pt">复述 · 含约束</span></div>
+      <div class="zh veil">为了确认我理解对了：给的是<strong>一条单链表的头</strong>，要返回<strong>翻转之后的新头</strong>；而且题目要求<strong>用递归</strong>，所以我不会写迭代。</div>
+      <div class="en veil">So, to make sure I understand — we're given <strong>the head of a singly linked list</strong> and we return <strong>the head of the reversed list</strong>. The problem asks for it <strong>recursively</strong>, so I won't use iteration.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 3</span><span class="gt">提问　3 个</span><span class="gs">✓ 都问在点上</span>
+      <span class="gd">三个都是好问题，而且这题的真问句空间确实小。<b>下面第 ③ 句是「可以更好」的版本，不是「你漏了」</b>——它把你 STEP 6 报的 O(n) 栈空间提前变成一个问句，还顺手给自己铺了一个展示。</span></div>
+    <div class="ln"><div class="when">1:00 ① 你问了</div>
+      <div class="zh veil">这是<strong>单</strong>链表，所以我没有 prev 指针可用，对吗？</div>
+      <div class="en veil">It's a <strong>singly</strong> linked list, so I don't have a <strong>prev</strong> pointer to work with — is that right?</div></div>
+    <div class="ln"><div class="when">1:15 ② 你问了</div>
+      <div class="zh veil">我假设链表<strong>为空</strong>或<strong>只有一个节点</strong>时原样返回，不需要翻转，这样可以吗？</div>
+      <div class="en veil"><strong>I'll assume</strong> that an <strong>empty list</strong> or a <strong>single node</strong> comes back unchanged — is that fair? <span style="color:var(--muted)">〔I'll，不是 I。第 4 次〕</span></div></div>
+    <div class="ln"><div class="when">1:30 ③ 可以更好<span class="pt">真问句</span></div>
+      <div class="zh veil">递归会用 <strong>O(n) 的栈空间</strong>——这个可以接受吗，还是你需要 <strong>O(1)</strong>？</div>
+      <div class="en veil">The recursion will use <strong>O(n) stack space</strong> — is that acceptable, or do you need <strong>O(1)</strong>? <span style="color:var(--muted)">〔句式库「Should I ___, or ___?」的变体 · 两个答案你都能接：要 O(1) 就写迭代版，34 那道你已经会了。问出来等于告诉他你两版都有〕</span></div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 4</span><span class="gt">归约</span><span class="gs">✓ 五样里说满了四样半</span>
+      <span class="gd">①②③④ 全到位，第 ⑤ 样<b>说满了前一半</b>（返回什么 + 为什么只想一层）。<b>缺的是后一半</b>——见第 ④ 行，那一句直接决定这题是 O(n) 还是 O(n²)。</span></div>
+    <div class="ln"><div class="when">2:00 ① 减而治之</div>
+      <div class="zh veil">这归约成<strong>减而治之</strong>：先把 head 后面那条子链翻转，再把 head 接到末尾。规模每次<strong>减一</strong>。</div>
+      <div class="en veil">This reduces to <strong>reduce and conquer</strong>: reverse the sublist after head, then attach head at the end. The problem <strong>shrinks by one</strong> each level.</div></div>
+    <div class="ln"><div class="when">2:15 ② 递归契约</div>
+      <div class="zh veil"><code>reverse(x)</code> 返回的是「<strong>以 x 开头那条子链翻转之后的新头</strong>」。</div>
+      <div class="en veil"><code>reverse(x)</code> returns <strong>the new head of the sublist starting at x, after it has been reversed</strong>. <span style="color:var(--muted)">〔你说满了，而且说了三次〕</span></div></div>
+    <div class="ln"><div class="when">2:35 ③ 为什么只想一层</div>
+      <div class="zh veil">我只需要盯住<strong>一个</strong>节点——递归里每个节点做的事都一样，<strong>差别只是问题的规模</strong>。</div>
+      <div class="en veil">I only need to focus on <strong>one node</strong> — with recursion every node does the same thing; the only difference is <strong>the size of the problem</strong>. <span style="color:var(--muted)">〔你自己说出来的，一字不改〕</span></div></div>
+    <div class="ln"><div class="when">2:50 ④ <strong>该说没说 · 第 ⑤ 样的后半</strong></div>
+      <div class="zh veil">递归调用<strong>没有动过 <code>head.next</code> 这个字段</strong>，所以它还指着子链的<strong>旧头</strong>——而旧头翻转之后就是<strong>尾</strong>。<strong>尾已经在我手上了，不需要走过去找。</strong></div>
+      <div class="en veil">The recursive call <strong>never touched head.next</strong>, so it still points at the sublist's <strong>old head</strong> — and after the reversal, that node is the <strong>tail</strong>. <strong>The tail is already in my hand; I don't have to walk to it.</strong> <span style="color:var(--muted)">〔这一句说出来，那个 while 循环根本不会被写出来〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 5</span><span class="gt">边界　2 / 3</span><span class="gs">本周只盯 · 第 8 次</span>
+      <span class="gd">空链表和单节点都说了，而且这次的特判<b>不是死代码</b>——没有它递归停不下来。<b>缺的第三种正好是能让你当场看见 O(n²) 的那一个</b>，见第 ③ 行。</span></div>
+    <div class="ln"><div class="when">3:00 ① 没有 · 刚好一个</div>
+      <div class="zh veil">写代码之前，说一个边界：<strong>空链表</strong>返回 null，<strong>单节点</strong>返回它自己——两种都已经算「翻好了」，也是递归的出口。</div>
+      <div class="en veil">Before I code — one edge case: an <strong>empty list</strong> returns null and a <strong>single node</strong> returns itself. Both are already reversed, and both are the <strong>base case</strong> that stops the recursion.</div></div>
+    <div class="ln"><div class="when">3:20 ② <strong>该说没说 · 刚好在端点</strong></div>
+      <div class="zh veil">具体来说，<strong>两个节点</strong> 1→2 是<strong>递归只往下走一层</strong>的最小情况——这一层拿到的新头就是节点 2，而<strong>它同时也是尾</strong>。这个 case 直接说明了「尾就是 <code>head.next</code>」。</div>
+      <div class="en veil">Concretely, <strong>two nodes</strong> — one arrow two — is the smallest case where the recursion goes down <strong>exactly one level</strong>. The new head we get back <strong>is</strong> node two, and node two <strong>is also the tail</strong>. That case alone shows the tail is just <code>head.next</code>. <span style="color:var(--muted)">〔句式库「Concretely, for ___ the answer is ___.」〕</span></div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 6</span><span class="gt">复杂度 · 递球　★ 突破</span><span class="gs">主动推翻了自己</span>
+      <span class="gd">前五题你报完复杂度就往下走，<b>这是第一次回头检查自己刚说的话</b>。下面第 ② 行是你说的，留在这儿当参照。<b>差的只有第 ③ 行——说完之后要有下一个动作。</b></span></div>
+    <div class="ln"><div class="when">4:00 ① 第一版</div>
+      <div class="zh veil">时间 <strong>O(n)</strong>，因为一共有 n 个子问题；<strong>空间 O(n)</strong>，因为每一层都会在<strong>调用栈</strong>上占一帧。</div>
+      <div class="en veil">Time is <strong>big O of n</strong> — there are n subproblems. <strong>Space is O(n)</strong>, because each level adds a frame to the <strong>call stack</strong>. <span style="color:var(--muted)">〔"adds a frame to the call stack"，不是 "we will call the stack"〕</span></div></div>
+    <div class="ln"><div class="when">4:20 ② 自我推翻</div>
+      <div class="zh veil">等一下——时间其实可能是 <strong>O(n²)</strong>，因为<strong>每一层我都要走到尾</strong>再把 head 接上去。</div>
+      <div class="en veil">Actually — wait. The time is probably <strong>O(n squared)</strong>, because <strong>at every level I walk to the tail</strong> before attaching head. <span style="color:var(--muted)">〔squared，不是 square。你说的就是这个意思〕</span></div></div>
+    <div class="ln"><div class="when">4:35 ③ <strong>该说没说 · 说完要有动作</strong></div>
+      <div class="zh veil">既然那趟遍历是 O(n²) 的来源，<strong>我先看看能不能避开它</strong>——如果能，时间就回到 O(n)。</div>
+      <div class="en veil">Since that walk is what makes it quadratic, <strong>let me see if I can avoid it</strong> — if I can, we're back to <strong>O(n)</strong>. <span style="color:var(--muted)">〔这一句是这次真正缺的东西。说了「可能有问题」，下一句必须是「让我看看能不能避开」〕</span></div></div>
+    <div class="ln"><div class="when">4:50 ④ 递球</div>
+      <div class="zh veil">时间快到了，你希望我优化，还是多走几个例子？</div>
+      <div class="en veil">Given the time, should I <strong>optimize</strong>, or <strong>walk through more test cases</strong>? <span style="color:var(--muted)">〔连续第 5 题〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 7</span><span class="gt">测试　半步</span><span class="gs">三层递归 trace 全对，但选错了 case</span>
+      <span class="gd">你走了 1→2→3，<b>三层递归逐层说对了，一处没错</b>——递归比迭代难走得多，这是硬本事。<br><b>问题在选的 case</b>：三个节点时那个 while 会走一步，所以「找尾」看起来是必要的。<b>走两个节点，while 跑 0 步，「尾就在手上」当场就露出来了。</b></span></div>
+    <div class="ln"><div class="when">6:00 ① 你走的（全对）</div>
+      <div class="zh veil"><code>1→2→3</code>：第一层调用 <code>reverse(2)</code>，第二层调用 <code>reverse(3)</code> 命中 base case 返回 3；回到第二层，走到 3 的尾，把 2 接上去得到 <strong>3→2</strong>；回到第一层，走到尾 2，把 1 接上去得到 <strong>3→2→1</strong>。</div>
+      <div class="en veil">For <code>one, two, three</code>: the first level calls <code>reverse(two)</code>; the second calls <code>reverse(three)</code>, which hits the base case and returns three. Back at the second level we attach two and get <strong>three, two</strong>. Back at the first level we attach one and get <strong>three, two, one</strong>.</div></div>
+    <div class="ln"><div class="when">6:40 ② <strong>该走没走 · 会暴露 O(n²) 的那一个</strong></div>
+      <div class="zh veil">再走 <code>1→2</code>：递归返回节点 2，我的 while <strong>一步都没走</strong>——也就是说 <code>tmp</code> 一开始就等于 <code>head.next</code>。<strong>这说明那趟遍历本来就不需要。</strong></div>
+      <div class="en veil">Now <code>one, two</code>: the call returns node two, and my loop <strong>doesn't move at all</strong> — <code>tmp</code> starts out equal to <code>head.next</code>. <strong>That's the proof the walk was never needed.</strong> <span style="color:var(--muted)">〔最小的非平凡输入，往往是暴露多余步骤的那一个〕</span></div></div>
+  </div>
+
+  <h3 class="sec">这次要改的说法</h3>
+  <div class="four">
+    <div><span class="a">子问题　<strong>关键</strong></span><span class="b">the <strong>subproblem</strong> /ˈsʌbˌprɑːbləm/　<em>ASR 认成 "sup problem"（听起来像 soup problem）。/b/ 不是 /p/，这个词整章都要用</em></span></div>
+    <div><span class="a">递归　<strong>发音</strong></span><span class="b"><strong>recursion</strong> /rɪˈkɜːrʒən/ ／ <strong>recursively</strong>　<em>重音在第二音节。ASR 认成 "recorsion"</em></span></div>
+    <div><span class="a">平方</span><span class="b">O(n <strong>squared</strong>) /skwerd/　<em>是 squared 不是 square，要过去分词</em></span></div>
+    <div><span class="a">调用栈</span><span class="b">each level <strong>adds a frame to the call stack</strong>　<em>不是 "we will call the stack"。frame 是行话，一说面试官就知道你懂</em></span></div>
+    <div><span class="a">我假设……可以吗　<strong>第 4 次</strong></span><span class="b"><strong>I'll assume</strong> ___ — is that fair?　<em>还是漏 'll</em></span></div>
+    <div><span class="a">遍历　<strong>第 3 次</strong></span><span class="b"><strong>traverse</strong> /trəˈvɜːrs/ ／ <strong>walk to</strong> the tail　<em>重音第二音节。口语里 "walk to the tail" 更自然</em></span></div>
+    <div><span class="a">链表　<strong>第 6 次</strong></span><span class="b">a singly <strong>linked list</strong> /lɪŋkt lɪst/　<em>ASR 这次认成 "linked thist / ling tetlis / lingdet"</em></span></div>
+    <div><span class="a">空 · null　<strong>第 6 次 · 发音</strong></span><span class="b"><strong>null</strong> /nʌl/　<em>六题了，ASR 一次没认对。这两个词值得单独花五分钟</em></span></div>
+    <div><span class="a">本周只盯　<strong>边界三种形态</strong></span><span class="b"><strong>2 / 3　第 8 次</strong>　<em>而且这次的第三种（两个节点）正好是能让你发现 O(n²) 的那一个</em></span></div>
+  </div>
+
+  <h3 class="sec">代码 · O(n) 版</h3>
+<pre><span class="k">public</span> ListNode reverse(ListNode head) {
+  <span class="c">// base case：空链表和单节点都已经算「翻好了」，也是递归的出口</span>
+  <span class="k">if</span> (head == <span class="k">null</span> || head.next == <span class="k">null</span>) <span class="k">return</span> head;
+
+  <span class="c">// 子问题：把 head 后面那条翻转，拿回它的新头</span>
+  <span class="k">ListNode</span> newHead = reverse(head.next);
+
+  <span class="c">// 关键：这一层没有人改过 head.next 这个字段</span>
+  <span class="c">// 它还指着子链的旧头 —— 而旧头翻转之后就是尾</span>
+  <span class="hl">head.next.next = head;</span>   <span class="c">// 尾 → head</span>
+  head.next = <span class="k">null</span>;       <span class="c">// head 成为新的尾</span>
+
+  <span class="k">return</span> newHead;           <span class="c">// 新头一路原样往上传</span>
+}
+<span class="c">// TC O(n)　SC O(n)（调用栈）</span></pre>
+
+<pre><span class="c">// 逐层验证 1 → 2 → 3：</span>
+<span class="c">// reverse(3) → base case，返回 3</span>
+<span class="c">// reverse(2)  head=2, head.next=3, newHead=3</span>
+<span class="c">//             head.next.next = head  →  3.next = 2      得到 3→2</span>
+<span class="c">//             head.next = null       →  2.next = null</span>
+<span class="c">// reverse(1)  head=1, head.next=2, newHead=3</span>
+<span class="c">//             head.next.next = head  →  2.next = 1      得到 3→2→1</span>
+<span class="c">//             head.next = null       →  1.next = null   ✓</span></pre>
+
+  <h3 class="sec">六题对照</h3>
+  <div class="trend">
+    <table>
+      <thead><tr><th></th><th>34</th><th>36</th><th>37</th><th>39 🚩</th><th>41 🚩</th><th>653 🚩</th></tr></thead>
+      <tbody>
+        <tr><td>七步</td><td class="n bad">4.5</td><td class="n">5.0</td><td class="n">5.5</td><td class="n">5.0</td><td class="n">5.0</td><td class="n hi">6.0</td></tr>
+        <tr><td>归约五样</td><td class="n bad">1 / 5</td><td class="n hi">5 / 5</td><td class="n">3 / 5</td><td class="n bad">2 / 5</td><td class="n">3.5 / 5</td><td class="n hi">4.5 / 5</td></tr>
+        <tr><td>第 ⑤ 样</td><td class="bad">说错了</td><td class="hi">说满了</td><td class="bad">缺席</td><td class="bad">填了错理由</td><td>说了一半</td><td>前半满分<br>后半零分</td></tr>
+        <tr><td>复杂度</td><td>报了</td><td>报了</td><td>报了</td><td>报了</td><td class="hi">分三段报</td><td class="hi">★ 主动推翻自己</td></tr>
+        <tr><td>走例子</td><td class="bad">走脑内代码</td><td>串了自己抓住</td><td class="hi">一次走对</td><td class="bad">走脑内性质</td><td class="bad">碰不到 bug</td><td class="hi">三层递归全对</td></tr>
+        <tr><td>边界形态</td><td class="bad">2 / 3</td><td class="bad">2 / 3</td><td class="bad">2 / 3</td><td class="bad">1 / 3</td><td class="bad">2 / 3</td><td class="bad">2 / 3</td></tr>
+        <tr><td>结果</td><td class="bad">挂 1 次</td><td class="hi">AC</td><td class="hi">AC</td><td class="bad">挂 3 次</td><td class="bad">NPE</td><td class="hi">AC 但 O(n²)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="rail-note" style="margin-top:14px"><b>归约五样</b> = ① 模型全名　② 初始值 / 子问题　③ 每步做什么　④ 什么时候停（递归里就是 base case）　⑤ 为什么是这个停法 / <b>递归里：它返回什么 ＋ 它没动什么</b>。<br><b>「边界形态」这一行六题一格没动过。</b>它从 Binary Search 一路跟到 Recursion，是目前唯一一条<b>完全没有起色</b>的。其余每一行都在往右边走。</p>
+
+  <h3 class="sec">这次确实进步了的</h3>
+  <div class="won">
+    <div><strong>七步 6.0 / 7，历史最高</strong>，而且是在一个全新 pattern 的第一题上拿到的。</div>
+    <div><strong>主动推翻自己刚报的复杂度</strong>，理由完全正确。前五题你都是报完就往下走，这是第一次回头检查。<strong>面试里这一下比答对复杂度值钱。</strong></div>
+    <div><strong>说出了递归的元认知</strong>："I just focus on one node — with recursion each node does the same thing, the difference is just the size of the problem." 这句不是背的，是你自己讲出来的，整章接下来的题都靠它站住。</div>
+    <div><strong>复述里说出了约束</strong>（必须递归、不能迭代）——36 那次缺的正是这一格。</div>
+    <div><strong>三层递归的 trace 一处没错。</strong>递归比迭代难走得多，你逐层说清了每一层拿到什么、接上什么、返回什么。</div>
+    <div><strong>第一次用上库里 STEP 1 的第二句</strong>："Still reading — there's a lot of setup here."</div>
+    <div><strong>这次的 base case 特判不是死代码。</strong>你已经能分清「哪种开头判断是必要的」——没有它递归停不下来。</div>
+  </div>
+
+  <h3 class="sec">下一题只带走三件事</h3>
+  <ol class="take">
+    <li><strong>递归调用之后，先问「哪些指针我这一层没动过」。</strong>没动过的，还在原地等你，不用去找。<strong>在递归里写 <code>while</code> 去「找」东西 = 警报。</strong></li>
+    <li><strong>自己说出「可能有问题 / 可能更慢 / 可能挂」之后，下一句必须是「让我看看能不能避开」。</strong>不许直接往下写。这是第 2 次了（41 说了 1→2→3 没用，653 说了 O(n²) 照写）——<strong>再来一次就是头条</strong>。</li>
+    <li><strong>递归题的 STEP 5 第三种固定问：「递归只往下走一层的最小输入是什么？」</strong>这题是两个节点。<strong>最小的非平凡输入，往往就是暴露多余步骤的那一个。</strong></li>
+  </ol>
+
+  <footer>
+    <span>ALG ROUND 3 · #653 · Recursion 01 🚩 · 自己算出了 O(n²)，然后照着写了</span>
+    <span>七步 6.0 / 7 历史最高 · 本周只盯 边界三种形态 2 / 3 · 第 8 次</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.seg button'),body=document.body;
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    body.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m?'true':'false');});
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){setMode(b.dataset.m);}); });
+  body.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))) v.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
