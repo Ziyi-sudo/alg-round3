@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>指针画法 · 改结构的时候图为什么会乱</title>
+<meta name="description" content="你画的是链表长什么样，不是谁指着谁——节点钉死、只动箭头的三行画法，从 34 / 39 / 41 / 653 四次事故里长出来。">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<!--
+═══════════════════════════════════════════════════════════════
+  ALG ROUND 3 · 跟读卡模版　v3（Binary Search 十题后定稿）
+  用法：整个文件复制成 problems/NN-problem-name.html，只改 <body> 里的内容，CSS 一个字都不要动。
+
+  块清单（按出现顺序）—— ★必需　○按需
+  ★ header          题号 / 题名 / meta 一行
+  ★ head-find       头条发现。整张卡最重要的一块，写这次挖到的那一个东西。
+                    有跨题证据时用 .evid 表列出来（2 次以上才叫规律）。
+  ○ two             两遍对照 / 修改前后对照（重做的题、改代码的题用）
+  ★ rail            七步完成度 7 格：st（✓）/ st.half（半）/ st.up（★突破）
+  ★ chain           收缩链。原题 + 收缩①②③，卡住的那环加 .hot 和 <span class="tag">卡在这</span>
+  ○ hero            单点深挖。.hero.w = 红色（问题）／不加 = 绿色（突破）。一张卡 1–2 个，超过 2 个就稀释了
+  ★ cards           左：自检信号（.cd.die）　右：金句（.cd.gold）
+  ★ bar + grp       跟读区。bar 是三档遮盖开关，grp 按 STEP 分组
+                    .grp / .grp.half（这步只做到一半）/ .grp.aux（追问等非七步内容）
+                    每行 .ln = 时间点 + 中文 + 英文，两边都要 class="veil"
+  ★ four            "这次要改的说法"。左中右，右边只给正确形式 + <em>为什么</em>
+  ★ pre             代码。<span class="k">关键字 <span class="c">注释 <span class="hl">要盯的那一行
+  ○ trend(表)       任意对照表：跨题规律 / 一章总表 / 趋势
+  ○ won             这次确实进步了的（有真东西才写，没有就别凑）
+  ★ take            下一题只带走三件事。必须是三件，不能是五件
+  ★ footer
+
+  硬约束
+  · 中文正文用 --f-zh，英文台词用 --f-say，代码/标签用 --f-mono
+  · 颜色只用 token，不要写死 hex
+  · 主色 --speak 绿=会了/该说的　--warn 红=问题　--amber 黄=半步/教训
+  · 手机竖屏必须能读：rail 会降成 4 列再降 2 列，.ln 会堆成单列
+  · 每张卡只有一个头条。发现有三个的时候，选最能预测下一次的那个当头条，其余降为 hero
+═══════════════════════════════════════════════════════════════
+-->
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --warn:#A8412A; --warn-soft:#F7E7E2;
+  --amber:#8A6A1F; --amber-soft:#F5EDD8;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --warn:#E08A70; --warn-soft:#33201B;
+    --amber:#D9B45E; --amber-soft:#2C2617;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --warn:#E08A70; --warn-soft:#33201B;
+  --amber:#D9B45E; --amber-soft:#2C2617;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-zh);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:44px 24px 96px}
+
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--rule)}
+.crumb{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{font-family:var(--f-head);font-weight:700;font-size:clamp(25px,4.3vw,35px);line-height:1.12;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chapdone{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--speak);background:var(--speak-soft);border:1px solid var(--speak);border-radius:4px;padding:3px 9px}
+
+.head-find{margin-top:24px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:0 9px 9px 0;padding:22px 24px;box-shadow:var(--shadow)}
+.head-find .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--warn);font-weight:600}
+.head-find h2{font-family:var(--f-head);font-size:clamp(18px,2.9vw,22px);font-weight:700;margin:9px 0 6px;letter-spacing:-.015em;line-height:1.28}
+.head-find .sub{font-size:13.5px;color:var(--ink-2);margin:0 0 17px;line-height:1.62}
+.head-find .sub b{color:var(--ink);font-weight:600}
+.head-find .close{margin:17px 0 0;font-size:13.5px;color:var(--ink-2);line-height:1.62;padding-top:15px;border-top:1px dashed var(--rule)}
+.head-find .close b{color:var(--ink);font-weight:600}
+.evid{width:100%;border-collapse:collapse;font-size:13px}
+.evid th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 11px 8px;border-bottom:1px solid var(--rule)}
+.evid td{padding:11px;border-bottom:1px solid var(--rule-soft);vertical-align:top;line-height:1.55}
+.evid td.q{font-family:var(--f-mono);font-weight:600;color:var(--speak);width:1%;white-space:nowrap}
+.evid td.said{font-family:var(--f-say);color:var(--ink)}
+.evid td.out{color:var(--warn);font-weight:600;width:31%}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+.pass{border:1px solid var(--rule);border-radius:9px;padding:17px 19px;box-shadow:var(--shadow)}
+.pass.a{background:var(--warn-soft);border-left:3px solid var(--warn)}
+.pass.b{background:var(--speak-soft);border-left:3px solid var(--speak)}
+.pass .lb{font-family:var(--f-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:600}
+.pass.a .lb{color:var(--warn)} .pass.b .lb{color:var(--speak)}
+.pass .h{font-family:var(--f-head);font-size:17px;font-weight:700;margin:6px 0 9px;letter-spacing:-.01em}
+.pass ul{margin:0;padding-left:17px;font-size:13px;color:var(--ink-2);line-height:1.6}
+.pass li + li{margin-top:4px}
+.pass b{color:var(--ink);font-weight:600}
+.pass pre.mini{background:transparent;border:0;box-shadow:none;padding:9px 0 4px;font-size:12px;line-height:1.6;margin:0}
+
+.rail-wrap{margin-top:26px}
+.rail-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.rail-head .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.rail-head .score{font-family:var(--f-mono);font-size:15px;color:var(--speak);font-weight:600;font-variant-numeric:tabular-nums}
+.rail{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.st{border:1px solid var(--rule);border-radius:7px;padding:11px 10px 10px;display:flex;flex-direction:column;gap:5px;min-width:0;border-top:3px solid var(--speak);background:var(--speak-soft)}
+.st .n{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--speak)}
+.st .nm{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.st .mk{font-family:var(--f-mono);font-size:14px;line-height:1;margin-top:2px;color:var(--speak)}
+.st.half{border-top-color:var(--amber);background:var(--amber-soft)}
+.st.half .n,.st.half .mk{color:var(--amber)}
+.st.up{border-top-color:var(--speak);background:var(--speak);color:#fff}
+.st.up .n,.st.up .nm,.st.up .mk{color:#fff}
+.rail-note{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.rail-note b{color:var(--ink-2);font-weight:600}
+
+.chain{margin-top:26px;border:1px solid var(--rule);border-radius:9px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+.chain .ch{padding:14px 19px;border-bottom:1px solid var(--rule);background:var(--rule-soft)}
+.chain .ch .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.chain .ch .q{font-size:13.5px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.chain .ch .q b{color:var(--ink);font-weight:600}
+.stp{display:grid;grid-template-columns:112px 1fr;gap:0 18px;padding:15px 19px;border-bottom:1px solid var(--rule-soft);align-items:start}
+.stp:last-child{border-bottom:0}
+.stp .k{font-family:var(--f-mono);font-size:11px;color:var(--speak);font-weight:600;padding-top:2px;letter-spacing:.04em}
+.stp .arrow{font-family:var(--f-head);font-size:14.5px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.stp .why{font-size:13px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.stp .why b{color:var(--ink);font-weight:600}
+.stp .tc{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-top:5px}
+.stp.hot{background:var(--warn-soft)}
+.stp.hot .k{color:var(--warn)}
+.stp .tag{display:inline-block;font-family:var(--f-mono);font-size:9.5px;font-weight:600;color:var(--warn);background:var(--card);border:1px solid var(--warn);border-radius:3px;padding:1px 5px;margin-left:8px;vertical-align:2px;letter-spacing:.06em}
+
+.hero{margin-top:22px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--speak);border-radius:0 9px 9px 0;padding:20px 22px;box-shadow:var(--shadow)}
+.hero.w{border-left-color:var(--warn)}
+.hero .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--speak);font-weight:600}
+.hero.w .lb{color:var(--warn)}
+.hero h3{font-family:var(--f-head);font-size:17px;font-weight:600;margin:8px 0 12px;letter-spacing:-.01em}
+.hero .said{font-family:var(--f-say);font-size:16px;line-height:1.5;color:var(--ink);padding:12px 16px;background:var(--speak-soft);border-radius:7px;margin:0 0 11px}
+.hero.w .said{background:var(--warn-soft)}
+.hero .said b{color:var(--speak);font-weight:600}
+.hero.w .said b{color:var(--warn)}
+.hero .said s{color:var(--warn);text-decoration-thickness:1px}
+.hero p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero p + p{margin-top:9px}
+.hero p b{color:var(--ink);font-weight:600}
+.hero ol{margin:10px 0 0;padding-left:19px;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero ol li + li{margin-top:7px}
+.hero ol b{color:var(--ink);font-weight:600}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.sp{border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.sp.you{background:var(--speak-soft);border-left:3px solid var(--speak)}
+.sp.code{background:var(--warn-soft);border-left:3px solid var(--warn)}
+.sp .t{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:9px}
+.sp.you .t{color:var(--speak)} .sp.code .t{color:var(--warn)}
+.sp ol{margin:0;padding-left:17px;font-family:var(--f-mono);font-size:12px;line-height:1.85;color:var(--ink-2)}
+.sp ol b{color:var(--ink);font-weight:600}
+.sp .res{margin:11px 0 0;font-size:12.5px;color:var(--ink);font-weight:600;padding-top:9px;border-top:1px dashed var(--rule)}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.cd{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;box-shadow:var(--shadow)}
+.cd h3{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
+.cd.die{border-left:3px solid var(--amber)}
+.cd.die h3{color:var(--amber)}
+.cd.gold{border-left:3px solid var(--speak);background:var(--speak-soft)}
+.cd.gold h3{color:var(--speak)}
+.cd p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-2)}
+.cd p + p{margin-top:9px}
+.cd p strong{color:var(--ink);font-weight:600}
+.cd .quote{font-family:var(--f-say);font-size:16px;line-height:1.45;color:var(--ink);margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--rule-soft);padding:1px 5px;border-radius:3px}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0 6px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{font-family:var(--f-mono);font-size:11.5px;background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+.grp{margin-top:26px}
+.grp:first-of-type{margin-top:10px}
+.ghead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding:9px 13px;border-radius:7px 7px 0 0;border-left:3px solid var(--speak);background:var(--speak-soft)}
+.ghead .gn{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--speak);font-weight:600}
+.ghead .gt{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--ink)}
+.ghead .gs{font-family:var(--f-mono);font-size:11.5px;margin-left:auto;color:var(--speak)}
+.ghead .gd{font-size:12px;color:var(--muted);width:100%;line-height:1.5}
+.ghead .gd b{color:var(--ink-2);font-weight:600}
+.grp.aux .ghead{border-left-color:var(--rule);background:var(--rule-soft)}
+.grp.aux .ghead .gn,.grp.aux .ghead .gs{color:var(--muted)}
+.grp.half .ghead{border-left-color:var(--amber);background:var(--amber-soft)}
+.grp.half .ghead .gn,.grp.half .ghead .gs{color:var(--amber)}
+
+.ln{display:grid;grid-template-columns:120px 1fr 1.32fr;gap:0 20px;padding:15px 13px;border-bottom:1px solid var(--rule-soft);align-items:start;border-left:3px solid var(--speak-soft)}
+.grp.aux .ln{border-left-color:var(--rule-soft)}
+.grp.half .ln{border-left-color:var(--amber-soft)}
+.when{font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:3px;font-variant-numeric:tabular-nums}
+.pt{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--speak);background:var(--speak-soft);border-radius:3px;padding:1px 5px;margin-top:5px}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.zh strong{color:var(--ink);font-weight:600}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.48;color:var(--ink)}
+.en strong{font-weight:600;color:var(--speak)}
+.en s{color:var(--warn);text-decoration-thickness:1px}
+
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){color:transparent;background:var(--rule-soft);min-height:1.5em;user-select:none}
+:root.m-en .en.veil:not(.show) strong,
+:root.m-all .en.veil:not(.show) strong,
+:root.m-all .zh.veil:not(.show) strong{color:transparent}
+:root.m-en .en.veil:not(.show):hover,:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+h3.sec{font-family:var(--f-head);font-weight:600;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:52px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.four{display:flex;flex-direction:column;gap:0}
+.four div{display:grid;grid-template-columns:1fr 1.35fr;gap:20px;padding:12px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.four .a{font-size:13.5px;color:var(--ink-2)}
+.four .b{font-family:var(--f-say);font-size:15px;color:var(--ink)}
+.four .b strong{color:var(--speak);font-weight:600}
+.four .b em{font-style:normal;color:var(--muted);font-size:13px}
+
+pre{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;overflow-x:auto;box-shadow:var(--shadow);font-family:var(--f-mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:0}
+pre .c{color:var(--muted)}
+pre .k{color:var(--speak);font-weight:500}
+pre .hl{color:var(--warn);font-weight:600}
+pre + pre{margin-top:14px}
+
+ol.take{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:14px}
+ol.take li{counter-increment:t;position:relative;padding-left:34px;font-size:14px;color:var(--ink-2);line-height:1.6}
+ol.take li::before{content:counter(t);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--speak-soft);color:var(--speak);font-family:var(--f-mono);font-size:11px;font-weight:600;display:grid;place-items:center}
+ol.take strong{color:var(--ink);font-weight:600}
+
+.won{display:flex;flex-direction:column;gap:10px}
+.won div{font-size:13.5px;color:var(--ink-2);padding-left:24px;position:relative}
+.won div::before{content:"✓";position:absolute;left:0;color:var(--speak);font-weight:700}
+.won strong{color:var(--ink);font-weight:600}
+
+.trend{overflow-x:auto;margin-top:4px}
+.trend table{width:100%;border-collapse:collapse;font-size:13.5px}
+.trend th{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 10px 8px;border-bottom:1px solid var(--rule)}
+.trend td{padding:10px;border-bottom:1px solid var(--rule-soft);line-height:1.55}
+.trend td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:center;width:1%;white-space:nowrap}
+.trend td.hi{color:var(--speak);font-weight:600}
+.trend td.bad{color:var(--warn);font-weight:600}
+.trend td.id{font-family:var(--f-mono);font-weight:600;color:var(--muted);width:1%;text-align:center}
+.trend td.tpl{font-family:var(--f-mono);font-size:11.5px;color:var(--speak);white-space:nowrap;width:1%}
+
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:820px){ .rail{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:760px){
+  .wrap{padding:30px 17px 72px}
+  .cards,.two,.split{grid-template-columns:1fr}
+  .ln{grid-template-columns:1fr;gap:7px}
+  .stp{grid-template-columns:1fr;gap:5px}
+  .when{padding-top:0}
+  .four div{grid-template-columns:1fr;gap:5px}
+  .hint{margin-left:0;width:100%}
+  .ghead .gs{margin-left:0}
+  .evid td.out{width:auto}
+}
+@media (max-width:460px){ .rail{grid-template-columns:repeat(2,1fr)} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:11pt}.wrap{max-width:none;padding:0}
+  .ln,.cd,pre,.grp,.st,.hero,.sp,.stp,.head-find,.pass{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb"><a href="./">alg-round3</a><span>/</span><span>指针画法</span></div>
+    <h1>改结构的时候，图为什么会乱</h1>
+    <div class="meta">从 34 / 39 / 41 / 653 四次事故里长出来的 · 链表现在管用，树也一样管用</div>
+  </header>
+
+  <section class="head-find">
+    <span class="lb">诊断 · 4 题验证</span>
+    <h2>你画的是「链表现在长什么样」，不是「谁指着谁」。<b>前者一改结构就整张作废，后者只需要擦一根箭头。</b></h2>
+    <p class="sub">你画的是<b>状态快照</b>：1→2→3 变成 3→2→1，于是你在纸上<b>把节点搬了位置</b>。节点一搬，所有变量指向哪儿就全乱了，你只能重画。<br>正确的画法是<b>引用图</b>：<b>节点的位置永远不动</b>，改结构只改箭头和变量标签。这样每一步只擦一两笔，脑子里那张图不会崩。</p>
+    <div style="overflow-x:auto">
+    <table class="evid">
+      <thead><tr><th>题</th><th>你嘴里 / 纸上的图</th><th>图里少画的那根线</th></tr></thead>
+      <tbody>
+        <tr><td class="q">34</td><td class="said">"…so prev, prev is <b>null</b>, and then prev goes to cur…"</td><td class="out"><code>prev</code> 那个标签实际贴在 dummy 上，不是 null</td></tr>
+        <tr><td class="q">39</td><td class="said">"we find <b>prev's value is less than</b> the insert value one"</td><td class="out">dummy 里装的那个<b>具体数字</b>，你代的是「它反正比较小」</td></tr>
+        <tr><td class="q">41</td><td class="said">merge 循环加了两个「防越界」的条件</td><td class="out">A 和 B <b>谁先用完</b>——两条链的长度关系没画</td></tr>
+        <tr><td class="q">653</td><td class="said">画了子问题、也画了子问题的返回值，全对</td><td class="out"><code>head</code> 自己那根 <code>next</code>——<b>你手上还抓着的那根</b></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="close"><b>四次都是同一个形状：你画了「被改的那部分」，没画「没被改的那部分」。</b>而在指针题里，<b>没被改的那部分恰恰是你还能用的东西</b>——它还指着原来那个节点，等着你。</p>
+  </section>
+
+  <section class="two">
+    <div class="pass a">
+      <span class="lb">你现在的画法 · 状态快照</span>
+      <div class="h">节点跟着结果搬家</div>
+<pre class="mini"><span class="c">翻转前</span>  1 --&gt; 2 --&gt; 3
+
+<span class="c">翻转后</span>  3 --&gt; 2 --&gt; 1
+          <span class="hl">^ 节点被搬到别的位置了</span></pre>
+      <ul>
+        <li>❌ 每改一步就要<b>重画一整张</b></li>
+        <li>❌ 变量标签跟不上，只好凭感觉（"prev 反正在前面"）</li>
+        <li>❌ 「没动过的那些线」在重画时<b>被顺手抹掉了</b></li>
+      </ul>
+    </div>
+    <div class="pass b">
+      <span class="lb">该用的画法 · 引用图</span>
+      <div class="h">节点钉死，只改箭头</div>
+<pre class="mini"><span class="c">翻转前</span>  1 --&gt; 2 --&gt; 3 --&gt; null
+
+<span class="c">翻转后</span>  1 &lt;-- 2 &lt;-- 3      1 --&gt; null
+          <span class="k">^ 位置一个都没动，只有箭头掉头</span></pre>
+      <ul>
+        <li>✓ 每改一步<b>只擦一两笔</b></li>
+        <li>✓ 变量标签写在节点<b>下面</b>，谁指着谁一目了然</li>
+        <li>✓ 没动过的线还在纸上——<b>它就是你能白拿的东西</b></li>
+      </ul>
+    </div>
+  </section>
+
+  <h3 class="sec">三行画法 · 固定动作</h3>
+<pre><span class="c">第 1 行　节点</span>        1       2       3       null
+<span class="c">          位置钉死，全程不动</span>
+
+<span class="c">第 2 行　next 箭头</span>   --&gt;     --&gt;     --&gt;
+<span class="c">          会变，改结构就是改这一行</span>
+
+<span class="c">第 3 行　变量标签</span>    ^
+                       head
+<span class="c">          会移动，用 ^ 指着它现在贴在哪个节点上</span></pre>
+
+  <p class="rail-note" style="margin-top:16px"><b>唯一的规矩：节点位置永远不动。</b>「改结构」这个动作，在纸上只有两种形态——<b>掉转一根箭头</b>，或者<b>把一个变量标签挪到另一个节点下面</b>。<br>只要节点不动，你就不会丢线；只要不丢线，「我手上还抓着谁」就一直看得见。</p>
+
+  <h3 class="sec">用它重画 653 · 递归反转</h3>
+<pre><span class="c">━━ 第 1 层：head = 1，准备调用 reverse(head.next) ━━</span>
+
+    1  --&gt;  2  --&gt;  3  --&gt;  null
+    ^       ^
+   head   head.next     <span class="c">← 你传进去的就是它</span>
+
+
+<span class="c">━━ 递归只管方括号里这段，框外一根线都碰不到 ━━</span>
+
+    1  --&gt; [ 2  --&gt;  3  --&gt;  null ]
+    ^        <span class="hl">这一段进了递归</span></pre>
+
+<pre><span class="c">━━ 返回之后：框里被翻转了，框外那根线原封不动 ━━</span>
+
+    1  --&gt; [ 3  --&gt;  2  --&gt;  null ]
+    ^        ^        ^
+   head   newHead   head.next     <span class="hl">← 还是 2！而 2 现在是尾</span>
+
+<span class="c">   1 --&gt; 2 这根线，这一层从头到尾没有任何人动过。</span>
+<span class="c">   2 原来是子链的头；翻转把第一个变成最后一个，所以 2 成了尾。</span>
+<span class="c">   于是：head.next 就是尾。不用找。</span></pre>
+
+<pre><span class="c">━━ 接回来：两笔 ━━</span>
+
+<span class="k">head.next.next = head;</span>          <span class="c">// 尾（2）的 next 指回 1</span>
+
+    1  &lt;--  2   &lt;--  3
+    ^                ^
+   head            newHead
+
+<span class="k">head.next = null;</span>              <span class="c">// 1 成为新的尾</span>
+
+    3  --&gt;  2  --&gt;  1  --&gt;  null
+    ^
+  newHead      <span class="c">← return 它</span></pre>
+
+  <section class="hero">
+    <span class="lb">你问的那个「好神奇」，其实是一句话</span>
+    <h3>你传给递归的那个节点，就是返回结果的尾</h3>
+    <p class="said"><code>reverse(x)</code> 把「从 x 开始的那条链」翻过来。<b>翻转 = 把第一个变成最后一个。</b><br>x 原来是第一个 → x 现在是最后一个。<br>而 x 就是 <code>head.next</code>，因为那正是你传进去的。</p>
+    <p>所以 <code>head.next.next = head</code> 这一行，读出来是：<b>「让尾的 next 指回我」</b>。它不是一个技巧，是上面那句话的直接翻译。</p>
+    <p><b>为什么容易漏</b>：心理上，一旦把子链「交给」递归，就感觉自己撒手了。但你没有——<b>你手上那根绳子还系在子链的旧头上，而它现在成了尾。</b>画图的时候把那根绳子画出来，这件事就再也不会忘。</p>
+  </section>
+
+  <h3 class="sec">同一个画法，画迭代 · 34</h3>
+<pre><span class="c">━━ 初始 ━━</span>
+
+   null     1  --&gt;  2  --&gt;  3  --&gt;  null
+    ^       ^
+  prev     cur
+
+
+<span class="c">━━ 一轮之后：next=cur.next; cur.next=prev; prev=cur; cur=next ━━</span>
+
+   null &lt;-- 1       2  --&gt;  3  --&gt;  null
+            ^       ^
+          prev     cur
+
+<span class="c">   节点 1 位置没动，只有它的箭头掉了头，两个标签各挪一格。</span>
+
+
+<span class="c">━━ 再一轮 ━━</span>
+
+   null &lt;-- 1  &lt;--  2       3  --&gt;  null
+                    ^       ^
+                  prev     cur
+
+<span class="c">   循环退出的条件是 cur 走到 null，那时 prev 停在最后一个翻好的节点</span>
+<span class="c">   —— 它就是新头。这就是 return prev 的来处。</span></pre>
+
+  <p class="rail-note" style="margin-top:16px"><b>迭代和递归画出来是同一张图。</b>迭代里 <code>prev</code> 是一个<b>会移动的标签</b>；递归里同一个东西叫<b>返回值</b>，一层一层往上传。所以 34 的迭代版和 653 的尾递归版是同一个算法的两种写法——<b>你手上握着的那个「已翻好的部分的头」，一个用变量存，一个用参数传。</b></p>
+
+  <section class="cards">
+    <div class="cd die">
+      <h3>改结构之前的固定自检</h3>
+      <p><strong>动手改任何一根 next 之前，先问两句：</strong></p>
+      <p><strong>①「这一步之后，谁会指不到了？」</strong>——指不到就得先存下来。这是 34 的 <code>next = cur.next</code>、41 的 <code>an = a.next</code>。</p>
+      <p><strong>②「这一步我没动过哪些字段？」</strong>——没动过的还指着原来那个节点，<strong>它是你能白拿的东西</strong>。这是 653 的 <code>head.next</code>。</p>
+      <p style="margin-top:11px"><strong>警报：在递归里写 <code>while</code> 去「找」什么。</strong>递归每一层已经把该给你的都给你了；还要去找，通常说明第 ② 句没问。</p>
+    </div>
+    <div class="cd gold">
+      <h3>一句口诀</h3>
+      <p class="quote">节点钉死，只动箭头。<br>递归撒手的那一刻，<br>手里还攥着一根绳子。</p>
+      <p style="margin-top:11px;font-size:13px;color:var(--ink-2)">英文版，可以直接在面试里说出来：<br><span style="font-family:var(--f-say)">"The node I hand to the recursion comes back as the tail — I never let go of it."</span></p>
+    </div>
+  </section>
+
+  <h3 class="sec">四次事故，忘的是哪根线</h3>
+  <div class="trend">
+    <table>
+      <thead><tr><th>题</th><th>你在改什么结构</th><th>忘了画的那根线</th><th>后果</th></tr></thead>
+      <tbody>
+        <tr><td class="id">34</td><td>反转，prev 一路往前挪</td><td><code>prev</code> 标签一开始贴在<b>哪个节点</b>上</td><td class="bad">成环，判题报 cycle</td></tr>
+        <tr><td class="id">39</td><td>插入，在 prev 和 cur 之间接线</td><td>dummy 节点里装的那个<b>具体数字</b></td><td class="bad">挂 3 次，改了 3 次常数</td></tr>
+        <tr><td class="id">41</td><td>切链 + 交替穿插</td><td>两条链的<b>长度关系</b>（差 0 或 1）</td><td class="bad">加了 2 个防御条件，丢节点</td></tr>
+        <tr><td class="id">653</td><td>递归返回后接回来</td><td><code>head</code> 自己那根 <code>next</code></td><td class="bad">多走一趟找尾，O(n²)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="rail-note" style="margin-top:14px"><b>四次里三次的后果是「多写了东西」而不是「少写了东西」</b>——多一个特判、多两个条件、多一趟遍历、多一个常数。<b>图上少一根线，代码里就多一段。</b>因为你看不见手上已经有的东西，只好重新去弄一个。</p>
+
+  <h3 class="sec">树里会变成什么样</h3>
+  <p style="font-size:14px;color:var(--ink-2);line-height:1.7;margin:0 0 16px">树是同一件事，只是每个节点手上有<b>两根</b>绳子（<code>left</code> 和 <code>right</code>），而且——<b>和单链表一样，你没有 parent 指针，所以照样不能往回看</b>。你在 41 说过的那句「in a linked list we only know what is next, we cannot look back」，在树里一字不改地成立。</p>
+
+  <div class="split">
+    <div class="sp code"><div class="t">陷阱一 · 覆盖（34 的树版）</div>
+      <ol>
+        <li>Invert Binary Tree：要交换 left 和 right</li>
+        <li><code>node.left = node.right</code> 一写下去，<b>原来的 left 就找不到了</b></li>
+        <li>必须先存：<code>TreeNode tmp = node.left;</code></li>
+      </ol>
+      <p class="res">→ 就是「先存后继，再改指针」</p></div>
+    <div class="sp you"><div class="t">陷阱二 · 手上还攥着（653 的树版）</div>
+      <ol>
+        <li>Flatten Binary Tree to Linked List</li>
+        <li>递归展平了左子树，你需要<b>它的尾</b>才能接上右子树</li>
+        <li><b>别去走</b>——让递归<b>返回</b>尾，或者用 <code>node.left</code> 那根没动过的线找回去</li>
+      </ol>
+      <p class="res">→ 和 653 一模一样，走一趟就是 O(n²)</p></div>
+  </div>
+
+  <p class="rail-note" style="margin-top:16px"><b>树的三行画法：</b>第 1 行画节点（钉死，按层排），第 2 行画 <code>left</code> / <code>right</code> 两种箭头（用不同符号区分，比如 <code>/</code> 和 <code>\</code>），第 3 行标变量。<b>规矩不变：节点不动，只改箭头。</b><br><b>树比链表多问一句：「这个递归调用返回给我的，是子树的根，还是别的什么？」</b>——链表里返回的总是新头，树里可能是根、是高度、是尾、是布尔值。<b>返回什么必须在归约里说死</b>，这是你的第 ⑤ 样。</p>
+
+  <h3 class="sec">下次画图带走三件事</h3>
+  <ol class="take">
+    <li><strong>节点钉死，只动箭头和标签。</strong>不要在纸上把节点搬到「结果里该在的位置」——那是状态快照，一改就全废。变量名写在节点<strong>下面</strong>，用 <code>^</code> 指着。</li>
+    <li><strong>改一根 next 之前问「谁会指不到了」，改完之后问「我没动过哪些字段」。</strong>前一句救你不丢节点，后一句让你白拿一个已经在手上的东西。</li>
+    <li><strong>递归调用画一个方括号，框外的线一根都不要擦。</strong>框里交给递归，框外那根 <code>head.next</code> 是你唯一还抓着的绳子——它通常就是答案的一半。</li>
+  </ol>
+
+  <footer>
+    <span>ALG ROUND 3 · 指针画法 · 从 34 / 39 / 41 / 653 长出来</span>
+    <span>节点钉死 · 只动箭头 · 手里还攥着一根绳子</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.seg button'),body=document.body;
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    body.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m?'true':'false');});
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){setMode(b.dataset.m);}); });
+  body.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))) v.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
