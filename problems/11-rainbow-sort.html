@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>11 · Rainbow Sort</title>
+<meta name="description" content="不变量差了一格——而且嘴里和注释里是一致地差，所以自查查不出来。边界第一次 3/3，真问句第一次破零。">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<!--
+═══════════════════════════════════════════════════════════════
+  ALG ROUND 3 · 跟读卡模版　v3（Binary Search 十题后定稿）
+  用法：整个文件复制成 problems/NN-problem-name.html，只改 <body> 里的内容，CSS 一个字都不要动。
+
+  块清单（按出现顺序）—— ★必需　○按需
+  ★ header          题号 / 题名 / meta 一行
+  ★ head-find       头条发现。整张卡最重要的一块，写这次挖到的那一个东西。
+                    有跨题证据时用 .evid 表列出来（2 次以上才叫规律）。
+  ○ two             两遍对照 / 修改前后对照（重做的题、改代码的题用）
+  ★ rail            七步完成度 7 格：st（✓）/ st.half（半）/ st.up（★突破）
+  ★ chain           收缩链。原题 + 收缩①②③，卡住的那环加 .hot 和 <span class="tag">卡在这</span>
+  ○ hero            单点深挖。.hero.w = 红色（问题）／不加 = 绿色（突破）。一张卡 1–2 个，超过 2 个就稀释了
+  ★ cards           左：自检信号（.cd.die）　右：金句（.cd.gold）
+  ★ bar + grp       跟读区。bar 是三档遮盖开关，grp 按 STEP 分组
+                    .grp / .grp.half（这步只做到一半）/ .grp.aux（追问等非七步内容）
+                    每行 .ln = 时间点 + 中文 + 英文，两边都要 class="veil"
+  ★ four            "这次要改的说法"。左中右，右边只给正确形式 + <em>为什么</em>
+  ★ pre             代码。<span class="k">关键字 <span class="c">注释 <span class="hl">要盯的那一行
+  ○ trend(表)       任意对照表：跨题规律 / 一章总表 / 趋势
+  ○ won             这次确实进步了的（有真东西才写，没有就别凑）
+  ★ take            下一题只带走三件事。必须是三件，不能是五件
+  ★ footer
+
+  硬约束
+  · 中文正文用 --f-zh，英文台词用 --f-say，代码/标签用 --f-mono
+  · 颜色只用 token，不要写死 hex
+  · 主色 --speak 绿=会了/该说的　--warn 红=问题　--amber 黄=半步/教训
+  · 手机竖屏必须能读：rail 会降成 4 列再降 2 列，.ln 会堆成单列
+  · 每张卡只有一个头条。发现有三个的时候，选最能预测下一次的那个当头条，其余降为 hero
+═══════════════════════════════════════════════════════════════
+-->
+<style>
+:root{
+  --paper:#FAF9F6; --card:#FFFFFF;
+  --ink:#16171B; --ink-2:#4A4943; --muted:#78766D;
+  --rule:#E4E1DA; --rule-soft:#EFEDE7;
+  --speak:#0B6B5B; --speak-soft:#DCEDE9;
+  --warn:#A8412A; --warn-soft:#F7E7E2;
+  --amber:#8A6A1F; --amber-soft:#F5EDD8;
+  --shadow:0 1px 2px rgba(22,23,27,.05), 0 8px 24px -16px rgba(22,23,27,.18);
+  --f-head:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --f-say:"Source Serif 4",Georgia,"Songti SC",serif;
+  --f-zh:"Archivo",-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131417; --card:#191A1E;
+    --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+    --rule:#2C2E33; --rule-soft:#232529;
+    --speak:#5FC7B0; --speak-soft:#16302C;
+    --warn:#E08A70; --warn-soft:#33201B;
+    --amber:#D9B45E; --amber-soft:#2C2617;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131417; --card:#191A1E;
+  --ink:#E9E7E1; --ink-2:#BFBCB3; --muted:#8E8B82;
+  --rule:#2C2E33; --rule-soft:#232529;
+  --speak:#5FC7B0; --speak-soft:#16302C;
+  --warn:#E08A70; --warn-soft:#33201B;
+  --amber:#D9B45E; --amber-soft:#2C2617;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-zh);font-size:15px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:44px 24px 96px}
+
+.top{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--rule)}
+.crumb{font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.crumb a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--rule)}
+.crumb a:hover{color:var(--speak);border-color:var(--speak)}
+h1{font-family:var(--f-head);font-weight:700;font-size:clamp(25px,4.3vw,35px);line-height:1.12;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chapdone{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--speak);background:var(--speak-soft);border:1px solid var(--speak);border-radius:4px;padding:3px 9px}
+
+.head-find{margin-top:24px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--warn);border-radius:0 9px 9px 0;padding:22px 24px;box-shadow:var(--shadow)}
+.head-find .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--warn);font-weight:600}
+.head-find h2{font-family:var(--f-head);font-size:clamp(18px,2.9vw,22px);font-weight:700;margin:9px 0 6px;letter-spacing:-.015em;line-height:1.28}
+.head-find .sub{font-size:13.5px;color:var(--ink-2);margin:0 0 17px;line-height:1.62}
+.head-find .sub b{color:var(--ink);font-weight:600}
+.head-find .close{margin:17px 0 0;font-size:13.5px;color:var(--ink-2);line-height:1.62;padding-top:15px;border-top:1px dashed var(--rule)}
+.head-find .close b{color:var(--ink);font-weight:600}
+.evid{width:100%;border-collapse:collapse;font-size:13px}
+.evid th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 11px 8px;border-bottom:1px solid var(--rule)}
+.evid td{padding:11px;border-bottom:1px solid var(--rule-soft);vertical-align:top;line-height:1.55}
+.evid td.q{font-family:var(--f-mono);font-weight:600;color:var(--speak);width:1%;white-space:nowrap}
+.evid td.said{font-family:var(--f-say);color:var(--ink)}
+.evid td.out{color:var(--warn);font-weight:600;width:31%}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+.pass{border:1px solid var(--rule);border-radius:9px;padding:17px 19px;box-shadow:var(--shadow)}
+.pass.a{background:var(--warn-soft);border-left:3px solid var(--warn)}
+.pass.b{background:var(--speak-soft);border-left:3px solid var(--speak)}
+.pass .lb{font-family:var(--f-mono);font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:600}
+.pass.a .lb{color:var(--warn)} .pass.b .lb{color:var(--speak)}
+.pass .h{font-family:var(--f-head);font-size:17px;font-weight:700;margin:6px 0 9px;letter-spacing:-.01em}
+.pass ul{margin:0;padding-left:17px;font-size:13px;color:var(--ink-2);line-height:1.6}
+.pass li + li{margin-top:4px}
+.pass b{color:var(--ink);font-weight:600}
+.pass pre.mini{background:transparent;border:0;box-shadow:none;padding:9px 0 4px;font-size:12px;line-height:1.6;margin:0}
+
+.rail-wrap{margin-top:26px}
+.rail-head{display:flex;align-items:baseline;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.rail-head .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.rail-head .score{font-family:var(--f-mono);font-size:15px;color:var(--speak);font-weight:600;font-variant-numeric:tabular-nums}
+.rail{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.st{border:1px solid var(--rule);border-radius:7px;padding:11px 10px 10px;display:flex;flex-direction:column;gap:5px;min-width:0;border-top:3px solid var(--speak);background:var(--speak-soft)}
+.st .n{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:var(--speak)}
+.st .nm{font-size:12.5px;font-weight:600;line-height:1.3;color:var(--ink)}
+.st .mk{font-family:var(--f-mono);font-size:14px;line-height:1;margin-top:2px;color:var(--speak)}
+.st.half{border-top-color:var(--amber);background:var(--amber-soft)}
+.st.half .n,.st.half .mk{color:var(--amber)}
+.st.up{border-top-color:var(--speak);background:var(--speak);color:#fff}
+.st.up .n,.st.up .nm,.st.up .mk{color:#fff}
+.rail-note{margin:12px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.rail-note b{color:var(--ink-2);font-weight:600}
+
+.chain{margin-top:26px;border:1px solid var(--rule);border-radius:9px;background:var(--card);box-shadow:var(--shadow);overflow:hidden}
+.chain .ch{padding:14px 19px;border-bottom:1px solid var(--rule);background:var(--rule-soft)}
+.chain .ch .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.chain .ch .q{font-size:13.5px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.chain .ch .q b{color:var(--ink);font-weight:600}
+.stp{display:grid;grid-template-columns:112px 1fr;gap:0 18px;padding:15px 19px;border-bottom:1px solid var(--rule-soft);align-items:start}
+.stp:last-child{border-bottom:0}
+.stp .k{font-family:var(--f-mono);font-size:11px;color:var(--speak);font-weight:600;padding-top:2px;letter-spacing:.04em}
+.stp .arrow{font-family:var(--f-head);font-size:14.5px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.stp .why{font-size:13px;color:var(--ink-2);margin-top:5px;line-height:1.6}
+.stp .why b{color:var(--ink);font-weight:600}
+.stp .tc{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-top:5px}
+.stp.hot{background:var(--warn-soft)}
+.stp.hot .k{color:var(--warn)}
+.stp .tag{display:inline-block;font-family:var(--f-mono);font-size:9.5px;font-weight:600;color:var(--warn);background:var(--card);border:1px solid var(--warn);border-radius:3px;padding:1px 5px;margin-left:8px;vertical-align:2px;letter-spacing:.06em}
+
+.hero{margin-top:22px;background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--speak);border-radius:0 9px 9px 0;padding:20px 22px;box-shadow:var(--shadow)}
+.hero.w{border-left-color:var(--warn)}
+.hero .lb{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--speak);font-weight:600}
+.hero.w .lb{color:var(--warn)}
+.hero h3{font-family:var(--f-head);font-size:17px;font-weight:600;margin:8px 0 12px;letter-spacing:-.01em}
+.hero .said{font-family:var(--f-say);font-size:16px;line-height:1.5;color:var(--ink);padding:12px 16px;background:var(--speak-soft);border-radius:7px;margin:0 0 11px}
+.hero.w .said{background:var(--warn-soft)}
+.hero .said b{color:var(--speak);font-weight:600}
+.hero.w .said b{color:var(--warn)}
+.hero .said s{color:var(--warn);text-decoration-thickness:1px}
+.hero p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero p + p{margin-top:9px}
+.hero p b{color:var(--ink);font-weight:600}
+.hero ol{margin:10px 0 0;padding-left:19px;font-size:13.5px;color:var(--ink-2);line-height:1.62}
+.hero ol li + li{margin-top:7px}
+.hero ol b{color:var(--ink);font-weight:600}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.sp{border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.sp.you{background:var(--speak-soft);border-left:3px solid var(--speak)}
+.sp.code{background:var(--warn-soft);border-left:3px solid var(--warn)}
+.sp .t{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:9px}
+.sp.you .t{color:var(--speak)} .sp.code .t{color:var(--warn)}
+.sp ol{margin:0;padding-left:17px;font-family:var(--f-mono);font-size:12px;line-height:1.85;color:var(--ink-2)}
+.sp ol b{color:var(--ink);font-weight:600}
+.sp .res{margin:11px 0 0;font-size:12.5px;color:var(--ink);font-weight:600;padding-top:9px;border-top:1px dashed var(--rule)}
+
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.cd{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;box-shadow:var(--shadow)}
+.cd h3{font-family:var(--f-mono);font-size:10.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0 0 10px}
+.cd.die{border-left:3px solid var(--amber)}
+.cd.die h3{color:var(--amber)}
+.cd.gold{border-left:3px solid var(--speak);background:var(--speak-soft)}
+.cd.gold h3{color:var(--speak)}
+.cd p{margin:0;font-size:13.5px;line-height:1.62;color:var(--ink-2)}
+.cd p + p{margin-top:9px}
+.cd p strong{color:var(--ink);font-weight:600}
+.cd .quote{font-family:var(--f-say);font-size:16px;line-height:1.45;color:var(--ink);margin:0}
+code{font-family:var(--f-mono);font-size:.88em;background:var(--rule-soft);padding:1px 5px;border-radius:3px}
+
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:34px 0 6px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.bar .lab{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.seg{display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden;background:var(--card)}
+.seg button{font-family:var(--f-mono);font-size:11.5px;background:transparent;color:var(--ink-2);border:0;padding:7px 15px;cursor:pointer;transition:background .15s,color .15s}
+.seg button + button{border-left:1px solid var(--rule)}
+.seg button:hover{color:var(--speak)}
+.seg button[aria-pressed="true"]{background:var(--speak);color:#fff}
+.hint{font-size:12px;color:var(--muted);margin-left:auto}
+
+.grp{margin-top:26px}
+.grp:first-of-type{margin-top:10px}
+.ghead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;padding:9px 13px;border-radius:7px 7px 0 0;border-left:3px solid var(--speak);background:var(--speak-soft)}
+.ghead .gn{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;color:var(--speak);font-weight:600}
+.ghead .gt{font-family:var(--f-head);font-size:15px;font-weight:600;color:var(--ink)}
+.ghead .gs{font-family:var(--f-mono);font-size:11.5px;margin-left:auto;color:var(--speak)}
+.ghead .gd{font-size:12px;color:var(--muted);width:100%;line-height:1.5}
+.ghead .gd b{color:var(--ink-2);font-weight:600}
+.grp.aux .ghead{border-left-color:var(--rule);background:var(--rule-soft)}
+.grp.aux .ghead .gn,.grp.aux .ghead .gs{color:var(--muted)}
+.grp.half .ghead{border-left-color:var(--amber);background:var(--amber-soft)}
+.grp.half .ghead .gn,.grp.half .ghead .gs{color:var(--amber)}
+
+.ln{display:grid;grid-template-columns:120px 1fr 1.32fr;gap:0 20px;padding:15px 13px;border-bottom:1px solid var(--rule-soft);align-items:start;border-left:3px solid var(--speak-soft)}
+.grp.aux .ln{border-left-color:var(--rule-soft)}
+.grp.half .ln{border-left-color:var(--amber-soft)}
+.when{font-family:var(--f-mono);font-size:11px;color:var(--muted);padding-top:3px;font-variant-numeric:tabular-nums}
+.pt{display:inline-block;font-family:var(--f-mono);font-size:10px;font-weight:600;color:var(--speak);background:var(--speak-soft);border-radius:3px;padding:1px 5px;margin-top:5px}
+.zh{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.zh strong{color:var(--ink);font-weight:600}
+.en{font-family:var(--f-say);font-size:15.5px;line-height:1.48;color:var(--ink)}
+.en strong{font-weight:600;color:var(--speak)}
+.en s{color:var(--warn);text-decoration-thickness:1px}
+
+.veil{position:relative;cursor:pointer;border-radius:5px;transition:background .15s}
+:root.m-en .en.veil:not(.show),
+:root.m-all .en.veil:not(.show),
+:root.m-all .zh.veil:not(.show){color:transparent;background:var(--rule-soft);min-height:1.5em;user-select:none}
+:root.m-en .en.veil:not(.show) strong,
+:root.m-all .en.veil:not(.show) strong,
+:root.m-all .zh.veil:not(.show) strong{color:transparent}
+:root.m-en .en.veil:not(.show):hover,:root.m-all .veil:not(.show):hover{background:var(--speak-soft)}
+
+h3.sec{font-family:var(--f-head);font-weight:600;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:52px 0 16px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.four{display:flex;flex-direction:column;gap:0}
+.four div{display:grid;grid-template-columns:1fr 1.35fr;gap:20px;padding:12px 0;border-bottom:1px solid var(--rule-soft);align-items:baseline}
+.four .a{font-size:13.5px;color:var(--ink-2)}
+.four .b{font-family:var(--f-say);font-size:15px;color:var(--ink)}
+.four .b strong{color:var(--speak);font-weight:600}
+.four .b em{font-style:normal;color:var(--muted);font-size:13px}
+
+pre{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:18px 20px;overflow-x:auto;box-shadow:var(--shadow);font-family:var(--f-mono);font-size:12.5px;line-height:1.7;color:var(--ink);margin:0}
+pre .c{color:var(--muted)}
+pre .k{color:var(--speak);font-weight:500}
+pre .hl{color:var(--warn);font-weight:600}
+pre + pre{margin-top:14px}
+
+ol.take{margin:0;padding:0;list-style:none;counter-reset:t;display:flex;flex-direction:column;gap:14px}
+ol.take li{counter-increment:t;position:relative;padding-left:34px;font-size:14px;color:var(--ink-2);line-height:1.6}
+ol.take li::before{content:counter(t);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--speak-soft);color:var(--speak);font-family:var(--f-mono);font-size:11px;font-weight:600;display:grid;place-items:center}
+ol.take strong{color:var(--ink);font-weight:600}
+
+.won{display:flex;flex-direction:column;gap:10px}
+.won div{font-size:13.5px;color:var(--ink-2);padding-left:24px;position:relative}
+.won div::before{content:"✓";position:absolute;left:0;color:var(--speak);font-weight:700}
+.won strong{color:var(--ink);font-weight:600}
+
+.trend{overflow-x:auto;margin-top:4px}
+.trend table{width:100%;border-collapse:collapse;font-size:13.5px}
+.trend th{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:0 10px 8px;border-bottom:1px solid var(--rule)}
+.trend td{padding:10px;border-bottom:1px solid var(--rule-soft);line-height:1.55}
+.trend td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:center;width:1%;white-space:nowrap}
+.trend td.hi{color:var(--speak);font-weight:600}
+.trend td.bad{color:var(--warn);font-weight:600}
+.trend td.id{font-family:var(--f-mono);font-weight:600;color:var(--muted);width:1%;text-align:center}
+.trend td.tpl{font-family:var(--f-mono);font-size:11.5px;color:var(--speak);white-space:nowrap;width:1%}
+
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:820px){ .rail{grid-template-columns:repeat(4,1fr)} }
+@media (max-width:760px){
+  .wrap{padding:30px 17px 72px}
+  .cards,.two,.split{grid-template-columns:1fr}
+  .ln{grid-template-columns:1fr;gap:7px}
+  .stp{grid-template-columns:1fr;gap:5px}
+  .when{padding-top:0}
+  .four div{grid-template-columns:1fr;gap:5px}
+  .hint{margin-left:0;width:100%}
+  .ghead .gs{margin-left:0}
+  .evid td.out{width:auto}
+}
+@media (max-width:460px){ .rail{grid-template-columns:repeat(2,1fr)} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{
+  .bar{display:none}
+  :root.m-en .veil,:root.m-all .veil{color:var(--ink)!important;background:none!important}
+  body{background:#fff;font-size:11pt}.wrap{max-width:none;padding:0}
+  .ln,.cd,pre,.grp,.st,.hero,.sp,.stp,.head-find,.pass{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="crumb"><a href="../">alg-round3</a><span>/</span><span>problems</span><span>/</span><span>11</span></div>
+    <h1>Rainbow Sort</h1>
+    <div class="meta">Recursion &amp; Sorting 第 7 题 · 🚩 A 类 · 脱稿 · 提交挂 → 多轮自己修 · 七步 5.5 / 7 · <b>边界第一次 3 / 3</b></div>
+  </header>
+
+  <section class="head-find">
+    <span class="lb">这次的头条发现 · 新形态</span>
+    <h2>你的不变量差了一格——而且<b>嘴里和注释里是一致地差</b>，所以你自己查不出来。</h2>
+    <p class="sub">以前是「说的和写的不一样」（34 / 39 / 653），这次不同：<b>你的注释是照着你的口述写的，所以两个一起错，而且互相印证。</b>走例子的时候两边都对得上，你就说了那句 <span style="font-family:var(--f-say)">"I think the code should be right but the answer is wrong"</span>——因为在你那张图里，它确实是对的。</p>
+    <div style="overflow-x:auto">
+    <table class="evid">
+      <thead><tr><th>来源</th><th>未知区是哪一段</th><th>1 区是哪一段</th></tr></thead>
+      <tbody>
+        <tr><td class="q">你的口述</td><td class="said">"from j to <b>k minus one</b> is the range that are not exploring"</td><td class="out">"from <b>k</b> to end include 1"</td></tr>
+        <tr><td class="q">你的注释</td><td class="said"><code>[j,k-1]</code></td><td class="out"><code>[k,end]</code></td></tr>
+        <tr><td class="q" style="color:var(--warn)">你的代码</td><td class="said"><code>while (j &lt;= k)</code> → 未知区是 <b><code>[j, k]</code></b></td><td class="out"><code>swap(k,j); k--;</code> → 1 区是 <b><code>[k+1, end]</code></b></td></tr>
+        <tr><td class="q" style="color:var(--speak)">官方注释</td><td class="said">"between zero and one is to be discovered <b>(inclusive of both)</b>"</td><td class="out">"the right side of one is 1 <b>(exclusive of one)</b>"</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="close"><b>看最后一行：官方注释每一条都专门标了「含不含端点」（inclusive / exclusive）。</b>这不是啰嗦——<b>差的就是这一格。</b><br><b>反过来用：写四段不变量的时候，每一段都必须标端点归谁。</b>四段一确定，「循环条件写 <code>&lt;</code> 还是 <code>&lt;=</code>」和「j 什么时候动」就都是<b>推出来的</b>，不用试。你这次是靠试的——录音里你自己说 <span style="font-family:var(--f-say)">"my while loop condition is i &lt;= k … I will fix that"</span>，改对了，但是撞对的。</p>
+  </section>
+
+  <section class="two">
+    <div class="pass a">
+      <span class="lb">挂的那一版 · 丢元素</span>
+      <div class="h">j 的推进交给了循环头</div>
+<pre class="mini"><span class="k">for</span>(j=i+1; j&lt;=k; <span class="hl">j++</span>) {
+  <span class="k">if</span>(array[j]==-1) {swap(i,j); i++;}
+  <span class="k">else if</span>(array[j]==1) {swap(k,j); k--;}
+  <span class="k">else</span> <span class="hl">j++</span>;
+}</pre>
+      <ul>
+        <li>❌ 0 分支：<b>j 加了两次</b>，跳过一个元素</li>
+        <li>❌ 1 分支：换过来的没看就被 for 推走了</li>
+        <li>❌ <code>j=i+1</code> 跳过 <code>array[i]</code> 本身</li>
+      </ul>
+    </div>
+    <div class="pass b">
+      <span class="lb">改完 · AC</span>
+      <div class="h">j 的推进写进分支</div>
+<pre class="mini"><span class="k">while</span>(j&lt;=k) {
+  <span class="k">if</span>(array[j]==-1) {swap(i,j); i++; <span class="k">j++</span>;}
+  <span class="k">else if</span>(array[j]==1) {swap(j,k); k--;}
+  <span class="k">else</span> <span class="k">j++</span>;
+}</pre>
+      <ul>
+        <li>✓ 每轮未知区 <code>[j,k]</code> <b>缩且只缩 1</b></li>
+        <li>✓ 换来已知的 0 → j 走；换来未知的 → j 不动</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="rail-wrap">
+    <div class="rail-head"><span class="t">脱稿完成度</span><span class="score">5.5 / 7</span><span class="t">34→4.5　36→5.0　37→5.5　39→5.0　41→5.0　653→6.0　11→5.5</span></div>
+    <div class="rail">
+      <div class="st"><span class="n">STEP 1</span><span class="nm">开场</span><span class="mk">✓</span></div>
+      <div class="st"><span class="n">STEP 2</span><span class="nm">复述</span><span class="mk">✓</span></div>
+      <div class="st up"><span class="n">STEP 3</span><span class="nm">提问</span><span class="mk">★</span></div>
+      <div class="st half"><span class="n">STEP 4</span><span class="nm">归约</span><span class="mk">半</span></div>
+      <div class="st up"><span class="n">STEP 5</span><span class="nm">边界　3 / 3</span><span class="mk">★</span></div>
+      <div class="st half"><span class="n">STEP 6</span><span class="nm">复杂度·递球</span><span class="mk">半</span></div>
+      <div class="st half"><span class="n">STEP 7</span><span class="nm">测试</span><span class="mk">半</span></div>
+    </div>
+    <p class="rail-note"><b>两个 ★，都是九题以来的第一次。</b>STEP 3 出现了真正的真问句，STEP 5 <b>三种形态全说满</b>——这一项从 Binary Search 一路 2 / 3，今天第一次满格。<br><b>STEP 6 反而掉了</b>：整段转录里没找到复杂度那句（递球说了）。前六题你每题都报，这次是第一次漏——大概率是被 debug 的焦虑挤掉了。<b>如果你其实说了、只是 ASR 没认出来，就当我没说。</b><br><b>STEP 4 的半步</b>：三段区间说出来了，但差一格；而且「j 什么时候动」你自己提出过疑问（<span style="font-family:var(--f-say)">"after swap, should it be checked again?"</span>）却<b>没给出结论</b>——那个疑问是对的，答案就在下面。</p>
+  </section>
+
+  <section class="chain">
+    <div class="ch">
+      <span class="t">收缩链</span>
+      <div class="q"><b>原题</b>　数组里只有 -1 / 0 / 1 三种值，原地排成「-1 全左、0 居中、1 全右」。O(n) 时间，O(1) 空间。</div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ①</span>
+      <div>
+        <div class="arrow">排序 → 分区（不需要比较大小）</div>
+        <div class="why">值域只有三个，所以这不是排序问题，是<b>三向分区</b>（Dutch National Flag）。<span style="color:var(--speak)">这一环你说得很清楚，而且把编码含义（-1 红 / 0 绿 / 1 蓝）复述了一遍。</span></div>
+        <div class="tc">O(n)　一趟</div>
+      </div>
+    </div>
+    <div class="stp hot">
+      <span class="k">收缩 ②</span>
+      <div>
+        <div class="arrow">三向分区 → <b>四个区间，三个指针</b><span class="tag">卡在这</span></div>
+        <div class="why"><b>四段，每段都要标端点归谁：</b><br>
+        <code>[0, neg-1]</code>　　全是 <b>-1</b>　（不含 neg）<br>
+        <code>[neg, zero-1]</code>　全是 <b>0</b>　（不含 zero）<br>
+        <code>[zero, one]</code>　　<b>未知</b>　　<b>两端都含</b>　← 你说的是 <code>[zero, one-1]</code><br>
+        <code>[one+1, end]</code>　全是 <b>1</b>　（不含 one）<br><br>
+        <b>差的就是「未知区含不含 one」这一格。</b>含，所以循环条件是 <code>zero &lt;= one</code>；不含，就得写 <code>zero &lt; one</code> 并且收尾还要单独处理 <code>one</code> 那一格。你后来把条件改对了，但是撞对的——四段没写死，条件就只能试。</div>
+        <div class="tc">O(1)　这一环是这题的全部</div>
+      </div>
+    </div>
+    <div class="stp">
+      <span class="k">收缩 ③</span>
+      <div>
+        <div class="arrow">每一轮怎么缩 → <b>未知区缩且只缩 1</b></div>
+        <div class="why"><b>不变量：每轮 <code>[zero, one]</code> 正好少一格，要么左端右移，要么右端左移，绝不同时。</b><br>
+        · 看到 <b>-1</b>：和 neg 换 → 换来的是 <code>[neg, zero-1]</code> 里<b>已知的 0</b> → <code>neg++ zero++</code>，左端右移<br>
+        · 看到 <b>0</b>：本来就在中段 → <code>zero++</code>，左端右移<br>
+        · 看到 <b>1</b>：和 one 换 → 换来的来自<b>未知区另一头</b>，没看过 → <code>one--</code>，右端左移，<b>zero 不动</b><br>
+        <span style="color:var(--speak)">你录音里问过 <span style="font-family:var(--f-say)">"after swap, should it be checked again?"</span>——<b>问题问对了</b>，答案就是这三行的不对称。</span></div>
+        <div class="tc">O(1) 每轮</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero">
+    <span class="lb">九题以来第一次 · 两个 ★</span>
+    <h3>STEP 5 边界终于 3 / 3，STEP 3 出现了真正的真问句——而且问的正是你自己的老毛病</h3>
+    <p class="said">"…if it only contains one node I will return itself. <b>Should I include this condition to the general case?</b>"</p>
+    <p><b>这一句是这张卡里最重要的东西。</b>「第一个不特殊，它是循环的第 0 次」这条结构反射，从 06 跟到现在六次，<b>今天你第一次主动把它问了出来</b>——而且是当成一个真问句问的，不是自己下结论。<br>（顺带回答：这题的答案是<b>可以并进去</b>。单元素数组进主循环，跑一轮就退出，结果一样。所以那个特判只是为了 <code>null</code> 和读得顺，不是必需的。）</p>
+    <p class="said" style="margin-top:15px">"…the array equals null or zero, we should do nothing… if it only contains <b>one</b> node, I will return itself… Concretely, for only having <b>two</b> nodes, such as <b>one and zero</b>…"</p>
+    <p><b>没有 / 刚好一个 / 刚好两个——三种形态全说满，而且第三种你还配了具体例子并走了指针。</b>这一项从 Binary Search 09 一路 2 / 3、39 甚至掉到 1 / 3，<b>今天第一次满格</b>。上周我们刚说完「问自己：主逻辑第一次真正跑起来需要多小的输入」，你隔一题就用上了。</p>
+    <p style="margin-top:11px"><b>还有一个第一次</b>：你把<b>设计过程</b>说出来了——<span style="font-family:var(--f-say)">"at first I thought I can use two pointers to solve this problem, but two pointers isn't enough, so I changed it to three pointers."</span> 这是你六题零次的那个「alternative」的雏形。差的只是加个理由：<b>两指针不够，是因为它只能切成两段，而这题要三段。</b></p>
+  </section>
+
+  <section class="hero w">
+    <span class="lb">结构反射 · 第 4 次（09 / 34 / 39 / 11）</span>
+    <h3>走例子走通了，代码是错的——而这次你连怀疑的方向都对，只是没找到</h3>
+    <p class="said">"I think the code <b>should be right</b> but the answer is wrong, so let me check whether I have some <b>writing</b> problem."</p>
+    <p><b>你的判断完全正确：确实是「写」的问题，不是「想」的问题。</b>你脑子里 j 是<b>单加</b>的，代码里 <code>for</code> 的头上有一个 <code>j++</code>、<code>else</code> 里又有一个 —— <b>0 分支上 j 加了两次</b>。所以你的 trace 每一步都对，代码每两步丢一个。</p>
+    <p>但你没找到它，因为你在<b>读代码</b>而不是<b>数代码</b>。这类 bug 读一百遍也看不出来——<code>for(...; j++)</code> 和 <code>else j++;</code> 隔了四行，视线不会把它们放在一起。</p>
+    <div class="split" style="margin-top:13px">
+      <div class="sp you"><div class="t">你 trace 的（{1,0,-1,-1,1,0}）</div>
+        <ol><li>j=1 是 0 → j 走一格 → j=2</li><li>j=2 是 -1 → 换到 i，i++</li><li>…每一步都对</li></ol>
+        <p class="res">→ 结论正确</p></div>
+      <div class="sp code"><div class="t">代码实际跑的</div>
+        <ol><li>j=1 是 0 → <b>else 的 j++ → j=2</b></li><li><b>for 的 j++ → j=3</b></li><li>索引 2 的 -1 <b>从没被看过</b></li></ol>
+        <p class="res">→ [-1, 0, -1, 1, 0, 1]</p></div>
+    </div>
+    <p style="margin-top:13px"><b>检验法（这一条比「一行行走」更具体）：写完循环，把每个改变循环变量的地方<b>圈出来数一遍</b>。</b>循环头一个、分支里一个，就是两个。<b>每轮循环变量必须只被改一次</b>——这就是「未知区缩且只缩 1」在代码层面的样子。</p>
+  </section>
+
+  <section class="cards">
+    <div class="cd die">
+      <h3>可以带走的自检信号</h3>
+      <p><strong>指针的名字就是它的不变量。如果你只能叫它 i / j / k，说明你还没把它定义清楚。</strong></p>
+      <p>官方解法里那三个名字——<code>neg</code> / <code>zero</code> / <code>one</code>——<strong>名字本身就是「我左边全是这个」</strong>。你用 i / j / k，就必须在脑子里额外维护一张「谁是谁」的映射表，<strong>而你这次的映射表差了一格</strong>。</p>
+      <p style="margin-top:11px"><strong>更硬的版本：</strong>写完四段区间，每一段后面强制写「含 / 不含端点」。官方注释四条里三条都专门标了 <em>exclusive</em>，一条标了 <em>inclusive of both</em> —— <strong>那不是啰嗦，那是这题唯一会错的地方。</strong></p>
+    </div>
+    <div class="cd gold">
+      <h3>这道题的金句</h3>
+      <p class="quote">Each pass shrinks the unknown region by exactly one — either the left edge moves right, or the right edge moves left, never both.</p>
+      <p style="margin-top:11px;font-size:13px;color:var(--ink-2)"><strong>模型全名</strong>：three-way partition，也叫 <strong>Dutch National Flag</strong>（Dijkstra 那个）。<br><strong>识别信号</strong>：值域只有两三种 + 要求原地分组 → 三向分区。<br>这一套还管：Sort Colors、Move Zeroes、Quick Sort 的 partition、Partition Linked List。</p>
+    </div>
+  </section>
+
+  <div class="bar">
+    <span class="lab">跟读</span>
+    <span class="seg">
+      <button type="button" data-m="none" aria-pressed="true">① 看着念</button>
+      <button type="button" data-m="en" aria-pressed="false">② 只看中文</button>
+      <button type="button" data-m="all" aria-pressed="false">③ 全盖住</button>
+    </span>
+    <span class="hint">建议 ②：重点在 STEP 4 那四段区间和「缩且只缩 1」那一句</span>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 1 · 2</span><span class="gt">开场 + 复述</span><span class="gs">✓ ✓ 连续第 6 题</span>
+      <span class="gd">开场两句都用上了。复述这次很完整：不光说了输入输出，还<b>把 −1 / 0 / 1 各代表什么颜色复述了一遍</b>——编码题最容易在这儿讲糊，你没有。</span></div>
+    <div class="ln"><div class="when">0:00<span class="pt">申请沉默</span></div>
+      <div class="zh veil">我先通读一遍，会安静一两分钟。还在读，这题铺垫挺长。</div>
+      <div class="en veil">Let me <strong>read through this once</strong> — I'll be <strong>quiet for a minute or two</strong>. Still reading — <strong>there's a lot of setup here</strong>.</div></div>
+    <div class="ln"><div class="when">0:30<span class="pt">复述</span></div>
+      <div class="zh veil">为了确认我理解对了：给的是一个整数数组，里面<strong>只有三种值</strong>——<strong>−1 是红、0 是绿、1 是蓝</strong>。要原地把它们分成三段：红在左、绿在中、蓝在右。</div>
+      <div class="en veil">So, to make sure I understand — we're given an integer array containing <strong>only three values</strong>: <strong>minus one for red, zero for green, one for blue</strong>. We rearrange it <strong>in place</strong> so all the reds are on the left, greens in the middle, blues on the right.</div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 3</span><span class="gt">提问　★ 突破</span><span class="gs">第一次出现真正的真问句</span>
+      <span class="gd">第 ② 句是你自己问出来的，而且问的正是你的老毛病。<b>问完记得停下来等答案</b>——这次你问完接着往下走了。</span></div>
+    <div class="ln"><div class="when">1:00 ① 带假设</div>
+      <div class="zh veil">我假设数组为 <strong>null</strong> 或者<strong>长度为 0</strong> 时什么都不做，原样返回，这样可以吗？</div>
+      <div class="en veil"><strong>I'll assume</strong> that if the array is <strong>null or empty</strong> we do nothing and return it as is — is that fair?</div></div>
+    <div class="ln"><div class="when">1:15 ② <strong>真问句 · 你问出来了</strong></div>
+      <div class="zh veil">单元素的情况，<strong>要不要把它并进主逻辑里</strong>，还是单独特判？</div>
+      <div class="en veil">For the single-element case — <strong>should I fold that into the general case</strong>, or handle it separately? <span style="color:var(--muted)">〔你自己问出来的。答案：可以并进去，单元素进主循环跑一轮就退出。问完<b>停三秒</b>〕</span></div></div>
+    <div class="ln"><div class="when">1:30 ③ 可以补</div>
+      <div class="zh veil">题目保证元素<strong>只有这三个值</strong>吗？会不会出现别的数字？</div>
+      <div class="en veil">Is it guaranteed that every element is <strong>exactly one of those three values</strong>? <span style="color:var(--muted)">〔句式库「Can the input contain ___?」· 题目 Assumption 里写了「all elements are valid」，你可以顺手用掉它〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 4</span><span class="gt">归约　半步</span><span class="gs">四段说了，差一格</span>
+      <span class="gd">三个指针、四个区间你都说出来了，<b>而且说了「原本想两指针、不够、改成三指针」的设计过程</b>——这是新东西。扣的半步在「含不含端点」，见第 ② 行。</span></div>
+    <div class="ln"><div class="when">2:00 ① 模型全名 + 为什么</div>
+      <div class="zh veil">因为值域只有三个，这归约成<strong>三向分区</strong>，也叫荷兰国旗问题。我一开始想用<strong>两个指针</strong>，但两个指针只能切成<strong>两段</strong>，这题要三段，所以改成<strong>三个</strong>。</div>
+      <div class="en veil">Since there are only three possible values, this reduces to a <strong>three-way partition</strong> — the <strong>Dutch National Flag</strong> problem. I first tried <strong>two pointers</strong>, but two pointers only give me <strong>two regions</strong>, and I need three — so I moved to <strong>three</strong>. <span style="color:var(--muted)">〔「两指针不够」你说了，加上「因为只能切两段」这个理由就完整了〕</span></div></div>
+    <div class="ln"><div class="when">2:25 ② <strong>该说没说 · 端点归谁</strong></div>
+      <div class="zh veil">四段，每段我说清楚含不含端点：<strong>[0, neg−1] 全是 −1</strong>，<strong>[neg, zero−1] 全是 0</strong>，<strong>[zero, one] 是未知区、两端都含</strong>，<strong>[one+1, 末尾] 全是 1</strong>。</div>
+      <div class="en veil">Four regions, and I'll be explicit about the endpoints: <strong>[0, neg−1] are all minus ones</strong>; <strong>[neg, zero−1] are all zeros</strong>; <strong>[zero, one] is the unknown region — inclusive on both ends</strong>; <strong>[one+1, end] are all ones</strong>. <span style="color:var(--muted)">〔「inclusive on both ends」这半句决定了循环条件是 <code>&lt;=</code> 而不是 <code>&lt;</code>〕</span></div></div>
+    <div class="ln"><div class="when">2:50 ③ <strong>该说没说 · 每轮缩多少</strong></div>
+      <div class="zh veil">每一轮未知区<strong>正好缩小 1</strong>：要么左端右移，要么右端左移，<strong>绝不同时</strong>。循环在未知区<strong>变空</strong>时退出，也就是 <code>zero &gt; one</code>。</div>
+      <div class="en veil">Each pass shrinks the unknown region by <strong>exactly one</strong> — either the left edge moves right, or the right edge moves left, <strong>never both</strong>. The loop <strong>runs while</strong> the region is non-empty and <strong>exits when</strong> zero passes one. <span style="color:var(--muted)">〔句式库「The loop runs while ___, and exits when ___.」· 说了这句，循环条件不用试〕</span></div></div>
+    <div class="ln"><div class="when">3:10 ④ <strong>该说没说 · 那个不对称</strong></div>
+      <div class="zh veil">和左边换，换来的是<strong>已经确定的 0</strong>，所以指针可以往前走；和右边换，换来的<strong>来自未知区另一头、还没看过</strong>，所以指针<strong>留在原地</strong>。</div>
+      <div class="en veil">Swapping with the <strong>left</strong> pointer brings back a <strong>known zero</strong>, so the scanner moves on. Swapping with the <strong>right</strong> brings back something from the <strong>unexplored</strong> region, so the scanner <strong>stays</strong>. <span style="color:var(--muted)">〔你录音里问了 "after swap, should it be checked again?"——这就是答案〕</span></div></div>
+  </div>
+
+  <div class="grp">
+    <div class="ghead"><span class="gn">STEP 5</span><span class="gt">边界　★ 3 / 3</span><span class="gs">九题以来第一次满格</span>
+      <span class="gd">三种形态全说满，而且第三种你配了具体例子 <code>{1, 0}</code> 还走了指针。<b>下面三行是你真的说出来的</b>，留在这儿当参照。</span></div>
+    <div class="ln"><div class="when">3:30 ① 没有</div>
+      <div class="zh veil">写代码之前，说一个边界：数组是 <strong>null</strong> 或者<strong>长度为 0</strong>，什么都不做，原样返回。</div>
+      <div class="en veil">Before I code — one edge case: if the array is <strong>null or empty</strong>, we do nothing and return it as is.</div></div>
+    <div class="ln"><div class="when">3:40 ② 刚好一个</div>
+      <div class="zh veil"><strong>只有一个元素</strong>，它本身就是有序的，返回它自己。</div>
+      <div class="en veil">With <strong>a single element</strong>, it's already sorted — we return it as is.</div></div>
+    <div class="ln"><div class="when">3:50 ③ 刚好在端点</div>
+      <div class="zh veil">具体来说，<strong>两个元素 {1, 0}</strong> 的答案是 <strong>{0, 1}</strong>——这是<strong>循环真正跑起来的最小输入</strong>，也是唯一一次「和右边换完之后左指针还得再看一次同一格」。</div>
+      <div class="en veil">Concretely, for <strong>two elements, one and zero</strong>, the answer is <strong>zero, one</strong> — that's the smallest input where <strong>the loop actually runs</strong>, and the only case where after swapping with the right, the scanner has to <strong>look at the same slot again</strong>. <span style="color:var(--muted)">〔句式库「Concretely, for ___ the answer is ___.」〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 6</span><span class="gt">复杂度 · 递球　半步</span><span class="gs">递球说了，复杂度没找到</span>
+      <span class="gd">整段转录里没有复杂度那句（代码注释里写了 <code>TC O n, SC O1</code>，但嘴上没说）。<b>前六题你每题都报，这是第一次漏</b>——大概率是被 debug 挤掉了。如果你其实说了、只是 ASR 没认出来，当我没说。</span></div>
+    <div class="ln"><div class="when">4:00 ① <strong>该说没说</strong></div>
+      <div class="zh veil">时间 <strong>O(n)</strong>，每个元素最多被看两次（和右边换那次会再看一遍）；<strong>空间 O(1)</strong>，只有三个下标。</div>
+      <div class="en veil">Time is <strong>big O of n</strong> — each element is examined at most twice, since a swap with the right makes us re-check that slot. <strong>Space is O(1)</strong>: just three indices.</div></div>
+    <div class="ln"><div class="when">4:15 ② 递球</div>
+      <div class="zh veil">时间快到了，你希望我优化，还是多走几个例子？</div>
+      <div class="en veil">Given the time, should I <strong>optimize</strong>, or <strong>walk through more test cases</strong>? <span style="color:var(--muted)">〔连续第 6 题〕</span></div></div>
+  </div>
+
+  <div class="grp half">
+    <div class="ghead"><span class="gn">STEP 7</span><span class="gt">测试　半步</span><span class="gs">走了三个例子，trace 全通，代码是错的</span>
+      <span class="gd">你走了 <code>{1,0}</code>、<code>{0,1,-1,0}</code>、<code>{1,0,-1,-1,1,0}</code>，量很足，而且过程中<b>自己抓出了两个真问题</b>（j 要重置、循环条件该用 j 不该用 i）。<b>但 trace 通过、提交挂了</b>——第 4 次。</span></div>
+    <div class="ln"><div class="when">6:00 ① 自我纠正 · 你抓到的</div>
+      <div class="zh veil">等等，每一轮 j 都得<strong>重置</strong>到起点——我回去改一下。</div>
+      <div class="en veil">Actually, wait — <strong>j has to be reset</strong> each round. Let me fix that.</div></div>
+    <div class="ln"><div class="when">6:30 ② 自我纠正 · 你抓到的</div>
+      <div class="zh veil">循环条件不该用 i，应该是 <strong>j 小于等于 k</strong>——因为 j 超过 k 就说明<strong>没有待检查的区间了</strong>，所有元素都在正确位置。</div>
+      <div class="en veil">The loop condition shouldn't use i — it should be <strong>j less than or equal to k</strong>, because once j passes k there's <strong>no unexplored region left</strong> and every element is in its right place. <span style="color:var(--muted)">〔理由完全正确，留着〕</span></div></div>
+    <div class="ln"><div class="when">8:00 ③ <strong>该做没做 · 数 j++</strong></div>
+      <div class="zh veil">我把每个会改动 j 的地方<strong>圈出来数一遍</strong>：循环头一个、else 里一个——<strong>一轮里 j 被改了两次</strong>，多缩了一格。</div>
+      <div class="en veil">Let me <strong>circle every place that changes j</strong> and count them: one in the loop header, one in the else branch — <strong>j moves twice in a single pass</strong>, so the region shrinks by two. <span style="color:var(--muted)">〔这类 bug 读代码读不出来，要数〕</span></div></div>
+  </div>
+
+  <h3 class="sec">这次要改的说法</h3>
+  <div class="four">
+    <div><span class="a">模型全名</span><span class="b"><strong>three-way partition</strong> ／ <strong>Dutch National Flag</strong>　<em>叫得出这个名字，面试官立刻知道你见过</em></span></div>
+    <div><span class="a">不变量　<strong>发音</strong></span><span class="b"><strong>invariant</strong> /ɪnˈveriənt/　<em>重音在第二音节，in-VAIR-ee-ant</em></span></div>
+    <div><span class="a">交换　<strong>发音</strong></span><span class="b"><strong>swap</strong> /swɑːp/　<em>ASR 全程认成 "swop / sworp"。短促的 /ɑː/，不是 /ɔː/</em></span></div>
+    <div><span class="a">未探索的区间</span><span class="b">the <strong>unexplored</strong> region ／ the region <strong>yet to be discovered</strong>　<em>不是 "not exploring"。官方注释用的是 "to be discovered"</em></span></div>
+    <div><span class="a">含端点 / 不含端点　<strong>关键</strong></span><span class="b"><strong>inclusive</strong> of both ／ <strong>exclusive</strong> of ___　<em>这两个词是这题的胜负手，官方注释四条里四条都标了</em></span></div>
+    <div><span class="a">我假设……可以吗　<strong>第 5 次</strong></span><span class="b"><strong>I'll assume</strong> ___ — is that fair?　<em>还是漏 'll</em></span></div>
+    <div><span class="a">复杂度　<strong>第一次漏</strong></span><span class="b">Time is <strong>big O of n</strong>, space is <strong>O(1)</strong>.　<em>前六题每题都报，这次没说。debug 焦虑最容易吃掉这一句</em></span></div>
+    <div><span class="a">本周只盯　<strong>边界三种形态</strong></span><span class="b"><strong>3 / 3　第一次满格</strong>　<em>09 / 20 / 34 / 36 / 37 / 39 / 41 / 653 连续八题没满，今天满了</em></span></div>
+  </div>
+
+  <h3 class="sec">代码 · 你的 AC 版（i / j / k）</h3>
+<pre><span class="k">public int</span>[] rainbowSort(<span class="k">int</span>[] array) {
+  <span class="k">if</span> (array == <span class="k">null</span> || array.length &lt;= 1) <span class="k">return</span> array;
+
+  <span class="c">// [0,i-1]=-1　[i,j-1]=0　[j,k]=未知（两端都含）　[k+1,end]=1</span>
+  <span class="k">int</span> i = 0, j = 0, k = array.length - 1;
+
+  <span class="k">while</span> (j &lt;= k) {
+    <span class="k">if</span> (array[j] == -1) { swap(array, i, j); i++; <span class="hl">j++;</span> }  <span class="c">// 换来已知的 0 → 走</span>
+    <span class="k">else if</span> (array[j] == 1) { swap(array, j, k); k--; }        <span class="c">// 换来未知的 → 不动</span>
+    <span class="k">else</span> j++;
+  }
+  <span class="k">return</span> array;
+}
+<span class="c">// TC O(n)　SC O(1)</span></pre>
+
+  <h3 class="sec">代码 · 官方参考版（neg / zero / one）</h3>
+<pre><span class="c">// three bounds:</span>
+<span class="c">// 1. the left side of neg is -1   (exclusive of neg)</span>
+<span class="c">// 2. the right side of one is 1   (exclusive of one)</span>
+<span class="c">// 3. the part between neg and zero is 0  (exclusive of zero)</span>
+<span class="c">// 4. between zero and one is to be discovered  (INCLUSIVE of both)  ← 你差的那一格</span>
+<span class="k">int</span> neg  = 0;
+<span class="k">int</span> one  = array.length - 1;
+<span class="k">int</span> zero = 0;
+
+<span class="k">while</span> (zero &lt;= one) {
+  <span class="k">if</span> (array[zero] == -1) {
+    swap(array, <span class="hl">neg++, zero++</span>);      <span class="c">// 两个一起动</span>
+  } <span class="k">else if</span> (array[zero] == 0) {
+    zero++;
+  } <span class="k">else</span> {
+    swap(array, zero, <span class="hl">one--</span>);        <span class="c">// zero 不动</span>
+  }
+}
+<span class="k">return</span> array;</pre>
+
+  <p class="rail-note" style="margin-top:16px"><b>两版是同一个算法——你写的不是 brute force。</b>差别只有两处，而且都不在逻辑上：<br><b>① 变量名。</b><code>neg</code> / <code>zero</code> / <code>one</code> 直接说出了「我左边全是这个」，i / j / k 说不出，所以你得靠注释记——<b>而你的注释差了一格</b>。<br><b>② 官方没有 preamble、没有外层 while。</b>你那两行 <code>while(array[i]==-1) i++</code> 和外层循环删掉之后，一样过——这是你自己的检验法：注释掉跑一遍，能过就删。</p>
+
+  <h3 class="sec">七题对照</h3>
+  <div class="trend">
+    <table>
+      <thead><tr><th></th><th>34</th><th>36</th><th>37</th><th>39 🚩</th><th>41 🚩</th><th>653 🚩</th><th>11 🚩</th></tr></thead>
+      <tbody>
+        <tr><td>七步</td><td class="n bad">4.5</td><td class="n">5.0</td><td class="n">5.5</td><td class="n">5.0</td><td class="n">5.0</td><td class="n hi">6.0</td><td class="n">5.5</td></tr>
+        <tr><td>归约五样</td><td class="n bad">1/5</td><td class="n hi">5/5</td><td class="n">3/5</td><td class="n bad">2/5</td><td class="n">3.5/5</td><td class="n hi">4.5/5</td><td class="n">3.5/5</td></tr>
+        <tr><td>STEP 3 真问句</td><td class="bad">0</td><td class="bad">0</td><td class="bad">0</td><td class="bad">0</td><td class="bad">0</td><td class="bad">0</td><td class="hi">★ 1</td></tr>
+        <tr><td>边界形态</td><td class="bad">2/3</td><td class="bad">2/3</td><td class="bad">2/3</td><td class="bad">1/3</td><td class="bad">2/3</td><td class="bad">2/3</td><td class="hi">★ 3/3</td></tr>
+        <tr><td>走例子</td><td class="bad">走脑内</td><td>串了自己抓住</td><td class="hi">一次走对</td><td class="bad">走脑内</td><td class="bad">碰不到 bug</td><td class="hi">三层全对</td><td class="bad">走通了代码错</td></tr>
+        <tr><td>复杂度</td><td>报了</td><td>报了</td><td>报了</td><td>报了</td><td class="hi">分三段报</td><td class="hi">★ 推翻自己</td><td class="bad">没说</td></tr>
+        <tr><td>结果</td><td class="bad">挂 1 次</td><td class="hi">AC</td><td class="hi">AC</td><td class="bad">挂 3 次</td><td class="bad">NPE</td><td class="hi">AC 但 O(n²)</td><td class="bad">挂 → 自己修到 AC</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="rail-note" style="margin-top:14px"><b>看第 3 行和第 4 行。</b>这两格是六题里唯二完全没动过的，今天<b>同一天双双破零</b>。这不是巧合——上一轮我们刚拆过「第三种边界怎么找」和「真问句和带假设怎么分」，你隔一题就用上了。<br><b>代价是第 6 行掉了</b>：注意力是有限的，新动作占了位置，旧的稳定项（复杂度）反而漏了。<b>这很正常，下一题把它捡回来就行——不用同时新增第三个动作。</b></p>
+
+  <h3 class="sec">这次确实进步了的</h3>
+  <div class="won">
+    <div><strong>边界三种形态第一次 3 / 3。</strong>没有 / 刚好一个 / 刚好两个，第三种还配了具体例子 <code>{1,0}</code> 并走了指针。这一项从 09 一路到 653 连续八题没满过。</div>
+    <div><strong>STEP 3 第一次出现真正的真问句</strong>，而且问的正是你的老毛病：<span style="font-family:var(--f-say)">"Should I include this condition to the general case?"</span>「第一个不特殊」跟了六次，今天你主动问了出来。</div>
+    <div><strong>说出了设计过程</strong>："at first I thought two pointers, but two pointers isn't enough, so I changed it to three pointers." 这是你六题零次的那个「alternative」的雏形。</div>
+    <div><strong>自己抓出了两个真问题</strong>：j 每轮要重置、循环条件该用 j 不该用 i——而且第二个你给了<strong>完全正确的理由</strong>（j 超过 k 就说明没有待检查区间了）。</div>
+    <div><strong>挂了之后没放弃，自己一版一版改到 AC。</strong>中间每一步你都能说清改了什么，虽然有两次方向偏了，但没有一次是瞎试。</div>
+    <div><strong>复述把编码含义说清了</strong>（−1 红 / 0 绿 / 1 蓝）——这类编码题最容易在这儿讲糊。</div>
+  </div>
+
+  <h3 class="sec">下一题只带走三件事</h3>
+  <ol class="take">
+    <li><strong>写区间不变量的时候，每一段后面强制标「含 / 不含端点」。</strong>官方注释四条标了四条 inclusive / exclusive——那不是啰嗦，那是这题唯一会错的地方。四段一钉死，循环条件用 <code>&lt;</code> 还是 <code>&lt;=</code> 是<strong>推出来的</strong>，不用试。</li>
+    <li><strong>指针用语义名，不用 i / j / k。</strong><code>neg</code> / <code>zero</code> / <code>one</code>、<code>slow</code> / <code>fast</code>、<code>prev</code> / <code>cur</code>——名字本身就是不变量。<strong>如果你想不出一个有意义的名字，说明这个指针你还没定义清楚。</strong></li>
+    <li><strong>写完循环，把每个改动循环变量的地方圈出来数一遍。</strong>循环头一个、分支里一个 = 两个 = 一轮走两格。这类 bug <strong>读代码读不出来，只能数</strong>——这次就是它。<br>顺带：<strong>复杂度那句捡回来</strong>，前六题都报了，别在这儿断。</li>
+  </ol>
+
+  <footer>
+    <span>ALG ROUND 3 · #11 · Rainbow Sort 🚩 · 不变量差一格，嘴和注释一致地差</span>
+    <span>边界 3 / 3 第一次满格 · 真问句第一次破零</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement,btns=document.querySelectorAll('.seg button'),body=document.body;
+  function setMode(m){
+    root.classList.remove('m-en','m-all');
+    if(m==='en') root.classList.add('m-en');
+    if(m==='all') root.classList.add('m-all');
+    body.querySelectorAll('.show').forEach(function(el){el.classList.remove('show');});
+    btns.forEach(function(b){b.setAttribute('aria-pressed', b.dataset.m===m?'true':'false');});
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){setMode(b.dataset.m);}); });
+  body.addEventListener('click',function(e){
+    var v=e.target.closest('.veil');
+    if(v && (root.classList.contains('m-en')||root.classList.contains('m-all'))) v.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
